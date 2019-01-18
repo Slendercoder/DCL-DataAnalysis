@@ -1,16 +1,12 @@
-# Simulation of WSLS-probabilistic heuristic
-# Edgar Andrade-Lotero 2018
+# Simulation of WSLS and FRA models
+# Edgar Andrade-Lotero 2019
+# Python 3
 
 print("Loading packages...")
 from random import choice, uniform, random, sample, randint
 from math import floor
-# import matplotlib.pyplot as plt
-# import string
 import numpy as np
-# import pandas as pd
 from pathlib import Path
-# import sys
-# import matplotlib.pyplot as plt
 print("Loaded!")
 
 ###########################
@@ -111,6 +107,7 @@ def sigmoid(x):
 	return 1. / (1 + np.exp(-beta * (x - gamma)))
 
 def code2Vector(strategy):
+    # Returns a vector of 0s and 1s representing the region in strategy
 	size = int(Num_Loc * Num_Loc)
 	v = [0] * size
 	for i in range(size):
@@ -134,6 +131,11 @@ def simil(k, i, o):
     return(np.exp(- o * distance))
 
 def probabilities(i, score, j):
+    # Implements the heuristic of the models
+    # Returns a vector containing the probability of choosing one of the 9 regions
+	# Input: i, which is the region that the player is in
+	#		 s, which is the player's score
+	#		 j, which is the overlapping region with the other player
 
 	attractiveness = [x for x in bias] # start from bias
 	# attactPrint = ["%.2f" % v for v in attractiveness]
@@ -388,11 +390,11 @@ def experiment(strategies):
 		# print('-----------------')
 
 
-# Create a set of n pairwise disjoint paths in the board
-# Returns a dictionary with keys and paths
 def create_strategies():
-	# Define the strategies
+    # Create a set of n pairwise disjoint paths in the board
+    # Returns a dictionary with keys and paths
 
+	# Define the strategies
 	size = int(Num_Loc * Num_Loc)
 	half_size = int(Num_Loc * Num_Loc / 2)
 	half_Num_Loc = int(Num_Loc / 2)
