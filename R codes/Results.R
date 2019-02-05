@@ -23,15 +23,15 @@ mean(DLIRound1)
 sd(DLIRound1)
 t.test(DLIRound60, DLIRound1) # => Difference one-shot task vs iterated task is significant
 
-DLIRound60 <- df1$DLIndex[which(df2$Round == 60)]
+DLIRound60 <- df2$DLIndex[which(df2$Round == 60)]
 mean(DLIRound60)
 sd(DLIRound60)
-DLIRound1 <- df2$DLIndex[which(df2$Round == 0)]
+DLIRound1 <- df2$DLIndex[which(df2$Round == 1)]
 mean(DLIRound1)
 sd(DLIRound1)
 t.test(DLIRound60, DLIRound1) # => Difference one-shot task vs iterated task is significant
 
-DLIRound60 <- df1$DLIndex[which(df3$Round == 60)]
+DLIRound60 <- df3$DLIndex[which(df3$Round == 60)]
 mean(DLIRound60)
 sd(DLIRound60)
 DLIRound1 <- df3$DLIndex[which(df3$Round == 1)]
