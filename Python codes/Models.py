@@ -1,12 +1,16 @@
-# Simulation of WSLS and FRA models
-# Edgar Andrade-Lotero 2019
-# Python 3
+# Simulation of WSLS-probabilistic heuristic
+# Edgar Andrade-Lotero 2018
 
 print("Loading packages...")
 from random import choice, uniform, random, sample, randint
 from math import floor
+# import matplotlib.pyplot as plt
+# import string
 import numpy as np
+# import pandas as pd
 from pathlib import Path
+# import sys
+# import matplotlib.pyplot as plt
 print("Loaded!")
 
 ###########################
@@ -17,14 +21,8 @@ Pl = 2 # number of players
 Num_Loc = 8 # number of locations (squares in a row in the grid)
 N = 60 # number of iterations per experiment
 IT = 100 # number of experiments in a set
-# theta = [0.01, 0.01, 0.01, 0.01, 39, 405, 0.933, 0, 0, 0] # RS-92percent
-# theta = [0.0625, 0.0625, 0.0625, 0.0625, 39, 405, 0.933, 0, 0, 0] # RS-50percent
-# theta = [0.115, 0.115, 0.115, 0.115, 39, 405, 0.933, 0, 0, 0] # RS-8percent
-# theta = [0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.933, 0, 0, 0] # WSLS LIKELIHOOD FIT
-# theta = [0.01, 0.01, 0.01, 0.01, 39, 405, 0.933, 0, 0.94, 3] # FRA-alpha0
-# theta = [0.01, 0.01, 0.01, 0.01, 39, 405, 0.933, 1, 0.94, 3] # FRA-alpha1
-# theta = [0.01, 0.01, 0.01, 0.01, 39, 405, 0.933, 5, 0.94, 3] # FRA-alpha5
- theta = [0.077, 0.048, 0, 0, 48, 402, 0.99, 1.57, 0.94, 3] # FRA FIT TO DATA
+# theta = [0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.933, 0, 0, 0, 0] # WSLS LIKELIHOOD FIT
+theta = [0.076, 0.05, 0, 0, 48, 398, 0.99, 1.53, 0.94, 3, 1.1] # FRA FIT TO DATA
 wALL = float(theta[0])
 wNOTHING = float(theta[1])
 wDOWN = float(theta[2])
@@ -43,8 +41,9 @@ alpha = theta[4] # for how much the focal region augments attractiveness
 beta = theta[5] # amplitude of the sigmoid function
 gamma = theta[6] # position of the sigmoid function
 delta = theta[7] # for how much the similarity to complement augments attractiveness
-epsilon = theta[8] # for similarity
+epsilon = theta[8] # for similarity to complementary focal region
 zeta = theta[9] # for the stubbornness
+eta = theta[10] # for similarity to focal region
 
 size = int(Num_Loc * Num_Loc)
 half_size = int(Num_Loc * Num_Loc / 2)
@@ -107,7 +106,6 @@ def sigmoid(x):
 	return 1. / (1 + np.exp(-beta * (x - gamma)))
 
 def code2Vector(strategy):
-    # Returns a vector of 0s and 1s representing the region in strategy
 	size = int(Num_Loc * Num_Loc)
 	v = [0] * size
 	for i in range(size):
@@ -131,11 +129,6 @@ def simil(k, i, o):
     return(np.exp(- o * distance))
 
 def probabilities(i, score, j):
-    # Implements the heuristic of the models
-    # Returns a vector containing the probability of choosing one of the 9 regions
-	# Input: i, which is the region that the player is in
-	#		 s, which is the player's score
-	#		 j, which is the overlapping region with the other player
 
 	attractiveness = [x for x in bias] # start from bias
 	# attactPrint = ["%.2f" % v for v in attractiveness]
@@ -147,7 +140,6 @@ def probabilities(i, score, j):
 	# print('alpha * sigmoid: ', alpha * sigmoid(n))
 	if ((i != 0) and (i != 9)):
 		attractiveness[i] += alpha * sigmoid(n) # Adding 'Win Stay'
-		attractiveness[i] += zeta # Adding stubbornness if in a focal region
 
 	# attactPrint = ["%.2f" % v for v in attractiveness]
 	# print('attractiveness with WS and stubbornness\n', attactPrint)
@@ -165,6 +157,21 @@ def probabilities(i, score, j):
 	# similsPrint = ["%.2f" % v for v in simils]
 	# print('Similarity to complement\n', similsPrint)
 	attractiveness += np.multiply(delta, simils)
+
+	# attactPrint = ["%.2f" % v for v in attractiveness]
+	# print('final attractiveness\n', attactPrint)
+
+	iV = strategies[i]
+	# print('jV ', jV)
+	simils = [0] * 9
+	for k in range(2,9): # do no consider 'rs'
+		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
+		# print('Considering region: ', k)
+		simils[k] = simil(jV, kComp, eta)
+	#
+	# similsPrint = ["%.2f" % v for v in simils]
+	# print('Similarity to complement\n', similsPrint)
+	attractiveness += np.multiply(zeta, simils)
 
 	# attactPrint = ["%.2f" % v for v in attractiveness]
 	# print('final attractiveness\n', attactPrint)
@@ -390,11 +397,11 @@ def experiment(strategies):
 		# print('-----------------')
 
 
+# Create a set of n pairwise disjoint paths in the board
+# Returns a dictionary with keys and paths
 def create_strategies():
-    # Create a set of n pairwise disjoint paths in the board
-    # Returns a dictionary with keys and paths
-
 	# Define the strategies
+
 	size = int(Num_Loc * Num_Loc)
 	half_size = int(Num_Loc * Num_Loc / 2)
 	half_Num_Loc = int(Num_Loc / 2)
@@ -511,6 +518,7 @@ print('gamma: ', gamma)
 print('delta: ', delta)
 print('epsilon: ', epsilon)
 print('zeta: ', zeta)
+print('eta: ', eta)
 
 for h in range(0, IT):
 	print("****************************")
