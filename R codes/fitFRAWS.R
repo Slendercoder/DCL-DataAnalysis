@@ -55,7 +55,7 @@ args$freq <- lapply(args$pair, function(x) {
 
 # A function to get deviance from WSLS and FRA models
 FRAWSutil <- function(theta, args, regions){
-  # Input: theta, parameter vector of length 5
+  # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
   # Output: Deviance of WSLSpred for all regions and scores
   
@@ -72,6 +72,7 @@ FRAWSutil <- function(theta, args, regions){
   delta <- theta[8]
   epsilon <- theta[9]
   zeta <- theta[10]
+  eta <- theta[11]
   
   # Calculate the probabilities based on FRAWSpred
 #  print('Calculating probabilities')
@@ -83,7 +84,7 @@ FRAWSutil <- function(theta, args, regions){
     else if (sl == 2) {s <- 20}
     else {s <- 32}
     j <- as.character(x[[3]][1])
-    return(FRAWSpred(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, regions))
+    return(FRAWSpred(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions))
   })
 #  print(args$probs[1:6])
   
@@ -185,12 +186,13 @@ w7 <- 0.97 # thresshold sigmoid
 w8 <- 3 # attraction similarity
 w9 <- 0.96 # exponential similarity
 w10 <- 5 # stubborness
+w11 <- 1 # eta
 margen1 <- 0.000001
 margen2 <- 0.02
 margen3 <- 0.05
 margen4 <- 0.1
 margen5 <- 2
-fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10),
+fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11),
                fn = function(theta) FRAWSutil(theta, args, regions),
                lower=c(w1 - margen2,
                        w2 - margen2,
@@ -201,7 +203,8 @@ fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10),
                        w7 - margen2,
                        w8 - margen5,
                        w9 - margen2,
-                       w10 - margen5),
+                       w10 - margen5,
+                       w11 - margen4),
                upper=c(w1 + margen2,
                        w2 + margen2,
                        w3 + margen1,
@@ -211,11 +214,12 @@ fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10),
                        w7 + margen2,
                        w8 + margen5,
                        w9 + margen2,
-                       w10 + margen5),
+                       w10 + margen5,
+                       w11 + margen4),
                control=list(trace=0))
 
 print(fitresFRA$par) 
 print(fitresFRA$value) 
 
-theta <- c(0.077, 0.048, 0, 0, 48, 402, 0.99, 1.57, 0.94, 3)
+theta <- c(0.076, 0.05, 0, 0, 48, 398, 0.99, 1.53, 0.94, 3, 1.1)
 FRAWSutil(theta, args, regions) # 2709

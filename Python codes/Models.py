@@ -147,7 +147,7 @@ def probabilities(i, score, j):
 	jV = code2Vector(j)
 	# print('jV ', jV)
 	simils = [0] * 9
-	for k in range(2,9): # do no consider 'rs'
+	for k in range(2,9): # do no consider 'rs' or 'all'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 		kComp = [1 - x for x in kCoded]
 		# print('Considering region: ', k)
@@ -161,13 +161,13 @@ def probabilities(i, score, j):
 	# attactPrint = ["%.2f" % v for v in attractiveness]
 	# print('final attractiveness\n', attactPrint)
 
-	iV = strategies[i]
+	iV = code2Vector(strategies[i])
 	# print('jV ', jV)
 	simils = [0] * 9
-	for k in range(2,9): # do no consider 'rs'
+	for k in range(1,9): # do no consider 'rs'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 		# print('Considering region: ', k)
-		simils[k] = simil(jV, kComp, eta)
+		simils[k] = simil(iV, kCoded, eta)
 	#
 	# similsPrint = ["%.2f" % v for v in simils]
 	# print('Similarity to complement\n', similsPrint)
@@ -402,30 +402,30 @@ def experiment(strategies):
 def create_strategies():
 	# Define the strategies
 
-	size = int(Num_Loc * Num_Loc)
-	half_size = int(Num_Loc * Num_Loc / 2)
-	half_Num_Loc = int(Num_Loc / 2)
-
-	# First pair of complementary paths -- UD
-	up = [1] * half_size + [0] * half_size
-	down = [1 - i for i in up]
-	# Second pair of complementary paths -- LR
-	right = []
-	for i in range(0, Num_Loc):
-		right += [0] * half_Num_Loc + [1] * half_Num_Loc
-
-	left = [1 - i for i in right]
-	# Third pair of complementary paths -- AN
-	all = [1] * size
-	nothing = [0] * size
-	# Fourth pair of complementary paths -- IO
-	In = [0] * Num_Loc
-	for i in range(Num_Loc - 2):
-		In += [0] + [1] * (Num_Loc - 2) + [0]
-
-	In += [0] * Num_Loc
-
-	out = [1 - i for i in In]
+	# size = int(Num_Loc * Num_Loc)
+	# half_size = int(Num_Loc * Num_Loc / 2)
+	# half_Num_Loc = int(Num_Loc / 2)
+	#
+	# # First pair of complementary paths -- UD
+	# up = [1] * half_size + [0] * half_size
+	# down = [1 - i for i in up]
+	# # Second pair of complementary paths -- LR
+	# right = []
+	# for i in range(0, Num_Loc):
+	# 	right += [0] * half_Num_Loc + [1] * half_Num_Loc
+	#
+	# left = [1 - i for i in right]
+	# # Third pair of complementary paths -- AN
+	# all = [1] * size
+	# nothing = [0] * size
+	# # Fourth pair of complementary paths -- IO
+	# In = [0] * Num_Loc
+	# for i in range(Num_Loc - 2):
+	# 	In += [0] + [1] * (Num_Loc - 2) + [0]
+	#
+	# In += [0] * Num_Loc
+	#
+	# out = [1 - i for i in In]
 
 	UP = []
 	DOWN = []

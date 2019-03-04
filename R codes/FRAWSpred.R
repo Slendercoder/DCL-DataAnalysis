@@ -6,7 +6,7 @@ sigmoid <- function(x, beta, gamma) {
   return(1 / (1 + exp(-beta * (x - gamma))))
 }
 
-FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, regions){
+FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions){
   # Returns the transition probability vector
   # Each position in the vector represents a region
   # and the value represents the probability of going to that region
@@ -20,10 +20,11 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, regi
   #        delta, for how much the similarity to complement augments attractiveness
   #        epsilon, which is a parameter for the exponential similarity
   #        zeta, which is a parameter for the stubbornness
+  #        eta, which is a parameter for the similarity to focal region
   
-#  if (any(is.na(c(w, alpha, beta, gamma, delta, epsilon, zeta)))) {
+#  if (any(is.na(c(w, alpha, beta, gamma, delta, epsilon, zeta, eta)))) {
 #    print('Incorrect parameters on FRAWSpred: ')
-#    print(c(w, alpha, beta, gamma, delta, epsilon, zeta))
+#    print(c(w, alpha, beta, gamma, delta, epsilon, zeta, eta))
 #  }
 
   # First we calculate the prior probabilities
@@ -49,8 +50,10 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, regi
     index <- which(regions == i)
     # adding win stay
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
-    # adding stubborness
+    # Regions collapsed. Cannot measure similarity between region 'i' and focal region, or trivial {1, 0}
+    # Parameter eta not used!
     attractiveness[index] <- attractiveness[index] + zeta
+    
   }
 
 #  print('attractiveness with bias and winstay and stubbornness')
@@ -72,6 +75,23 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, regi
   similarity2Complement <- as.numeric(unlist(similarity2Complement))
   similarity2Complement <- c(0, 0, similarity2Complement)
   attractiveness <- attractiveness + delta * similarity2Complement
+
+  # Consider distance from i to each focal region k and augment attractiveness
+#  index <- which(regions == i) # REGIONS COLLAPSED! CANNOT USE 'i'
+#  iV <- regionsCoded[index - 1]
+#  iV <- code2Vector(iV)
+#  kVector <- lapply(regions[2:9], function(k) {
+#    index <- which(regions == k)
+#    kCoded <- regionsCoded[index - 1] # regionsCoded does not have 'RS'
+#    kV <- code2Vector(kCoded)
+#  })
+#  similarities <- lapply(kVector, function(x) {
+#    simil(iV, x, eta) 
+#  })
+#  similarities <- as.numeric(unlist(similarities))
+#  similarities <- c(0, similarities)
+#  attractiveness <- attractiveness + zeta * similarities
+  
   
 #  print('attractiveness final')
 #  print(attractiveness)
