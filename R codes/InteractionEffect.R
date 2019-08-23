@@ -1,4 +1,6 @@
 library(ggplot2)
+library(sjPlot)
+library(sjmisc)
 
 df1 = read.csv("humans.csv")
 # head(df1)
@@ -23,6 +25,8 @@ g2 <- plot_model(model3h,
                  legend.title = "Overlap",
                  axis.title = c("Absolute difference\nin consistency", "DLindex"))
 
+g2 <- g2 + theme_sjplot()
+
 g2
 
-ggsave("DegreesReactivity.eps", width=4, height=3.5, device=cairo_ps, g2)
+# ggsave("DegreesReactivity.eps", width=4, height=3.5, device=cairo_ps, g2)
