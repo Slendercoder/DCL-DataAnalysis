@@ -19,15 +19,15 @@ def standard_simulation(gameParameters, modelParameters):
     print("****************************")
     print('--- Model parameters ----')
     print('wALL: ', modelParameters[0])
-    print('wNOTHING: ', modelParameters[1])
-    print('wDOWN: ', modelParameters[2])
-    print('wIN: ', modelParameters[3])
-    print('alpha: ', modelParameters[4])
-    print('beta: ', modelParameters[5])
-    print('gamma: ', modelParameters[6])
-    print('delta: ', modelParameters[7])
-    print('epsilon: ', modelParameters[8])
-    print('zeta: ', modelParameters[9])
+    print('wNOTHING: ', modelParameters[0])
+    print('wDOWN: ', modelParameters[0])
+    print('wIN: ', modelParameters[0])
+    print('alpha: ', modelParameters[1])
+    print('beta: ', modelParameters[2])
+    print('gamma: ', modelParameters[3])
+    print('delta: ', modelParameters[4])
+    print('epsilon: ', modelParameters[5])
+    print('zeta: ', modelParameters[6])
     print("\n")
     print('--- Game parameters ---')
     print('Probabilit of a unicorn: ', gameParameters[0])
@@ -40,6 +40,8 @@ def standard_simulation(gameParameters, modelParameters):
     E = DL.Experiment(gameParameters, modelParameters)
     E.run_simulation()
     E.get_measures()
+    E.df.to_csv('output.csv', index=False)
+    print('Data saved to output.csv')
 
     # print(E.df)
 
@@ -70,8 +72,10 @@ def parameter_sweep1(gameParameters, modelParameters):
     print("Sweeping Focal and Gamma parameters...")
 
     # Intervals for sweep
-    forFocal = np.arange(0.025, 0.05, 0.075)
-    forGamma = np.arange(0.95, 0.975, 0.99)
+    # forFocal = np.arange(0.025, 0.05, 0.075)
+    # forGamma = np.arange(0.95, 0.975, 0.99)
+    forFocal = [0.025, 0.05, 0.075]
+    forGamma = [0.95, 0.975, 0.99]
 
     print('--- Sweep parameters ----')
     print('Focal: ', forFocal)
@@ -90,9 +94,9 @@ def parameter_sweep1(gameParameters, modelParameters):
             E = DL.Experiment(gameParameters, modelParameters)
             E.run_simulation()
             E.get_measures()
-            E.df['Focal'] = [forFocal]*len(E.df['Dyad'])
-            E.df['Gamma'] = [forGamma]*len(E.df['Dyad'])
-            outputFile = 'out_Focal' + str(forFocal) + '-Gamma' + str(forGamma) + '.csv'
+            E.df['Focal'] = [i]*len(E.df['Dyad'])
+            E.df['Gamma'] = [j]*len(E.df['Dyad'])
+            outputFile = 'out_Focal' + str(i) + '-Gamma' + str(j) + '.csv'
             E.df.to_csv(outputFile, index=False)
             print("Results saved to " + outputFile)
 
@@ -223,8 +227,8 @@ def parameter_sweep3(gameParameters, modelParameters):
 
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
-modelParameters = [0, 40, 400, 0, 0, 0, 0]
+modelParameters = [0.125, 100, 400, 1, 0, 0, 0]
 
-# standard_simulation(gameParameters, modelParameters)
+standard_simulation(gameParameters, modelParameters)
 
-parameter_sweep1(gameParameters, modelParameters)
+# parameter_sweep1(gameParameters, modelParameters)

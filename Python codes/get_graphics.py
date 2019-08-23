@@ -25,7 +25,7 @@ print("Reading data...")
 #data = pd.read_csv(data_archivo, sep='\t', header=0)
 data = pd.read_csv(data_archivo, index_col=False)
 #data = pd.read_csv(data_archivo, index_col=False)
-print("Data readed!")
+print("Data red!")
 # print data[:3]
 
 # Find the min value of score

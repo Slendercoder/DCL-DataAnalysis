@@ -18,6 +18,8 @@ g3 <- ggplot(df1, aes(log(Distancias_LAG1), Consistency)) +
   ylab("Consistency on Round n") +
   geom_smooth(method = lm)
 
-g3
+g3 <- g3 + theme_sjplot()
+
+g3 
 
 ggsave("ConsistencyWRTDist2FR.eps", width=3.5, height=3.5, device=cairo_ps, g3)

@@ -285,20 +285,24 @@ class Experiment(object):
 
 		# get the probability vector
 		probs = self.probabilities(i, s, j)
-		# probsPrint = ["%.2f" % v for v in probs]
+		# probsPrint = ["%.3f" % v for v in probs]
 		# print('probs\n', probsPrint)
 		# print('Suma: ', np.sum(probs))
 		# get the selected strategy
 		newStrategy = np.random.choice(range(9), p=probs)
 		# print('newStrategy', newStrategy)
 		# Determines if should not randomize RS
-		n = (s + 128) / 160 # normalizing score
-		beta = self.modelParameters[5] # amplitude of the sigmoid function
-		gamma = self.modelParameters[6] # position of the sigmoid function
-		if uniform(0,1) > self.sigmoid(n, beta, gamma):
-			return newStrategy, True
+		if newStrategy == 0:
+			n = (s + 128) / 160 # normalizing score
+			beta = self.modelParameters[2] # amplitude of the sigmoid function
+			gamma = self.modelParameters[3] # position of the sigmoid function
+			if uniform(0,1) > self.sigmoid(n, beta, gamma):
+				return newStrategy, True
+			else:
+				return newStrategy, False
 		else:
 			return newStrategy, False
+		# return newStrategy, False
 
 	def run_dyad(self):
 
@@ -463,16 +467,24 @@ class Experiment(object):
 			a.append(Players[0].strategy)
 			sc.append(Players[0].score)
 			newStrategy, sameRS = self.chooseStrategy(Players[0].strategy, Players[0].score, both)
+			Players[0].strategy = newStrategy
+			# print('newStrategy:', newStrategy)
 			if not sameRS:
 				self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			# else:
+			# 	print('Do not randomize for player 0')
 
 			a.append(Players[1].strategy)
 			sc.append(Players[1].score)
 			newStrategy, sameRS = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
+			# print('newStrategy:', newStrategy)
 			if newStrategy == 0:
 				newStrategy = 9
+			Players[1].strategy = newStrategy
 			if not sameRS:
 				self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			# else:
+			# 	print('Do not randomize for player 1')
 
 			# print('-----------------')
 			# print('both', len(both))
