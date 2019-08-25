@@ -67,7 +67,7 @@ g21 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   theme_bw() +
-  theme(legend.position="top")
+  theme(legend.position="right")
 
 #g21 
 
@@ -90,15 +90,15 @@ df$Strategy <- lapply(df$Strategy, function(x) {
   } else if(x=='1') {
     return('ALL')
   } else if(x=='2') {
-    return('NOTH')
+    return('NOT')
   } else if(x=='3') {
-    return('DOWN')
+    return('DOW')
   } else if(x=='4') {
     return('UP')
   } else if(x=='5') {
-    return('LEFT')
+    return('LEF')
   } else if(x=='6') {
-    return('RIGHT')
+    return('RIG')
   } else if(x=='7') {
     return('IN')
   } else if(x=='8') {
@@ -112,11 +112,11 @@ df$Strategy <- unlist(df$Strategy)
 df$Strategy <- as.factor(df$Strategy)
 df$Strategy <- factor(df$Strategy, levels = c('RS',
                                               'ALL', 
-                                              'NOTH', 
-                                              'DOWN', 
+                                              'NOT', 
+                                              'DOW', 
                                               'UP', 
-                                              'LEFT', 
-                                              'RIGHT', 
+                                              'LEF', 
+                                              'RIG', 
                                               'IN', 
                                               'OUT'))
 
@@ -150,12 +150,25 @@ g24 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
 
 #g24
 
+dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
+# head(dfc_DLIndex)
+
+# Density plot Size_visited
+g25 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+#  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
+  #  scale_y_continuous(limits = c(0, 3)) + 
+  labs(color = "Source of data") +
+  theme_bw() +
+  theme(legend.position="bottom")               # Position legend in bottom right
+
 # AlphaEffect
 legend <- get_legend(g21)
 g21 <- g21 + theme(legend.position="none")
 g22 <- g22 + theme(legend.position="none")
 g23 <- g23 + theme(legend.position="none")
 g24 <- g24 + theme(legend.position="none")
+g25 <- g25 + theme(legend.position="none")
 
 #title1=textGrob(TeX('bias$_{RS}=0.05; \\beta=500; \\gamma=0.98$'), gp=gpar(fontface="bold"))
 expTex = TeX('$bias_{RS}=0.6$, $\\beta{=}500$, $\\gamma{=}0.98$')
@@ -164,9 +177,13 @@ title1=textGrob(expTex, gp=gpar(fontface="bold"))
 g2 <- grid.arrange(legend,
                    g21, g22,
                    g23, g24,
+                   g25,
                    nrow = 3, ncol=2, 
-                   layout_matrix = rbind(c(1), c(5, 4), c(2, 3)), 
-                   heights = c(0.2,1,1),
+                   layout_matrix = rbind(
+                     c(5, 4), 
+                     c(2, 3),
+                     c(6, 1)), 
+#                   heights = c(0.2,1,1,1),
                    bottom=title1)
 
 # ggsave("AlphaEffect.eps", width=7, height=5, device=cairo_ps, g2)
