@@ -81,10 +81,6 @@ def parameter_sweep1(gameParameters, modelParameters):
     print('Focal: ', forFocal)
     print('Gamma: ', forGamma)
 
-    aux = {}
-    aux['Focal'] = []
-    aux['Gamma'] = []
-    aux['Av_DLL'] = []
     for i in list(forFocal):
         for j in list(forGamma):
             print('\n----------')
@@ -116,52 +112,40 @@ def parameter_sweep2(gameParameters, modelParameters):
     print("\n")
 
     print('--- Fixed parameters ----')
-    print('alpha: ', modelParameters[4])
-    print('beta: ', modelParameters[5])
-    print('delta: ', modelParameters[7])
-    print('epsilon: ', modelParameters[8])
-    print('zeta: ', modelParameters[9])
+    # print('Focal: ', modelParameters[0])
+    # print('alpha: ', modelParameters[1])
+    print('beta: ', modelParameters[2])
+    print('gamma: ', modelParameters[3])
+    print('delta: ', modelParameters[4])
+    print('epsilon: ', modelParameters[5])
+    print('zeta: ', modelParameters[6])
     print("\n")
+    print("Sweeping Focal and alpha parameters...")
 
-    # Intervals to sweep
-    forRS = np.arange(0.02, 0.13, 0.02)
-    forGamma = np.arange(0.8, 1, 0.03)
+    # Intervals for sweep
+    # forFocal = np.arange(0.025, 0.05, 0.075)
+    # forGamma = np.arange(0.95, 0.975, 0.99)
+    forFocal = [0.025, 0.05, 0.075]
+    forAlpha = [0, 70, 150]
 
     print('--- Sweep parameters ----')
-    print('wALL: ', forRS)
-    print('wNOTHING: ', forRS)
-    print('wDOWN: ', forRS)
-    print('wIN: ', forRS)
-    print('gamma: ', forGamma)
+    print('Focal: ', forFocal)
+    print('alpha: ', forAlpha)
 
-    aux = {}
-    aux['RS'] = []
-    aux['gamma'] = []
-    aux['Av_DLL'] = []
-    for i in list(forRS):
-        for j in list(forGamma):
+    for i in list(forFocal):
+        for j in list(forAlpha):
             print('\n----------')
             print('Sweep ' + str(i) + ', ' + str(j))
             modelParameters[0] = i
-            modelParameters[1] = i
-            modelParameters[2] = i
-            modelParameters[3] = i
-            modelParameters[4] = j
+            modelParameters[1] = j
             E = DL.Experiment(gameParameters, modelParameters)
             E.run_simulation()
-            E.get_DLL()
-            data = E.df.loc[E.df['Round'] > 50]
-
-            aux['RS'].append(1 - (i * 8))
-            aux['gamma'].append(j)
-            aux['Av_DLL'].append(data['DLIndex'].mean())
-
-    data = pd.DataFrame.from_dict(aux)
-    print("Sorting by RS, gamma ...")
-    data = data.sort_values(['RS','gamma'], ascending=[True, True])
-    outputFile = 'sweep2.csv'
-    data.to_csv(outputFile, index=False)
-    print("Results saved to " + outputFile)
+            E.get_measures()
+            E.df['Focal'] = [i]*len(E.df['Dyad'])
+            E.df['Alpha'] = [j]*len(E.df['Dyad'])
+            outputFile = 'out_Focal' + str(i) + '-Alpha' + str(j) + '.csv'
+            E.df.to_csv(outputFile, index=False)
+            print("Results saved to " + outputFile)
 
 def parameter_sweep3(gameParameters, modelParameters):
 
@@ -227,8 +211,8 @@ def parameter_sweep3(gameParameters, modelParameters):
 
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
-modelParameters = [0.125, 200, 500, 0.99, 0, 0, 0]
+modelParameters = [0, 0, 500, 0.98, 0, 0, 0]
 
 # standard_simulation(gameParameters, modelParameters)
 
-parameter_sweep1(gameParameters, modelParameters)
+parameter_sweep2(gameParameters, modelParameters)

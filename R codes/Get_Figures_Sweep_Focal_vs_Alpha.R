@@ -7,14 +7,14 @@ library(latex2exp)
 ###############################################
 # Focal = 0.025
 ###############################################
-df1 = read.csv("out_Focal0.025-Gamma0.95.csv")
-df1$Exp <- as.character("0.95")
+df1 = read.csv("out_Focal0.025-Alpha0.csv")
+df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Focal0.025-Gamma0.975.csv")
-df2$Exp <- as.character("0.975")
+df2 = read.csv("out_Focal0.025-Alpha70.csv")
+df2$Exp <- as.character("70")
 # head(df2)
-df3 = read.csv("out_Focal0.025-Gamma0.99.csv")
-df3$Exp <- as.character("0.99")
+df3 = read.csv("out_Focal0.025-Alpha150.csv")
+df3$Exp <- as.character("150")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -42,7 +42,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0.95', '0.975', '0.99'))
+df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 head(dfCons)
@@ -52,7 +52,7 @@ g11 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   xlab("Round (unicorn absent)") +
   ylab("Consistency") +
   ggtitle('Focal = 0.025') + 
-  labs(color = TeX('$\\gamma$')) +
+  labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
 #  theme(legend.position="bottom") +
   theme_bw()
@@ -66,7 +66,7 @@ g12 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("DLIndex") +
-  labs(color = TeX('$\\gamma$')) +
+  labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   theme_bw()
 
@@ -127,7 +127,7 @@ g14 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(color = TeX('$\\gamma$')) +
+  labs(color = TeX('$\\alpha$')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
 #  theme(legend.position="bottom") +
@@ -140,14 +140,14 @@ g1 <- grid.arrange(g11, g12, g13, g14, nrow = 4)
 ###############################################
 # Focal = 0.05
 ###############################################
-df1 = read.csv("out_Focal0.05-Gamma0.95.csv")
-df1$Exp <- as.character("0.95")
+df1 = read.csv("out_Focal0.05-Alpha0.csv")
+df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Focal0.05-Gamma0.975.csv")
-df2$Exp <- as.character("0.975")
+df2 = read.csv("out_Focal0.05-Alpha70.csv")
+df2$Exp <- as.character("70")
 # head(df2)
-df3 = read.csv("out_Focal0.05-Gamma0.99.csv")
-df3$Exp <- as.character("0.99")
+df3 = read.csv("out_Focal0.05-Alpha150.csv")
+df3$Exp <- as.character("150")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -175,7 +175,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0.95', '0.975', '0.99'))
+df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 head(dfCons)
@@ -184,8 +184,9 @@ g21 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Consistency") +
-  ggtitle('Focal = 0.05') + 
-  labs(color = TeX('$\\gamma$')) +
+#  ggtitle('Focal = 0.05') + 
+  ggtitle('Prob(RS)=0.6') + 
+  labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
   theme_bw()
@@ -199,7 +200,7 @@ g22 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("DLIndex") +
-  labs(color = TeX('$\\gamma$')) +
+  labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   theme_bw()
 
@@ -260,7 +261,7 @@ g24 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(color = TeX('$\\gamma$')) +
+  labs(color = TeX('$\\alpha$')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
   #  theme(legend.position="bottom") +
@@ -273,14 +274,14 @@ g2 <- grid.arrange(g21, g22, g23, g24, nrow = 4)
 ###############################################
 # Focal = 0.075
 ###############################################
-df1 = read.csv("out_Focal0.075-Gamma0.95.csv")
-df1$Exp <- as.character("0.95")
+df1 = read.csv("out_Focal0.075-Alpha0.csv")
+df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Focal0.075-Gamma0.975.csv")
-df2$Exp <- as.character("0.975")
+df2 = read.csv("out_Focal0.075-Alpha70.csv")
+df2$Exp <- as.character("70")
 # head(df2)
-df3 = read.csv("out_Focal0.075-Gamma0.99.csv")
-df3$Exp <- as.character("0.99")
+df3 = read.csv("out_Focal0.075-Alpha150.csv")
+df3$Exp <- as.character("150")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -308,7 +309,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0.95', '0.975', '0.99'))
+df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 head(dfCons)
@@ -317,8 +318,9 @@ g31 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Consistency") +
-  ggtitle('Focal = 0.075') + 
-  labs(color = TeX('$\\gamma$')) +
+#  ggtitle('Focal = 0.075') + 
+  ggtitle('Prob(RS)=0.4') + 
+  labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
   theme_bw()
@@ -332,7 +334,7 @@ g32 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("DLIndex") +
-  labs(color = TeX('$\\gamma$')) +
+  labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   theme_bw()
 
@@ -393,7 +395,7 @@ g34 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(color = TeX('$\\gamma$')) +
+  labs(color = TeX('$\\alpha$')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
   #  theme(legend.position="bottom") +
