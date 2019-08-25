@@ -163,45 +163,40 @@ def parameter_sweep3(gameParameters, modelParameters):
     print("\n")
 
     print('--- Fixed parameters ----')
-    print('alpha: ', modelParameters[4])
-    print('beta: ', modelParameters[5])
-    print('gamma: ', modelParameters[6])
-    print('epsilon: ', modelParameters[8])
+    print('Focal: ', modelParameters[0])
+    print('alpha: ', modelParameters[1])
+    print('beta: ', modelParameters[2])
+    print('gamma: ', modelParameters[3])
+    # print('delta: ', modelParameters[4])
+    print('epsilon: ', modelParameters[5])
+    # print('zeta: ', modelParameters[6])
     print("\n")
+    print("Sweeping delta and zeta parameters...")
 
-    # Intervals to sweep
-    forDelta = np.arange(1.3, 1.8, 0.1)
-    forZeta = np.arange(2.5, 3.75, 0.25)
+    # Intervals for sweep
+    # forFocal = np.arange(0.025, 0.05, 0.075)
+    # forGamma = np.arange(0.95, 0.975, 0.99)
+    forDelta = [0, 0.5, 1, 1.5]
+    forZeta = [0, 0.1]
 
     print('--- Sweep parameters ----')
     print('delta: ', forDelta)
     print('zeta: ', forZeta)
 
-    aux = {}
-    aux['delta'] = []
-    aux['zeta'] = []
-    aux['Av_DLL'] = []
     for i in list(forDelta):
         for j in list(forZeta):
             print('\n----------')
             print('Sweep ' + str(i) + ', ' + str(j))
-            modelParameters[7] = i
-            modelParameters[9] = j
+            modelParameters[4] = i
+            modelParameters[6] = j
             E = DL.Experiment(gameParameters, modelParameters)
             E.run_simulation()
-            E.get_DLL()
-            data = E.df.loc[E.df['Round'] > 50]
-
-            aux['delta'].append(i)
-            aux['zeta'].append(j)
-            aux['Av_DLL'].append(data['DLIndex'].mean())
-
-    data = pd.DataFrame.from_dict(aux)
-    print("Sorting by delta, zeta ...")
-    data = data.sort_values(['delta','zeta'], ascending=[True, True])
-    outputFile = 'sweep3.csv'
-    data.to_csv(outputFile, index=False)
-    print("Results saved to " + outputFile)
+            E.get_measures()
+            E.df['Delta'] = [i]*len(E.df['Dyad'])
+            E.df['Zeta'] = [j]*len(E.df['Dyad'])
+            outputFile = 'out_Delta' + str(i) + '-Zeta' + str(j) + '.csv'
+            E.df.to_csv(outputFile, index=False)
+            print("Results saved to " + outputFile)
 
 ##########################################################################
 #
@@ -211,8 +206,8 @@ def parameter_sweep3(gameParameters, modelParameters):
 
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
-modelParameters = [0, 0, 500, 0.98, 0, 0, 1]
+modelParameters = [0, 150, 500, 0.98, 0, 0, 1]
 
 # standard_simulation(gameParameters, modelParameters)
 
-parameter_sweep2(gameParameters, modelParameters)
+parameter_sweep3(gameParameters, modelParameters)

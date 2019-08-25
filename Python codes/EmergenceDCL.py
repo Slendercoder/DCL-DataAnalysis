@@ -209,7 +209,10 @@ class Experiment(object):
 		wIN = float(self.modelParameters[0])
 		wOUT = float(self.modelParameters[0])
 		bias = [0, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
+		# print('biases:', bias)
+		# print('sum', np.sum(bias))
 		wRS = 1 - np.sum(bias)
+		# print('wRS', wRS)
 		assert(wRS >= 0), "Error: wRS is negative! Incorrect parameters provided."
 		bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
 		# biasPrint = ["%.2f" % v for v in bias]

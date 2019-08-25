@@ -16,16 +16,16 @@ get_legend<-function(myggplot){
 }
 
 ###############################################
-# Focal = 0.025
+# Zeta = 0
 ###############################################
-df1 = read.csv("out_Focal0.025-Alpha0.csv")
-df1$Exp <- as.character("0")
+df1 = read.csv("out_Delta2-Zeta0.csv")
+df1$Exp <- as.character("2")
 # head(df1)
-df2 = read.csv("out_Focal0.025-Alpha70.csv")
-df2$Exp <- as.character("70")
+df2 = read.csv("out_Delta3-Zeta0.csv")
+df2$Exp <- as.character("3")
 # head(df2)
-df3 = read.csv("out_Focal0.025-Alpha150.csv")
-df3$Exp <- as.character("150")
+df3 = read.csv("out_Delta4-Zeta0.csv")
+df3$Exp <- as.character("4")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -53,7 +53,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
+df$Exp <- factor(df$Exp, levels = c('2', '3', '4'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 # head(dfCons)
@@ -62,8 +62,8 @@ g11 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. Consistency") +
-  ggtitle(TeX('bias$_{RS}=0.8')) + 
-  labs(color = TeX('$\\alpha$')) +
+  ggtitle(TeX('$\\zeta{=}0')) + 
+  labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
 #  theme(legend.position="bottom") +
   theme_bw()
@@ -77,7 +77,7 @@ g12 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. DLIndex") +
-  labs(color = TeX('$\\alpha$')) +
+  labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
   theme_bw()
 
@@ -125,7 +125,7 @@ g13 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
   ylab("Consistency") +
-  scale_color_discrete(name = TeX('$\\alpha$')) +
+  scale_color_discrete(name = TeX('$\\delta$')) +
   geom_smooth(method = lm)
 
 #g13 <- g13 + theme_sjplot()
@@ -139,7 +139,7 @@ g14 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(fill = TeX('$\\alpha$')) +
+  labs(fill = TeX('$\\delta$')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
   theme_bw() +
@@ -156,7 +156,7 @@ g15 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
   #  scale_y_continuous(limits = c(0, 3)) + 
 #   ggtitle(TeX('bias$_{RS}=0.6$')) + 
-  labs(color = TeX('$\\alpha$')) +
+  labs(color = TeX('$\\delta$')) +
   theme_bw() +
   theme(legend.position="bottom")               # Position legend in bottom right
 
@@ -172,16 +172,16 @@ g15 <- g15 + theme(legend.position="none")
 g1 <- grid.arrange(g11, g12, g13, g14, g15, nrow = 5)
 
 ###############################################
-# Focal = 0.05
+# Zeta = 1
 ###############################################
-df1 = read.csv("out_Focal0.05-Alpha0.csv")
-df1$Exp <- as.character("0")
+df1 = read.csv("out_Delta2-Zeta1.csv")
+df1$Exp <- as.character("2")
 # head(df1)
-df2 = read.csv("out_Focal0.05-Alpha70.csv")
-df2$Exp <- as.character("70")
+df2 = read.csv("out_Delta3-Zeta1.csv")
+df2$Exp <- as.character("3")
 # head(df2)
-df3 = read.csv("out_Focal0.05-Alpha150.csv")
-df3$Exp <- as.character("150")
+df3 = read.csv("out_Delta4-Zeta1.csv")
+df3$Exp <- as.character("4")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -209,7 +209,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
+df$Exp <- factor(df$Exp, levels = c('2', '3', '4'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 # head(dfCons)
@@ -218,8 +218,8 @@ g21 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. Consistency") +
-  ggtitle(TeX('bias$_{RS}=0.6')) + 
-  labs(color = TeX('$\\alpha$')) +
+  ggtitle(TeX('$\\zeta{=}2')) + 
+  labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
   theme_bw()
@@ -233,7 +233,7 @@ g22 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. DLIndex") +
-  labs(color = TeX('$\\alpha$')) +
+  labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
   theme_bw()
 
@@ -281,7 +281,7 @@ g23 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
   ylab("Consistency") +
-  scale_color_discrete(name = TeX('$\\alpha$')) +
+  scale_color_discrete(name = TeX('$\\delta$')) +
   geom_smooth(method = lm)
 
 #g23 <- g23 + theme_sjplot()
@@ -295,7 +295,7 @@ g24 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(fill = TeX('$\\alpha$')) +
+  labs(fill = TeX('$\\delta$')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
   #  theme(legend.position="bottom") +
@@ -312,7 +312,7 @@ g25 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
   #  scale_y_continuous(limits = c(0, 3)) + 
   #   ggtitle(TeX('bias$_{RS}=0.6$')) + 
-  labs(color = TeX('$\\alpha$')) +
+  labs(color = TeX('$\\delta$')) +
   theme_bw() +
   theme(legend.position="bottom")               # Position legend in bottom right
 
@@ -327,16 +327,16 @@ g25 <- g25 + theme(legend.position="none")
 g2 <- grid.arrange(g21, g22, g23, g24, g25, nrow = 5)
 
 ###############################################
-# Focal = 0.075
+# Zeta = 2
 ###############################################
-df1 = read.csv("out_Focal0.075-Alpha0.csv")
-df1$Exp <- as.character("0")
+df1 = read.csv("out_Delta2-Zeta2.csv")
+df1$Exp <- as.character("2")
 # head(df1)
-df2 = read.csv("out_Focal0.075-Alpha70.csv")
-df2$Exp <- as.character("70")
+df2 = read.csv("out_Delta3-Zeta2.csv")
+df2$Exp <- as.character("3")
 # head(df2)
-df3 = read.csv("out_Focal0.075-Alpha150.csv")
-df3$Exp <- as.character("150")
+df3 = read.csv("out_Delta4-Zeta2.csv")
+df3$Exp <- as.character("4")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -364,7 +364,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
+df$Exp <- factor(df$Exp, levels = c('2', '3', '4'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 # head(dfCons)
@@ -373,8 +373,8 @@ g31 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. Consistency") +
-  ggtitle(TeX('bias$_{RS}=0.4')) + 
-  labs(color = TeX('$\\alpha$')) +
+  ggtitle(TeX('$\\zeta{=}3')) + 
+  labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
   theme_bw()
@@ -388,7 +388,7 @@ g32 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. DLIndex") +
-  labs(color = TeX('$\\alpha$')) +
+  labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
   theme_bw()
 
@@ -436,7 +436,7 @@ g33 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
   ylab("Consistency") +
-  scale_color_discrete(name = TeX('$\\alpha$')) +
+  scale_color_discrete(name = TeX('$\\delta$')) +
   geom_smooth(method = lm)
 
 #g33 <- g33 + theme_sjplot()
@@ -450,7 +450,7 @@ g34 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(fill = TeX('$\\alpha$')) +
+  labs(fill = TeX('$\\delta$')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
   #  theme(legend.position="bottom") +
@@ -467,7 +467,7 @@ g35 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
   #  scale_y_continuous(limits = c(0, 3)) + 
   #   ggtitle(TeX('bias$_{RS}=0.6$')) + 
-  labs(color = TeX('$\\alpha$')) +
+  labs(color = TeX('$\\delta$')) +
   theme_bw() +
   theme(legend.position="bottom")               # Position legend in bottom right
 
@@ -482,7 +482,7 @@ g35 <- g35 + theme(legend.position="none")
 g3 <- grid.arrange(g31, g32, g33, g34, g35, nrow = 5)
 
 #title1=textGrob(TeX('bias$_{RS}=0.05; \\beta=500; \\gamma=0.98$'), gp=gpar(fontface="bold"))
-expTex = TeX('$\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}\\epsilon{=}\\zeta{=}0$')
+expTex = TeX('$bias_{RS}=1$, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\epsilon{=}1$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 g <- grid.arrange(g1, g2, g3, ncol = 3, top=legend, bottom=title1)
 
