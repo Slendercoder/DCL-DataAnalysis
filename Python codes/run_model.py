@@ -211,7 +211,7 @@ def parameter_sweep3(gameParameters, modelParameters):
 
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
-modelParameters = [0, 0, 500, 0.98, 0, 0, 0]
+modelParameters = [0, 0, 500, 0.98, 0, 0, 1]
 
 # standard_simulation(gameParameters, modelParameters)
 

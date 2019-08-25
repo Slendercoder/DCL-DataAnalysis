@@ -1,8 +1,19 @@
+library(ggplot2)
 library(sjPlot)
 library(sjmisc)
-library(ggplot2)
+library(gridExtra)
+library(grid)
+library(Rmisc)
 library(latex2exp)
+library(squash)
 #library(dplyr)
+
+get_legend<-function(myggplot){
+  tmp <- ggplot_gtable(ggplot_build(myggplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
 
 ###############################################
 # Focal = 0.025
@@ -45,13 +56,13 @@ df$Exp <- as.factor(df$Exp)
 df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
-head(dfCons)
+# head(dfCons)
 
 g11 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Consistency") +
-  ggtitle('Focal = 0.025') + 
+  ggtitle(TeX('bias$_{RS}=0.8')) + 
   labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
 #  theme(legend.position="bottom") +
@@ -60,7 +71,7 @@ g11 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
 #g11 
 
 dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
-head(dfDLI)
+# head(dfDLI)
 
 g12 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
@@ -78,15 +89,15 @@ df$Strategy <- lapply(df$Strategy, function(x) {
   } else if(x=='1') {
     return('ALL')
   } else if(x=='2') {
-    return('NOTH')
+    return('NOT')
   } else if(x=='3') {
-    return('DOWN')
+    return('DOW')
   } else if(x=='4') {
     return('UP')
   } else if(x=='5') {
-    return('LEFT')
+    return('LEF')
   } else if(x=='6') {
-    return('RIGHT')
+    return('RIG')
   } else if(x=='7') {
     return('IN')
   } else if(x=='8') {
@@ -100,20 +111,21 @@ df$Strategy <- unlist(df$Strategy)
 df$Strategy <- as.factor(df$Strategy)
 df$Strategy <- factor(df$Strategy, levels = c('RS',
                                               'ALL', 
-                                              'NOTH', 
-                                              'DOWN', 
+                                              'NOT', 
+                                              'DOW', 
                                               'UP', 
-                                              'LEFT', 
-                                              'RIGHT', 
+                                              'LEF', 
+                                              'RIG', 
                                               'IN', 
                                               'OUT'))
 
-g13 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, group=Exp)) +
+g13 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
   xlim(c(0.5,1)) + 
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
   ylab("Consistency") +
+  scale_color_discrete(name = TeX('$\\alpha$')) +
   geom_smooth(method = lm)
 
 #g13 <- g13 + theme_sjplot()
@@ -127,15 +139,37 @@ g14 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(color = TeX('$\\alpha$')) +
+  labs(fill = TeX('$\\alpha$')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
-#  theme(legend.position="bottom") +
-  theme_bw()
+  theme_bw() +
+  theme(legend.position="bottom")
   
 #g14
 
-g1 <- grid.arrange(g11, g12, g13, g14, nrow = 4)
+dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
+# head(dfc_DLIndex)
+
+# Density plot Size_visited
+g15 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+  #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
+  #  scale_y_continuous(limits = c(0, 3)) + 
+#   ggtitle(TeX('bias$_{RS}=0.6$')) + 
+  labs(color = TeX('$\\alpha$')) +
+  theme_bw() +
+  theme(legend.position="bottom")               # Position legend in bottom right
+
+#g15
+
+legend <- get_legend(g14)
+g11 <- g11 + theme(legend.position="none")
+g12 <- g12 + theme(legend.position="none")
+g13 <- g13 + theme(legend.position="none")
+g14 <- g14 + theme(legend.position="none")
+g15 <- g15 + theme(legend.position="none")
+
+g1 <- grid.arrange(g11, g12, g13, g14, g15, nrow = 5)
 
 ###############################################
 # Focal = 0.05
@@ -178,14 +212,13 @@ df$Exp <- as.factor(df$Exp)
 df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
-head(dfCons)
+# head(dfCons)
 
 g21 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Consistency") +
-#  ggtitle('Focal = 0.05') + 
-  ggtitle('Prob(RS)=0.6') + 
+  ggtitle(TeX('bias$_{RS}=0.6')) + 
   labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
@@ -194,7 +227,7 @@ g21 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
 #g21 
 
 dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
-head(dfDLI)
+# head(dfDLI)
 
 g22 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
@@ -212,15 +245,15 @@ df$Strategy <- lapply(df$Strategy, function(x) {
   } else if(x=='1') {
     return('ALL')
   } else if(x=='2') {
-    return('NOTH')
+    return('NOT')
   } else if(x=='3') {
-    return('DOWN')
+    return('DOW')
   } else if(x=='4') {
     return('UP')
   } else if(x=='5') {
-    return('LEFT')
+    return('LEF')
   } else if(x=='6') {
-    return('RIGHT')
+    return('RIG')
   } else if(x=='7') {
     return('IN')
   } else if(x=='8') {
@@ -234,20 +267,21 @@ df$Strategy <- unlist(df$Strategy)
 df$Strategy <- as.factor(df$Strategy)
 df$Strategy <- factor(df$Strategy, levels = c('RS',
                                               'ALL', 
-                                              'NOTH', 
-                                              'DOWN', 
+                                              'NOT', 
+                                              'DOW', 
                                               'UP', 
-                                              'LEFT', 
-                                              'RIGHT', 
+                                              'LEF', 
+                                              'RIG', 
                                               'IN', 
                                               'OUT'))
 
-g23 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, group=Exp)) +
+g23 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
   xlim(c(0.5,1)) + 
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
   ylab("Consistency") +
+  scale_color_discrete(name = TeX('$\\alpha$')) +
   geom_smooth(method = lm)
 
 #g23 <- g23 + theme_sjplot()
@@ -269,7 +303,28 @@ g24 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
 
 #g24
 
-g2 <- grid.arrange(g21, g22, g23, g24, nrow = 4)
+dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
+# head(dfc_DLIndex)
+
+# Density plot Size_visited
+g25 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+  #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
+  #  scale_y_continuous(limits = c(0, 3)) + 
+  #   ggtitle(TeX('bias$_{RS}=0.6$')) + 
+  labs(color = TeX('$\\alpha$')) +
+  theme_bw() +
+  theme(legend.position="bottom")               # Position legend in bottom right
+
+#g25
+
+g21 <- g21 + theme(legend.position="none")
+g22 <- g22 + theme(legend.position="none")
+g23 <- g23 + theme(legend.position="none")
+g24 <- g24 + theme(legend.position="none")
+g25 <- g25 + theme(legend.position="none")
+
+g2 <- grid.arrange(g21, g22, g23, g24, g25, nrow = 5)
 
 ###############################################
 # Focal = 0.075
@@ -312,14 +367,13 @@ df$Exp <- as.factor(df$Exp)
 df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
-head(dfCons)
+# head(dfCons)
 
 g31 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Consistency") +
-#  ggtitle('Focal = 0.075') + 
-  ggtitle('Prob(RS)=0.4') + 
+  ggtitle(TeX('bias$_{RS}=0.4')) + 
   labs(color = TeX('$\\alpha$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
@@ -328,7 +382,7 @@ g31 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
 #g31 
 
 dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
-head(dfDLI)
+# head(dfDLI)
 
 g32 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
@@ -346,15 +400,15 @@ df$Strategy <- lapply(df$Strategy, function(x) {
   } else if(x=='1') {
     return('ALL')
   } else if(x=='2') {
-    return('NOTH')
+    return('NOT')
   } else if(x=='3') {
-    return('DOWN')
+    return('DOW')
   } else if(x=='4') {
     return('UP')
   } else if(x=='5') {
-    return('LEFT')
+    return('LEF')
   } else if(x=='6') {
-    return('RIGHT')
+    return('RIG')
   } else if(x=='7') {
     return('IN')
   } else if(x=='8') {
@@ -368,20 +422,21 @@ df$Strategy <- unlist(df$Strategy)
 df$Strategy <- as.factor(df$Strategy)
 df$Strategy <- factor(df$Strategy, levels = c('RS',
                                               'ALL', 
-                                              'NOTH', 
-                                              'DOWN', 
+                                              'NOT', 
+                                              'DOW', 
                                               'UP', 
-                                              'LEFT', 
-                                              'RIGHT', 
+                                              'LEF', 
+                                              'RIG', 
                                               'IN', 
                                               'OUT'))
 
-g33 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, group=Exp)) +
+g33 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
   xlim(c(0.5,1)) + 
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
   ylab("Consistency") +
+  scale_color_discrete(name = TeX('$\\alpha$')) +
   geom_smooth(method = lm)
 
 #g33 <- g33 + theme_sjplot()
@@ -403,8 +458,33 @@ g34 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
 
 #g34
 
-g3 <- grid.arrange(g31, g32, g33, g34, nrow = 4)
+dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
+# head(dfc_DLIndex)
 
-g <- grid.arrange(g1, g2, g3, ncol = 3)
+# Density plot Size_visited
+g35 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+  #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
+  #  scale_y_continuous(limits = c(0, 3)) + 
+  #   ggtitle(TeX('bias$_{RS}=0.6$')) + 
+  labs(color = TeX('$\\alpha$')) +
+  theme_bw() +
+  theme(legend.position="bottom")               # Position legend in bottom right
+
+#g35
+
+g31 <- g31 + theme(legend.position="none")
+g32 <- g32 + theme(legend.position="none")
+g33 <- g33 + theme(legend.position="none")
+g34 <- g34 + theme(legend.position="none")
+g35 <- g35 + theme(legend.position="none")
+
+g3 <- grid.arrange(g31, g32, g33, g34, g35, nrow = 5)
+
+#title1=textGrob(TeX('bias$_{RS}=0.05; \\beta=500; \\gamma=0.98$'), gp=gpar(fontface="bold"))
+expTex = TeX('$\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}\\epsilon{=}\\zeta{=}0$')
+title1=textGrob(expTex, gp=gpar(fontface="bold"))
+g <- grid.arrange(g1, g2, g3, ncol = 3, top=legend, bottom=title1)
 
 # ggsave("ConsistencyWRTDist2FR.eps", width=3.5, height=3.5, device=cairo_ps, g3)
+
