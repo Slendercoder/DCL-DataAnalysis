@@ -22,6 +22,7 @@ df2$Exp <- as.character("0.6")
 # head(df2)
 df3 = read.csv("out_Epsilon0.3-Zeta1.5.csv")
 df3$Exp <- as.character("1.5")
+# head(df3)
 
 df1 <- df1[complete.cases(df1), ]
 df2 <- df2[complete.cases(df2), ]
@@ -109,11 +110,18 @@ g2 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   #  labs(y = "Percent", fill="Region") +
   xlab("Region") +
   ylab("Instances (%)") +
-  labs(fill = TeX('$\\zeta$')) +
+  labs(fill = TeX('$\\zeta$                 ')) +
   #  facet_grid(~Condition) +
   #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
   theme_bw() +
   theme(legend.position="bottom")
 
-g <- grid.arrange(g2, g1, nrow = 1)
+legend <- get_legend(g2)
+g1 <- g1 + theme(legend.position="none")
+g2 <- g2 + theme(legend.position="none")
+
+expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}0$, $\\epsilon{=}0.3$')
+title1=textGrob(expTex, gp=gpar(fontface="bold"))
+g <- grid.arrange(g1, g2, ncol = 2, top=legend, bottom=title1)
+
 

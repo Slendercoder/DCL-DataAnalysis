@@ -172,8 +172,8 @@ def parameter_sweep3(gameParameters, modelParameters):
     print("Sweeping delta and zeta parameters...")
 
     # Intervals for sweep
-    forDelta = [0, 0.1, 0.2]
-    forZeta = [0.3]
+    forDelta = [0.1]
+    forZeta = [0.6]
 
     print('--- Sweep parameters ----')
     print('delta: ', forDelta)
@@ -240,57 +240,6 @@ def parameter_sweep4(gameParameters, modelParameters):
             E.df['Epsilon'] = [i]*len(E.df['Dyad'])
             E.df['Zeta'] = [j]*len(E.df['Dyad'])
             outputFile = 'out_Epsilon' + str(i) + '-Zeta' + str(j) + '.csv'
-            E.df.to_csv(outputFile, index=False)
-            print("Results saved to " + outputFile)
-
-def parameter_sweep5(gameParameters, modelParameters):
-
-    # Sweep RS vs alpha
-
-    print("****************************")
-    print('Starting parameter sweep')
-    print("****************************")
-    print('--- Game parameters ---')
-    print('Probabilit of a unicorn: ', gameParameters[0])
-    print('Number of players: ', gameParameters[1])
-    print('Grid size: ', str(gameParameters[2]) + ' x ' + str(gameParameters[2]))
-    print('Number of rounds: ', gameParameters[3])
-    print('Number of dyads: ', gameParameters[4])
-    print("\n")
-
-    print('--- Fixed parameters ----')
-    print('Focal: ', modelParameters[0])
-    print('alpha: ', modelParameters[1])
-    print('beta: ', modelParameters[2])
-    print('gamma: ', modelParameters[3])
-    print('delta: ', modelParameters[4])
-    # print('epsilon: ', modelParameters[5])
-    print('zeta: ', modelParameters[6])
-    print("\n")
-    print("Sweeping delta and epsilon parameters...")
-
-    # Intervals for sweep
-    # forFocal = np.arange(0.025, 0.05, 0.075)
-    # forGamma = np.arange(0.95, 0.975, 0.99)
-    forDelta = [0.2, 0.4, 0.6]
-    forEpsilon = [0.3, 0.5, 0.9]
-
-    print('--- Sweep parameters ----')
-    print('delta: ', forDelta)
-    print('epsilon: ', forEpsilon)
-
-    for i in list(forDelta):
-        for j in list(forEpsilon):
-            print('\n----------')
-            print('Sweep ' + str(i) + ', ' + str(j))
-            modelParameters[4] = i
-            modelParameters[5] = j
-            E = DL.Experiment(gameParameters, modelParameters)
-            E.run_simulation()
-            E.get_measures()
-            E.df['Delta'] = [i]*len(E.df['Dyad'])
-            E.df['Epsilon'] = [j]*len(E.df['Dyad'])
-            outputFile = 'out_Delta' + str(i) + '-Epsilon' + str(j) + '.csv'
             E.df.to_csv(outputFile, index=False)
             print("Results saved to " + outputFile)
 
