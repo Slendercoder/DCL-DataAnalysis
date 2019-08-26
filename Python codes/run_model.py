@@ -167,9 +167,9 @@ def parameter_sweep3(gameParameters, modelParameters):
     print('alpha: ', modelParameters[1])
     print('beta: ', modelParameters[2])
     print('gamma: ', modelParameters[3])
-    # print('delta: ', modelParameters[4])
-    print('epsilon: ', modelParameters[5])
-    # print('zeta: ', modelParameters[6])
+    print('delta: ', modelParameters[4])
+    # print('epsilon: ', modelParameters[5])
+    print('zeta: ', modelParameters[6])
     print("\n")
     print("Sweeping delta and zeta parameters...")
 
