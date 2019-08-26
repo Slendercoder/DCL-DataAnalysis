@@ -115,5 +115,5 @@ g2 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   theme_bw() +
   theme(legend.position="bottom")
 
-g <- grid.arrange(g1, g2, nrow = 1)
+g <- grid.arrange(g2, g1, nrow = 1)
 

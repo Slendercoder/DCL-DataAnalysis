@@ -12,16 +12,16 @@ get_legend<-function(myggplot){
 }
 
 ###############################################
-# Epsilon = 0.3
+# Epsilon = 0.3; Zeta = 0.3
 ###############################################
-df1 = read.csv("out_Epsilon0.3-Zeta0.csv")
+df1 = read.csv("out_Delta0-Zeta0.3.csv")
 df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Epsilon0.3-Zeta0.6.csv")
-df2$Exp <- as.character("0.6")
+df2 = read.csv("out_Delta0.1-Zeta0.3.csv")
+df2$Exp <- as.character("0.1")
 # head(df2)
-df3 = read.csv("out_Epsilon0.3-Zeta1.5.csv")
-df3$Exp <- as.character("1.5")
+df3 = read.csv("out_Delta0.2-Zeta0.3.csv")
+df3$Exp <- as.character("0.2")
 
 df1 <- df1[complete.cases(df1), ]
 df2 <- df2[complete.cases(df2), ]
@@ -59,7 +59,7 @@ g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
   #  scale_y_continuous(limits = c(0, 3)) + 
 #  ggtitle(TeX('$\\epsilon{=}0.3$')) + 
-  labs(color = TeX('$\\zeta$')) +
+  labs(color = TeX('$\\delta$')) +
   theme_bw() +
   theme(legend.position="bottom")               # Position legend in bottom right
 
@@ -115,5 +115,5 @@ g2 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   theme_bw() +
   theme(legend.position="bottom")
 
-g <- grid.arrange(g1, g2, nrow = 1)
+g <- grid.arrange(g2, g1, nrow = 1)
 

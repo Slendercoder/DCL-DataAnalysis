@@ -47,7 +47,7 @@ def standard_simulation(gameParameters, modelParameters):
 
 def parameter_sweep1(gameParameters, modelParameters):
 
-    # Sweep RS vs alpha
+    # Sweep RS vs gamma
 
     print("****************************")
     print('Starting parameter sweep')
@@ -123,8 +123,6 @@ def parameter_sweep2(gameParameters, modelParameters):
     print("Sweeping Focal and alpha parameters...")
 
     # Intervals for sweep
-    # forFocal = np.arange(0.025, 0.05, 0.075)
-    # forGamma = np.arange(0.95, 0.975, 0.99)
     forFocal = [0.025, 0.05, 0.075]
     forAlpha = [0, 70, 150]
 
@@ -149,7 +147,7 @@ def parameter_sweep2(gameParameters, modelParameters):
 
 def parameter_sweep3(gameParameters, modelParameters):
 
-    # Sweep RS vs alpha
+    # Sweep delta vs zeta
 
     print("****************************")
     print('Starting parameter sweep')
@@ -167,17 +165,15 @@ def parameter_sweep3(gameParameters, modelParameters):
     print('alpha: ', modelParameters[1])
     print('beta: ', modelParameters[2])
     print('gamma: ', modelParameters[3])
-    print('delta: ', modelParameters[4])
-    # print('epsilon: ', modelParameters[5])
-    print('zeta: ', modelParameters[6])
+    # print('delta: ', modelParameters[4])
+    print('epsilon: ', modelParameters[5])
+    # print('zeta: ', modelParameters[6])
     print("\n")
     print("Sweeping delta and zeta parameters...")
 
     # Intervals for sweep
-    # forFocal = np.arange(0.025, 0.05, 0.075)
-    # forGamma = np.arange(0.95, 0.975, 0.99)
-    forDelta = [0, 0.5, 1, 1.5]
-    forZeta = [0, 0.1]
+    forDelta = [0, 0.1, 0.2]
+    forZeta = [0.3]
 
     print('--- Sweep parameters ----')
     print('delta: ', forDelta)
@@ -199,6 +195,55 @@ def parameter_sweep3(gameParameters, modelParameters):
             print("Results saved to " + outputFile)
 
 def parameter_sweep4(gameParameters, modelParameters):
+
+    # Sweep epsilon vs zeta
+
+    print("****************************")
+    print('Starting parameter sweep')
+    print("****************************")
+    print('--- Game parameters ---')
+    print('Probabilit of a unicorn: ', gameParameters[0])
+    print('Number of players: ', gameParameters[1])
+    print('Grid size: ', str(gameParameters[2]) + ' x ' + str(gameParameters[2]))
+    print('Number of rounds: ', gameParameters[3])
+    print('Number of dyads: ', gameParameters[4])
+    print("\n")
+
+    print('--- Fixed parameters ----')
+    print('Focal: ', modelParameters[0])
+    print('alpha: ', modelParameters[1])
+    print('beta: ', modelParameters[2])
+    print('gamma: ', modelParameters[3])
+    print('delta: ', modelParameters[4])
+    # print('epsilon: ', modelParameters[5])
+    # print('zeta: ', modelParameters[6])
+    print("\n")
+    print("Sweeping epsilon and zeta parameters...")
+
+    # Intervals for sweep
+    forEpsilon = [0.3]
+    forZeta = [1.2, 1.5]
+
+    print('--- Sweep parameters ----')
+    print('epsilon: ', forEpsilon)
+    print('zeta: ', forZeta)
+
+    for i in list(forEpsilon):
+        for j in list(forZeta):
+            print('\n----------')
+            print('Sweep ' + str(i) + ', ' + str(j))
+            modelParameters[5] = i
+            modelParameters[6] = j
+            E = DL.Experiment(gameParameters, modelParameters)
+            E.run_simulation()
+            E.get_measures()
+            E.df['Epsilon'] = [i]*len(E.df['Dyad'])
+            E.df['Zeta'] = [j]*len(E.df['Dyad'])
+            outputFile = 'out_Epsilon' + str(i) + '-Zeta' + str(j) + '.csv'
+            E.df.to_csv(outputFile, index=False)
+            print("Results saved to " + outputFile)
+
+def parameter_sweep5(gameParameters, modelParameters):
 
     # Sweep RS vs alpha
 
@@ -227,8 +272,8 @@ def parameter_sweep4(gameParameters, modelParameters):
     # Intervals for sweep
     # forFocal = np.arange(0.025, 0.05, 0.075)
     # forGamma = np.arange(0.95, 0.975, 0.99)
-    forDelta = [0.4, 0.5, 0.6]
-    forEpsilon = [0.2, 0.4, 0.6]
+    forDelta = [0.2, 0.4, 0.6]
+    forEpsilon = [0.3, 0.5, 0.9]
 
     print('--- Sweep parameters ----')
     print('delta: ', forDelta)
@@ -257,7 +302,7 @@ def parameter_sweep4(gameParameters, modelParameters):
 
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
-modelParameters = [0, 150, 500, 0.98, 0, 0.1, 0]
+modelParameters = [0, 150, 500, 0.98, 0, 0, 0.3]
 
 # standard_simulation(gameParameters, modelParameters)
 
