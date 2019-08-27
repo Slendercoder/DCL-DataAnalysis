@@ -151,7 +151,7 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 8), "Model parameters incorrect length!"
+		assert(len(modelParameters) == 7), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 
@@ -223,7 +223,6 @@ class Experiment(object):
 		delta = self.modelParameters[4] # for how much the similarity to complement augments attractiveness
 		epsilon = self.modelParameters[5] # for similarity to complementary focal region
 		zeta = self.modelParameters[6] # for the steepness of the similarity to focal region
-		eta = self.modelParameters[7] # for the steepness of the similarity to complementary focal region
 
 		regionsCoded = self.regions
 		strategies = self.strategies
@@ -252,7 +251,7 @@ class Experiment(object):
 			kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 			kComp = [1 - x for x in kCoded]
 			# print('Considering region: ', k)
-			simils[k] = self.simil(jV, kComp, eta)
+			simils[k] = self.simil(jV, kComp, epsilon)
 			# simils[k] = simil(jV, kCoded, epsilon)
 		#
 		# similsPrint = ["%.2f" % v for v in simils]
