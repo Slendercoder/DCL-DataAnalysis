@@ -124,6 +124,32 @@ def dibuja_region(reg, Num_Loc):
 
 		fig4.show()
 
+def dibuja_regiones(reg, Num_Loc, titulo):
+	assert(len(reg) == Num_Loc * Num_Loc), "Incorrect region size!"
+
+	fig4, axes4 = plt.subplots()
+	axes4.get_xaxis().set_visible(False)
+	axes4.get_yaxis().set_visible(False)
+	step = 1. / Num_Loc
+	tangulos = []
+	for j in range(0, Num_Loc * Num_Loc):
+		x = int(j) % Num_Loc
+		y = (int(j) - x) / Num_Loc
+		# print("x: " + str(x + 1))
+		# print("y: " + str(y + 1))
+		by_x = x * step
+		by_y = 1 - (y + 1) * step
+		#     # print("by_x: " + str(by_x))
+		#     # print("by_y: " + str(by_y))
+		if reg[j] == 1:
+			tangulos.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="black", alpha=1))
+
+	for t in tangulos:
+		axes4.add_patch(t)
+
+		fig4.show()
+
 ###########################
 # Define player objects
 ###########################

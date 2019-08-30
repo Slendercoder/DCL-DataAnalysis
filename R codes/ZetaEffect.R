@@ -12,16 +12,16 @@ get_legend<-function(myggplot){
 }
 
 ###############################################
-# Epsilon = 0.3
+# Epsilon = 0.1
 ###############################################
-df1 = read.csv("out_Epsilon0.3-Zeta0.csv")
+df1 = read.csv("out_Epsilon0.1-Zeta0.csv")
 df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Epsilon0.3-Zeta0.6.csv")
-df2$Exp <- as.character("0.6")
+df2 = read.csv("out_Epsilon0.1-Zeta5.csv")
+df2$Exp <- as.character("5")
 # head(df2)
-df3 = read.csv("out_Epsilon0.3-Zeta1.5.csv")
-df3$Exp <- as.character("1.5")
+df3 = read.csv("out_Epsilon0.1-Zeta15.csv")
+df3$Exp <- as.character("15")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -52,7 +52,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0', '0.6', '1.5'))
+df$Exp <- factor(df$Exp, levels = c('0', '5', '15'))
 
 dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
 # head(dfc_DLIndex)
@@ -129,7 +129,7 @@ g3 <- ggplot(df, aes(log(Distancias_LAG1), Consistency, color=Exp)) +
 # g3
 
 g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
-  geom_point(alpha = 1/5) +
+  geom_point(alpha = 1/8) +
   xlim(c(0.6,1)) + 
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
@@ -148,33 +148,6 @@ g2 <- g2 + theme(legend.position="none")
 g3 <- g3 + theme(legend.position="none")
 g4 <- g4 + theme(legend.position="none")
 
-expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}0$, $\\epsilon{=}0.3$')
+expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}0$, $\\epsilon{=}0.1$, $\\eta{=}0$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 g <- grid.arrange(g1, g2, g3, g4, ncol = 2, top=legend, bottom=title1)
-
-model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df3)
-
-g2 <- plot_model(model3h, 
-                 type = "pred", 
-                 terms = c("Dif_consist", "Joint_LAG1"), 
-                 colors = c("black", "red", "blue"),
-                 title = "",
-                 legend.title = "Overlap",
-                 axis.title = c("Absolute difference\nin consistency", "DLindex"))
-
-g2 <- g2 + theme_sjplot()
-
-g2
-
-g2 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
-  geom_point(alpha = 1/5) +
-  xlim(c(0.6,1)) + 
-  ylim(c(0,1)) + 
-  xlab("Norm. score prev. round") +
-  ylab("Consistency") +
-  scale_color_discrete(name = TeX('$\\delta$')) +
-  geom_smooth(method = lm)
-
-g2 <- g2 + theme_sjplot()
-
-# g2

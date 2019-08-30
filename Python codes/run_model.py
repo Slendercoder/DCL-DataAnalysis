@@ -221,8 +221,8 @@ def parameter_sweep4(gameParameters, modelParameters, ifDistances, ifClassify):
     print("Sweeping epsilon and zeta parameters...")
 
     # Intervals for sweep
-    forEpsilon = [0.01, 0.05, 0.1]
-    forZeta = [0, 1, 5]
+    forEpsilon = [0.1]
+    forZeta = [0, 5, 15]
 
     print('--- Sweep parameters ----')
     print('epsilon: ', forEpsilon)
@@ -271,8 +271,8 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
     print("Sweeping delta and eta parameters...")
 
     # Intervals for sweep
-    forDelta = [0, 10, 20]
-    forEta = [0.5, 0.8, 1]
+    forDelta = [150]
+    forEta = [0.5]
 
     print('--- Sweep parameters ----')
     print('delta: ', forDelta)
@@ -301,10 +301,10 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
 
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
-modelParameters = [0.025, 150, 500, 0.98, 0, 0.3, 0, 0]
+modelParameters = [0.025, 150, 500, 0.98, 15, 0.1, 0, 0]
 ifDistances = 1
 ifClassify = 0
 
 # standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
 
-parameter_sweep4(gameParameters, modelParameters, ifDistances, ifClassify)
+parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify)

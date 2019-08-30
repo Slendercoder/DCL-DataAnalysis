@@ -14,16 +14,17 @@ get_legend<-function(myggplot){
 }
 
 ###############################################
-# Zeta = 0.3
+# Eta = 1.5
 ###############################################
-df1 = read.csv("out_Delta10-Zeta0.3.csv")
-df1$Exp <- as.character("10")
+df1 = read.csv("out_Delta0-Eta0.5.csv")
+df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Delta100-Zeta0.3.csv")
-df2$Exp <- as.character("100")
+df2 = read.csv("out_Delta5-Eta0.5.csv")
+df2$Exp <- as.character("5")
 # head(df2)
-df3 = read.csv("out_Delta500-Zeta0.3.csv")
-df3$Exp <- as.character("500")
+df3 = read.csv("out_Delta50-Eta0.5.csv")
+df3$Exp <- as.character("50")
+# head(df3)
 
 df1 <- df1[complete.cases(df1), ]
 df2 <- df2[complete.cases(df2), ]
@@ -35,22 +36,25 @@ df <- rbind(
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
+        'Distancias_LAG1',
         'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
+        'Distancias_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
+        'Distancias_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('10', '100', '500'))
+df$Exp <- factor(df$Exp, levels = c('0', '5', '50'))
 
 dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
 # head(dfc_DLIndex)
@@ -60,7 +64,7 @@ g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   geom_density(size=1) +
   #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
   #  scale_y_continuous(limits = c(0, 3)) + 
-  ggtitle(TeX('$\\epsilon{=}0.3$')) + 
+#  ggtitle(TeX('$\\epsilon{=}0.3$')) + 
   labs(color = TeX('$\\delta$              ')) +
   theme_bw() +
   theme(legend.position="bottom")               # Position legend in bottom right
@@ -81,82 +85,36 @@ g2 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
 
 #g2 
 
-###############################################
-# Zeta = 0.6
-###############################################
-df1 = read.csv("out_Delta50-Zeta0.6.csv")
-df1$Exp <- as.character("50")
-# head(df1)
-df2 = read.csv("out_Delta100-Zeta0.6.csv")
-df2$Exp <- as.character("100")
-# head(df2)
-df3 = read.csv("out_Delta500-Zeta0.6.csv")
-df3$Exp <- as.character("500")
+g3 <- ggplot(df, aes(log(Distancias_LAG1), Consistency, color=Exp)) +
+  geom_point(alpha = 1/8) +
+  xlab("Log of max similarity w.r.t.\nfocal regions on Round n-1") +
+  ylab("Consistency on Round n") +
+  scale_color_discrete(name = TeX('$\\zeta$')) +
+  geom_smooth(method = lm)
 
-df1 <- df1[complete.cases(df1), ]
-df2 <- df2[complete.cases(df2), ]
-df3 <- df3[complete.cases(df3), ]
+# g3
 
-df <- rbind(
-  df1[c('Round', 
-        'DLIndex',
-        'Strategy',
-        'Consistency',
-        'Norm_Score_LAG1',
-        'Exp')],
-  df2[c('Round', 
-        'DLIndex',
-        'Strategy',
-        'Consistency',
-        'Norm_Score_LAG1',
-        'Exp')],
-  df3[c('Round', 
-        'DLIndex',
-        'Strategy',
-        'Consistency',
-        'Norm_Score_LAG1',
-        'Exp')]
-)
-df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('50', '100', '500'))
-
-dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
-# head(dfc_DLIndex)
-
-# Density plot Size_visited
-g3 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
-  geom_density(size=1) +
-  #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
-  #  scale_y_continuous(limits = c(0, 3)) + 
-  ggtitle(TeX('$\\epsilon{=}0.6$')) + 
-  labs(color = TeX('$\\delta$              ')) +
-  theme_bw() +
-  theme(legend.position="bottom")               # Position legend in bottom right
-
-#g3
-
-dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
-# head(dfDLI)
-
-g4 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
-  geom_line() +
-  xlab("Round (unicorn absent)") +
-  ylab("Av. DLIndex") +
-  labs(color = TeX('$\\delta$                        ')) +
+g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
+  geom_point(alpha = 1/8) +
+  xlim(c(0.6,1)) + 
   ylim(c(0,1)) + 
-  theme_bw() +
-  theme(legend.position="bottom")               # Position legend in bottom right
+  xlab("Norm. score prev. round") +
+  ylab("Consistency") +
+  scale_color_discrete(name = TeX('$\\zeta$')) +
+  geom_smooth(method = lm)
 
-#g4 
+g4 <- g4 + theme_sjplot()
+
+# g4
 
 
-legend <- get_legend(g1)
+legend <- get_legend(g2)
 g1 <- g1 + theme(legend.position="none")
 g2 <- g2 + theme(legend.position="none")
 g3 <- g3 + theme(legend.position="none")
 g4 <- g4 + theme(legend.position="none")
 
-expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\epsilon{=}0.3$')
+expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\zeta{=}15$, $\\epsilon{=}0.3$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 g <- grid.arrange(g1, g3, g2, g4, ncol = 2, top=legend, bottom=title1)
 
@@ -171,3 +129,4 @@ g2 <- plot_model(model3h,
                  axis.title = c("Absolute difference\nin consistency", "DLindex"))
 
 g2
+

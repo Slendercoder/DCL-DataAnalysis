@@ -38,6 +38,7 @@ joints <- unique(data$RJcode)
 
 # Create all combinations of regions, scores and joints
 args <- as.data.frame(expand.grid(i = regions, s = scores, j = joints))
+head(args)
 args$pair <- apply(args, 1, function(x) list(as.character(x[1]), as.numeric(x[2]), as.character(x[3])))
 #length(args$pair)
 #  of the fifth row, args$pair[5][[1]][1] is the region, args$pair[5][[1]][2] is the score
@@ -65,14 +66,14 @@ FRAWSutil <- function(theta, args, regions){
 #    return(10000)
 #  }
   
-  w <- theta[1:4]
-  alpha <- theta[5]
-  beta <- theta[6]
-  gamma <- theta[7]
-  delta <- theta[8]
-  epsilon <- theta[9]
-  zeta <- theta[10]
-  eta <- theta[11]
+  w <- theta[1]
+  alpha <- theta[2]
+  beta <- theta[3]
+  gamma <- theta[4]
+  delta <- theta[5]
+  epsilon <- theta[6]
+  zeta <- theta[7]
+  eta <- theta[8]
   
   # Calculate the probabilities based on FRAWSpred
 #  print('Calculating probabilities')
@@ -130,92 +131,49 @@ regions <- c('RS',
 
 
 # To search for best parameters WSLS model
-w1 <- 0.11 # bias 'ALL'
-w2 <- 0.05 # bias 'NOTHING'
-w3 <- 0.05 # bias 'DOWN', 'UP', 'LEFT', 'RIGHT'
-w4 <- 0.01 # bias 'IN', 'OUT'
-w5 <- 49 # win stay 
-w6 <- 399 # steepness sigmoid
-w7 <- 0.92 # thresshold sigmoid
-w8 <- 0.000001 # attraction similarity
-w9 <- 0.000001 # exponential similarity
-w10 <- 0.000001 # stubborness
-margen1 <- 0.000001
-margen2 <- 0.01
-margen3 <- 0.05
-margen4 <- 5
-fitresWSLS <- nmkb(par=c(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10),
-               fn = function(theta) FRAWSutil(theta, args, regions),
-               lower=c(w1 - margen3,
-                       w2 - margen3,
-                       w3 - margen3,
-                       w4 - margen2,
-                       w5 - margen4,
-                       w6 - margen4,
-                       w7 - margen2,
-                       w8 - margen1,
-                       w9 - margen1,
-                       w10 - margen1),
-               upper=c(w1 + margen3,
-                       w2 + margen3,
-                       w3 + margen3,
-                       w4 + margen2,
-                       w5 + margen4,
-                       w6 + margen4,
-                       w7 + margen2,
-                       w8 + margen1,
-                       w9 + margen1,
-                       w10 + margen1),
+w1 <- 0.05 # bias FOCAL
+w2 <- 150 # win stay 
+fitresWSLS <- nmkb(par=c(w1, w2),
+               fn = function(theta) FRAWSutil(c(theta, 500, 0.98, 0, 0, 0, 0), args, regions),
+               lower=c(w1 - 0.05,
+                       w2 - 10),
+               upper=c(w1 + 0.05,
+                       w2 + 10),
                control=list(trace=0))
 
 print(fitresWSLS$par) 
 print(fitresWSLS$value) 
 
-theta <- c(0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.933, 0, 0, 0)
+theta <- c(0.05, 150, 500, 0.98, 0, 0, 0, 0)
 FRAWSutil(theta, args, regions) # 3011
 
 
 # To search for best parameters FRA model
-w1 <- 0.07 # bias 'ALL'
-w2 <- 0.03 # bias 'NOTHING'
-w3 <- 0.000001 # bias 'DOWN', 'UP', 'LEFT', 'RIGHT'
-w4 <- 0.000001 # bias 'IN', 'OUT'
-w5 <- 50 # win stay 
-w6 <- 400 # steepness sigmoid
-w7 <- 0.97 # thresshold sigmoid
-w8 <- 3 # attraction similarity
-w9 <- 0.96 # exponential similarity
-w10 <- 5 # stubborness
-w11 <- 1 # eta
-margen1 <- 0.000001
-margen2 <- 0.02
-margen3 <- 0.05
-margen4 <- 0.1
-margen5 <- 2
-fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11),
-               fn = function(theta) FRAWSutil(theta, args, regions),
-               lower=c(w1 - margen2,
-                       w2 - margen2,
-                       0,
-                       0,
-                       w5 - margen5,
-                       w6 - margen5,
-                       w7 - margen2,
-                       w8 - margen5,
-                       w9 - margen2,
-                       w10 - margen5,
-                       w11 - margen4),
-               upper=c(w1 + margen2,
-                       w2 + margen2,
-                       w3 + margen1,
-                       w4 + margen1,
-                       w5 + margen5,
-                       w6 + margen5,
-                       w7 + margen2,
-                       w8 + margen5,
-                       w9 + margen2,
-                       w10 + margen5,
-                       w11 + margen4),
+w1 <- 0.00001 # bias FOCAL
+w2 <- 150 # win stay 
+w3 <- 3 # attraction similarity to complement
+w4 <- 5 # stubborness
+w5 <- 1 # eta
+fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5),
+               fn = function(theta) FRAWSutil(c(theta[1], 
+                                                theta[2],
+                                                500,
+                                                0.98,
+                                                theta[3],
+                                                0.3,
+                                                theta[4],
+                                                theta[5]), 
+                                              args, regions),
+               lower=c(0,
+                       w2 - 10,
+                       w3 - 2,
+                       w4 - 5,
+                       w5 - 0.04),
+               upper=c(w1 + 0.02,
+                       w2 + 10,
+                       w3 + 2,
+                       w4 + 5,
+                       w5 + 0.04),
                control=list(trace=0))
 
 print(fitresFRA$par) 
