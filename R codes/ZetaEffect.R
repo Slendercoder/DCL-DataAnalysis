@@ -34,18 +34,21 @@ df <- rbind(
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
+        'Distancias_LAG1',
         'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
+        'Distancias_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
+        'Distancias_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
@@ -116,12 +119,62 @@ g2 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
   theme_bw() +
   theme(legend.position="bottom")
 
+g3 <- ggplot(df, aes(log(Distancias_LAG1), Consistency, color=Exp)) +
+  geom_point(alpha = 1/8) +
+  xlab("Log of max similarity w.r.t.\nfocal regions on Round n-1") +
+  ylab("Consistency on Round n") +
+  scale_color_discrete(name = TeX('$\\zeta$')) +
+  geom_smooth(method = lm)
+
+# g3
+
+g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
+  geom_point(alpha = 1/5) +
+  xlim(c(0.6,1)) + 
+  ylim(c(0,1)) + 
+  xlab("Norm. score prev. round") +
+  ylab("Consistency") +
+  scale_color_discrete(name = TeX('$\\zeta$')) +
+  geom_smooth(method = lm)
+
+g4 <- g4 + theme_sjplot()
+
+# g4
+
+
 legend <- get_legend(g2)
 g1 <- g1 + theme(legend.position="none")
 g2 <- g2 + theme(legend.position="none")
+g3 <- g3 + theme(legend.position="none")
+g4 <- g4 + theme(legend.position="none")
 
 expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}0$, $\\epsilon{=}0.3$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
-g <- grid.arrange(g1, g2, ncol = 2, top=legend, bottom=title1)
+g <- grid.arrange(g1, g2, g3, g4, ncol = 2, top=legend, bottom=title1)
 
+model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df3)
 
+g2 <- plot_model(model3h, 
+                 type = "pred", 
+                 terms = c("Dif_consist", "Joint_LAG1"), 
+                 colors = c("black", "red", "blue"),
+                 title = "",
+                 legend.title = "Overlap",
+                 axis.title = c("Absolute difference\nin consistency", "DLindex"))
+
+g2 <- g2 + theme_sjplot()
+
+g2
+
+g2 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
+  geom_point(alpha = 1/5) +
+  xlim(c(0.6,1)) + 
+  ylim(c(0,1)) + 
+  xlab("Norm. score prev. round") +
+  ylab("Consistency") +
+  scale_color_discrete(name = TeX('$\\delta$')) +
+  geom_smooth(method = lm)
+
+g2 <- g2 + theme_sjplot()
+
+# g2

@@ -124,7 +124,6 @@ def dibuja_region(reg, Num_Loc):
 
 		fig4.show()
 
-
 ###########################
 # Define player objects
 ###########################
@@ -197,6 +196,22 @@ class Experiment(object):
 	    squares = np.multiply(dif, dif)
 	    distance = np.sqrt(np.sum(squares))
 	    return(np.exp(- o * distance))
+
+	def minDist2Focal(self, r, regionsCoded, eta):
+	    # Returns closest distance to focal region
+	    # Input: r, which is a region coded as a vector of 0s and 1s of length 64
+	    # Output: number representing the closest distance
+
+	    distances = [0] * 8
+	    contador = 0
+
+	    for k in regionsCoded:
+	        kV = self.code2Vector(k)
+	        distances[contador] = self.simil(r, kV, eta)
+	        contador = contador + 1
+
+	    valor = np.min(np.array(distances))
+	    return(valor)
 
 	def probabilities(self, i, score, j):
 
@@ -566,7 +581,7 @@ class Experiment(object):
 
 		self.df = data
 
-	def get_measures(self):
+	def get_measures(self, ifDistances, ifClassify):
 
 		data = self.df
 		Num_Loc = self.gameParameters[2]
@@ -579,9 +594,6 @@ class Experiment(object):
 		           'RIGHT', \
 		           'IN', \
 		           'OUT']
-
-		# ifDistances = input("Do you want to calculate distance to closest focal path? (1=Yes/0=No): ")
-		ifDistances = 0
 
 		# --------------------------------------------------
 		# Obtaining measures from players' performance
@@ -728,12 +740,43 @@ class Experiment(object):
 		data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
 		assert(all(data['DLIndex'] >= 0))
 
-		if ifDistances == 1:
+		if ifClassify == 1:
 		    # --------------------------------------------------
-		    # Finding distance per round, per player
+		    # Classify region per round, per player
 		    # --------------------------------------------------
-		    print("Finding distances to focal paths...")
+		    print("Classifying regions...")
 
+		    # Deterimining list of columns
+		    cols1 = ['a' + str(i) + str(j) \
+		            for i in range(1, Num_Loc + 1) \
+		            for j in range(1, Num_Loc + 1) \
+		            ]
+		    cols = cols1 + ['Player', 'Round']
+
+		    print("Sorting by Player, Round...")
+		    data = data.sort_values(['Player', 'Round'], \
+		                    ascending=[True, True]).reset_index()
+
+		    categoria = []
+		    for player, Grp in data[cols].groupby(['Player']):
+		        print("Working with player " + str(player) + "...")
+		        for ronda, grp in Grp.groupby(['Round']):
+		            # print "Obtaining path from round " + str(ronda) + "..."
+		            path = [int(list(grp[c])[0]) for c in cols1]
+		            # print path
+		            # print "finding region..."
+		            regionClassified = classifyRegion(path, 0.3, 0.55)
+		            # print "Min: " + str(regionClassified)
+		            categoria.append(regionClassified)
+
+		dictionary = dict((i,j) for i,j in enumerate(regions))
+		data['Category'] = data['Strategy'].map(dictionary)
+
+		# --------------------------------------------------
+		# Finding distance to closest focal region per round, per player
+		# --------------------------------------------------
+		if ifDistances == 1:
+		    print("Finding distances to focal paths...")
 
 		    # Deterimining list of columns
 		    cols1 = ['a' + str(i) + str(j) \
@@ -754,14 +797,11 @@ class Experiment(object):
 		            path = [int(list(grp[c])[0]) for c in cols1]
 		            # print path
 		            # print "finding region..."
-		            regionClassified = classifyRegion(path, 0.3, 0.55)
-		            # print "Min: " + str(regionClassified)
-		            distancias.append(regionClassified)
+		            minDist = self.minDist2Focal(path, self.regions, 0.3)
+		            # print "Min: " + str(minDist)
+		            distancias.append(minDist)
 
 		    data['Distancias'] = distancias
-
-		dictionary = dict((i,j) for i,j in enumerate(regions))
-		data['Distancias'] = data['Strategy'].map(dictionary)
 
 		# --------------------------------------------------
 		# Finding the lag variables

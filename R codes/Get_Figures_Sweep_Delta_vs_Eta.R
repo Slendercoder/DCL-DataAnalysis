@@ -366,7 +366,7 @@ df <- rbind(
 df$Exp <- as.factor(df$Exp)
 df$Exp <- factor(df$Exp, levels = c('0', '10', '20'))
 
-# dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
+dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 # head(dfCons)
 
 g31 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
@@ -381,7 +381,7 @@ g31 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
 
 #g31 
 
-# dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
+dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
 # head(dfDLI)
 
 g32 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
