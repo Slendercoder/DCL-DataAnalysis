@@ -16,16 +16,16 @@ get_legend<-function(myggplot){
 }
 
 ###############################################
-# Zeta = 0.1
+# Zeta = 0
 ###############################################
-df1 = read.csv("out_Delta0.5-Zeta0.1.csv")
-df1$Exp <- as.character("0.5")
+df1 = read.csv("out_Delta0-Zeta0.csv")
+df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Delta1-Zeta0.1.csv")
-df2$Exp <- as.character("1")
+df2 = read.csv("out_Delta100-Zeta0.csv")
+df2$Exp <- as.character("100")
 # head(df2)
-df3 = read.csv("out_Delta1.5-Zeta0.1.csv")
-df3$Exp <- as.character("1.5")
+df3 = read.csv("out_Delta120-Zeta0.csv")
+df3$Exp <- as.character("120")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -53,7 +53,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0.5', '1', '1.5'))
+df$Exp <- factor(df$Exp, levels = c('0', '100', '120'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 # head(dfCons)
@@ -62,7 +62,7 @@ g11 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. Consistency") +
-  ggtitle(TeX('$\\zeta{=}0.1')) + 
+  ggtitle(TeX('$\\zeta{=}0')) + 
   labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
 #  theme(legend.position="bottom") +
@@ -172,16 +172,16 @@ g15 <- g15 + theme(legend.position="none")
 g1 <- grid.arrange(g11, g12, g13, g14, g15, nrow = 5)
 
 ###############################################
-# Zeta = 0.3
+# Zeta = 1
 ###############################################
-df1 = read.csv("out_Delta0.5-Zeta0.3.csv")
-df1$Exp <- as.character("0.5")
+df1 = read.csv("out_Delta0-Zeta1.csv")
+df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Delta1-Zeta0.3.csv")
-df2$Exp <- as.character("1")
+df2 = read.csv("out_Delta100-Zeta1.csv")
+df2$Exp <- as.character("100")
 # head(df2)
-df3 = read.csv("out_Delta1.5-Zeta0.3.csv")
-df3$Exp <- as.character("1.5")
+df3 = read.csv("out_Delta120-Zeta1.csv")
+df3$Exp <- as.character("120")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -209,7 +209,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0.5', '1', '1.5'))
+df$Exp <- factor(df$Exp, levels = c('0', '100', '120'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 # head(dfCons)
@@ -218,7 +218,7 @@ g21 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. Consistency") +
-  ggtitle(TeX('$\\zeta{=}0.3')) + 
+  ggtitle(TeX('$\\zeta{=}1')) + 
   labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
@@ -327,16 +327,16 @@ g25 <- g25 + theme(legend.position="none")
 g2 <- grid.arrange(g21, g22, g23, g24, g25, nrow = 5)
 
 ###############################################
-# Zeta = 2
+# Zeta = 5
 ###############################################
-df1 = read.csv("out_Delta2-Zeta2.csv")
-df1$Exp <- as.character("2")
+df1 = read.csv("out_Delta0-Zeta5.csv")
+df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Delta3-Zeta2.csv")
-df2$Exp <- as.character("3")
+df2 = read.csv("out_Delta100-Zeta5.csv")
+df2$Exp <- as.character("100")
 # head(df2)
-df3 = read.csv("out_Delta4-Zeta2.csv")
-df3$Exp <- as.character("4")
+df3 = read.csv("out_Delta120-Zeta5.csv")
+df3$Exp <- as.character("120")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -364,7 +364,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('2', '3', '4'))
+df$Exp <- factor(df$Exp, levels = c('0', '100', '120'))
 
 dfCons <- summarySE(df, measurevar="Consistency", groupvars=c("Exp", "Round"))
 # head(dfCons)
@@ -373,7 +373,7 @@ g31 <- ggplot(dfCons, aes(Round, Consistency, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. Consistency") +
-  ggtitle(TeX('$\\zeta{=}3')) + 
+  ggtitle(TeX('$\\zeta{=}5')) + 
   labs(color = TeX('$\\delta$')) +
   ylim(c(0,1)) + 
   #  theme(legend.position="bottom") +
@@ -482,7 +482,7 @@ g35 <- g35 + theme(legend.position="none")
 g3 <- grid.arrange(g31, g32, g33, g34, g35, nrow = 5)
 
 #title1=textGrob(TeX('bias$_{RS}=0.05; \\beta=500; \\gamma=0.98$'), gp=gpar(fontface="bold"))
-expTex = TeX('$bias_{RS}=1$, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\epsilon{=}1$')
+expTex = TeX('$bias_{RS}=0$, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\epsilon{=}1$, $\\eta{=}1.2$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 g <- grid.arrange(g1, g2, g3, ncol = 3, top=legend, bottom=title1)
 

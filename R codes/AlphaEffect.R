@@ -5,15 +5,15 @@ library(sjPlot)
 library(sjmisc)
 
 ###############################################
-# Focal = 0.05; Beta = 500; Gamma = 0.98
+# Focal = 0.025; Beta = 500; Gamma = 0.98
 ###############################################
-df1 = read.csv("out_Focal0.05-Alpha0.csv")
+df1 = read.csv("out_Focal0.025-Alpha0.csv")
 df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Focal0.05-Alpha70.csv")
+df2 = read.csv("out_Focal0.025-Alpha70.csv")
 df2$Exp <- as.character("70")
 # head(df2)
-df3 = read.csv("out_Focal0.05-Alpha150.csv")
+df3 = read.csv("out_Focal0.025-Alpha150.csv")
 df3$Exp <- as.character("150")
 # head(df3)
 

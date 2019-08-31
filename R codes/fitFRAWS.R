@@ -1,5 +1,6 @@
 source("FRAWSpred.R")
 library(dfoptim)
+library(beepr)
 
 # USING scoreLevel
 getFreq <- function(i, s, j, df) {
@@ -131,53 +132,53 @@ regions <- c('RS',
 
 
 # To search for best parameters WSLS model
-w1 <- 0.05 # bias FOCAL
-w2 <- 150 # win stay 
+w1 <- 0.03 # bias FOCAL
+w2 <- 10 # win stay 
 fitresWSLS <- nmkb(par=c(w1, w2),
                fn = function(theta) FRAWSutil(c(theta, 500, 0.98, 0, 0, 0, 0), args, regions),
-               lower=c(w1 - 0.05,
+               lower=c(0,
                        w2 - 10),
                upper=c(w1 + 0.05,
                        w2 + 10),
                control=list(trace=0))
 
+beep()
 print(fitresWSLS$par) 
 print(fitresWSLS$value) 
 
-theta <- c(0.05, 150, 500, 0.98, 0, 0, 0, 0)
-FRAWSutil(theta, args, regions) # 3011
+theta <- c(0.035, 7.5, 500, 0.98, 0, 0, 0, 0)
+FRAWSutil(theta, args, regions) # 3689
 
 
 # To search for best parameters FRA model
 w1 <- 0.00001 # bias FOCAL
-w2 <- 150 # win stay 
-w3 <- 3 # attraction similarity to complement
-w4 <- 5 # stubborness
-w5 <- 1 # eta
-fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5),
+w2 <- 7 # win stay 
+w3 <- 1 # attraction similarity to complement
+w4 <- 1 # stubborness
+# w5 <- 1 # eta
+fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
                fn = function(theta) FRAWSutil(c(theta[1], 
                                                 theta[2],
                                                 500,
                                                 0.98,
                                                 theta[3],
-                                                0.3,
+                                                1,
                                                 theta[4],
-                                                theta[5]), 
+                                                1), 
                                               args, regions),
                lower=c(0,
-                       w2 - 10,
-                       w3 - 2,
-                       w4 - 5,
-                       w5 - 0.04),
-               upper=c(w1 + 0.02,
-                       w2 + 10,
-                       w3 + 2,
-                       w4 + 5,
-                       w5 + 0.04),
+                       0,
+                       0,
+                       0),
+               upper=c(0.075,
+                       10,
+                       5,
+                       5),
                control=list(trace=0))
 
+beep()
 print(fitresFRA$par) 
 print(fitresFRA$value) 
 
-theta <- c(0.076, 0.05, 0, 0, 48, 398, 0.99, 1.53, 0.94, 3, 1.1)
+theta <- c(0, 10, 500, 0.98, 10, 1, 1, 1.2)
 FRAWSutil(theta, args, regions) # 2709

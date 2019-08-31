@@ -4,7 +4,8 @@ library(grid)
 library(Rmisc)
 library(latex2exp)
 library(RColorBrewer)
-display.brewer.all(colorblindFriendly = TRUE)
+#display.brewer.all(colorblindFriendly = TRUE)
+library(sjmisc)
 
 get_legend<-function(myggplot){
   tmp <- ggplot_gtable(ggplot_build(myggplot))
@@ -14,16 +15,16 @@ get_legend<-function(myggplot){
 }
 
 ###############################################
-# Eta = 1.5
+# Eta = 1
 ###############################################
-df1 = read.csv("out_Delta0-Eta0.5.csv")
+df1 = read.csv("out_Delta0-Eta1.csv")
 df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Delta5-Eta0.5.csv")
-df2$Exp <- as.character("5")
+df2 = read.csv("out_Delta100-Eta1.csv")
+df2$Exp <- as.character("100")
 # head(df2)
-df3 = read.csv("out_Delta50-Eta0.5.csv")
-df3$Exp <- as.character("50")
+df3 = read.csv("out_Delta120-Eta1.csv")
+df3$Exp <- as.character("120")
 # head(df3)
 
 df1 <- df1[complete.cases(df1), ]
@@ -54,7 +55,7 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0', '5', '50'))
+df$Exp <- factor(df$Exp, levels = c('0', '5', '10'))
 
 dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
 # head(dfc_DLIndex)
@@ -114,7 +115,7 @@ g2 <- g2 + theme(legend.position="none")
 g3 <- g3 + theme(legend.position="none")
 g4 <- g4 + theme(legend.position="none")
 
-expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\zeta{=}15$, $\\epsilon{=}0.3$')
+expTex = TeX('$bias$_{focal}=0, $\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\zeta{=}1$, $\\epsilon{=}1$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 g <- grid.arrange(g1, g3, g2, g4, ncol = 2, top=legend, bottom=title1)
 

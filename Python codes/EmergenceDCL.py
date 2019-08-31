@@ -7,13 +7,36 @@ from random import choice, uniform, random, sample, randint
 from math import floor
 import numpy as np
 import pandas as pd
-from pathlib import Path
+# from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+
+DEB = False
 
 ############################################################
 # Define function that initializes regions and strategies
 ############################################################
+
+def nameRegion(r):
+	if r == 0 or r == 9:
+		return 'RS'
+	elif r == 1:
+		return 'ALL'
+	elif r == 2:
+		return 'NOTHING'
+	elif r == 3:
+		return 'DOWN'
+	elif r == 4:
+		return 'UP'
+	elif r == 5:
+		return 'LEFT'
+	elif r == 6:
+		return 'RIGHT'
+	elif r == 7:
+		return 'IN'
+	elif r == 8:
+		return 'OUT'
+
 
 def create_regions_and_strategies(Num_Loc):
 	size = int(Num_Loc * Num_Loc)
@@ -122,16 +145,19 @@ def dibuja_region(reg, Num_Loc):
 	for t in tangulos:
 		axes4.add_patch(t)
 
-		fig4.show()
+	plt.show()
 
-def dibuja_regiones(reg, Num_Loc, titulo):
-	assert(len(reg) == Num_Loc * Num_Loc), "Incorrect region size!"
+def dibuja_regiones(reg1, reg2, Num_Loc, titulo):
+	assert(len(reg1) == Num_Loc * Num_Loc), "Incorrect region size 1!"
+	assert(len(reg2) == Num_Loc * Num_Loc), "Incorrect region size 2!"
 
-	fig4, axes4 = plt.subplots()
-	axes4.get_xaxis().set_visible(False)
-	axes4.get_yaxis().set_visible(False)
+	fig4, axes4 = plt.subplots(1,2)
+	for a in axes4:
+		a.get_xaxis().set_visible(False)
+		a.get_yaxis().set_visible(False)
 	step = 1. / Num_Loc
-	tangulos = []
+	tangulos1 = []
+	tangulos2 = []
 	for j in range(0, Num_Loc * Num_Loc):
 		x = int(j) % Num_Loc
 		y = (int(j) - x) / Num_Loc
@@ -141,14 +167,26 @@ def dibuja_regiones(reg, Num_Loc, titulo):
 		by_y = 1 - (y + 1) * step
 		#     # print("by_x: " + str(by_x))
 		#     # print("by_y: " + str(by_y))
-		if reg[j] == 1:
-			tangulos.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+		if reg1[j] == 1:
+			tangulos1.append(patches.Rectangle(*[(by_x, by_y), step, step],\
 			facecolor="black", alpha=1))
+		if reg2[j] == 1:
+			tangulos2.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="black", alpha=1))
+		if reg1[j] == 1 and reg2[j] == 1:
+			tangulos1.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="red", alpha=1))
+			tangulos2.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="red", alpha=1))
 
-	for t in tangulos:
-		axes4.add_patch(t)
+	for t in tangulos1:
+		axes4[0].add_patch(t)
 
-		fig4.show()
+	for t in tangulos2:
+		axes4[1].add_patch(t)
+
+	fig4.suptitle(titulo)
+	plt.show()
 
 ###########################
 # Define player objects
@@ -273,18 +311,16 @@ class Experiment(object):
 		if i==9: i = 0
 
 		attractiveness = [x for x in bias] # start from bias
-		# attactPrint = ["%.2f" % v for v in attractiveness]
-		# print('attractiveness before WS and FRA\n', attactPrint)
+		if DEB:
+			attactPrint = ["%.2f" % v for v in attractiveness]
+			print('attractiveness before WS and FRA\n', attactPrint)
 
 		n = (score + 128) / 160 # normalizing score
 
-		# print('sigmoid: ', sigmoid(n))
-		# print('alpha * sigmoid: ', alpha * sigmoid(n))
-
 		attractiveness[i] += alpha * self.sigmoid(n, beta, gamma) # Adding 'Win Stay'
-
-		# attactPrint = ["%.2f" % v for v in attractiveness]
-		# print('attractiveness with WS and stubbornness\n', attactPrint)
+		if DEB:
+			attactPrint = ["%.3f" % v for v in attractiveness]
+			print('attractiveness with WS\n', attactPrint)
 
 		jV = self.code2Vector(j)
 		# print('jV ', jV)
@@ -292,12 +328,12 @@ class Experiment(object):
 		for k in range(2,9): # do no consider 'rs' or 'all'
 			kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 			kComp = [1 - x for x in kCoded]
-			# print('Considering region: ', k)
 			simils[k] = self.simil(jV, kComp, eta)
-			# simils[k] = simil(jV, kCoded, epsilon)
 		#
-		# similsPrint = ["%.2f" % v for v in simils]
-		# print('Similarity to complement\n', similsPrint)
+		if DEB:
+			similsPrint = ["%.3f" % v for v in simils]
+			print('Similarity to complement\n', similsPrint)
+
 		attractiveness += np.multiply(delta, simils)
 
 		# attactPrint = ["%.2f" % v for v in attractiveness]
@@ -310,8 +346,10 @@ class Experiment(object):
 			# print('Considering region: ', k)
 			simils[k] = self.simil(iV, kCoded, epsilon)
 		#
-		# similsPrint = ["%.2f" % v for v in simils]
-		# print('Similarity to complement\n', similsPrint)
+		if DEB:
+			similsPrint = ["%.3f" % v for v in simils]
+			print('Similarity to region\n', similsPrint)
+
 		attractiveness += np.multiply(zeta, simils)
 
 		# attactPrint = ["%.2f" % v for v in attractiveness]
@@ -330,8 +368,10 @@ class Experiment(object):
 
 		# get the probability vector
 		probs = self.probabilities(i, s, j)
-		# probsPrint = ["%.3f" % v for v in probs]
-		# print('probs\n', probsPrint)
+
+		if DEB:
+			probsPrint = ["%.3f" % v for v in probs]
+			print('probs\n', probsPrint)
 		# print('Suma: ', np.sum(probs))
 		# get the selected strategy
 		newStrategy = np.random.choice(range(9), p=probs)
@@ -506,6 +546,9 @@ class Experiment(object):
 				# print(self.df)
 				# print("Data from player " + str(k) + " has been saved")
 
+			reg1 = self.code2Vector(self.strategies[Players[0].strategy])
+			reg2 = self.code2Vector(self.strategies[Players[1].strategy])
+			j = self.code2Vector(both)
 			# Players determine their next strategy
 			a = []
 			sc = []
@@ -531,13 +574,17 @@ class Experiment(object):
 			# else:
 			# 	print('Do not randomize for player 1')
 
-			# print('-----------------')
-			# print('both', len(both))
-			# print('scores: p0: ', sc[0], ' p1: ', sc[1])
-			# print('Player 0 from region ', a[0], 'to region ', Players[0].strategy)
-			# print('Player 1 from region ', a[1], 'to region ', Players[1].strategy)
-			# print('End summary round ', i)
-			# print('-----------------')
+			if DEB:
+				print('-----------------')
+				print('both', len(both))
+				print('scores: p0: ', sc[0], ' p1: ', sc[1])
+				print('Player 0 from region ', nameRegion(a[0]), 'to region ', nameRegion(Players[0].strategy))
+				print('Player 1 from region ', nameRegion(a[1]), 'to region ', nameRegion(Players[1].strategy))
+				print('End summary round ', i)
+				print('-----------------')
+				# dibuja_region(j, 8)
+				dibuja_regiones(reg1, reg2, 8, 'Ok')
+
 
 	def run_simulation(self):
 
@@ -843,7 +890,8 @@ class Experiment(object):
 		                            ['Dif_consist'].transform('shift', LAG)
 		data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
 		                            ['Joint'].transform('shift', LAG)
-		data['Distancias_LAG1'] = data.groupby(['Dyad', 'Player'])\
+		if ifDistances == 1:
+			data['Distancias_LAG1'] = data.groupby(['Dyad', 'Player'])\
 		                            ['Distancias'].transform('shift', LAG)
 
 		print("Sorting by Dyad, Player, Round...")
