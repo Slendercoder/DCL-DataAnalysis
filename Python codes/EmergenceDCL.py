@@ -838,7 +838,7 @@ class Experiment(object):
 		            path = [int(list(grp[c])[0]) for c in cols1]
 		            # print path
 		            # print "finding region..."
-		            regionClassified = classifyRegion(path, 0.3, 0.55)
+		            regionClassified = self.classifyRegion(path, 0.3, 0.55)
 		            # print "Min: " + str(regionClassified)
 		            categoria.append(regionClassified)
 

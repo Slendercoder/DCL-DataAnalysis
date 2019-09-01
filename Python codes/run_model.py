@@ -302,11 +302,13 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
 
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
-modelParameters = [0.05, 150, 500, 0.98, 0, 1, 0, 1.2]
-# modelParameters = [0, 150, 500, 0.98, 120, 1, 1, 1.2]
+# WSLS optim
+modelParameters = [0.035, 100, 500, 0.98, 0, 0, 0, 0]
+# FRA optim
+# modelParameters = [0.022, 10, 500, 0.98, 1.33, 1, 1.5, 1.2]
 ifDistances = 1
 ifClassify = 0
 
-# standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
+standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
 
-parameter_sweep3(gameParameters, modelParameters, ifDistances, ifClassify)
+# parameter_sweep3(gameParameters, modelParameters, ifDistances, ifClassify)
