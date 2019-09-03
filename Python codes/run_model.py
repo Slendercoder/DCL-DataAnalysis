@@ -223,7 +223,7 @@ def parameter_sweep4(gameParameters, modelParameters, ifDistances, ifClassify):
 
     # Intervals for sweep
     forEpsilon = [1]
-    forZeta = [0, 1, 10]
+    forZeta = [20]
 
     print('--- Sweep parameters ----')
     print('epsilon: ', forEpsilon)
@@ -301,14 +301,17 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 45]
+# gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
-modelParameters = [0.035, 100, 500, 0.98, 0, 0, 0, 0]
+# modelParameters = [0.035, 100, 500, 0.98, 0, 0, 0, 0]
 # FRA optim
 # modelParameters = [0.022, 10, 500, 0.98, 1.33, 1, 1.5, 1.2]
+# Trying out things
+gameParameters = [0.5, 2, 8, 10, 1]
+modelParameters = [0.02, 150, 500, 0.98, 400, 1, 2, 1.5]
 ifDistances = 1
 ifClassify = 0
 
 standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
 
-# parameter_sweep3(gameParameters, modelParameters, ifDistances, ifClassify)
+# parameter_sweep4(gameParameters, modelParameters, ifDistances, ifClassify)

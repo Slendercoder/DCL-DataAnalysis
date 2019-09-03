@@ -57,7 +57,7 @@ g1 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
   geom_line() +
   xlab("Round (unicorn absent)") +
   ylab("Av. DLIndex") +
-  labs(color = TeX('$\\delta$')) +
+  labs(color = TeX('bias$_{focal}$')) +
   ylim(c(0,1)) + 
   theme_bw() +
   theme(legend.position="top") 
@@ -167,20 +167,21 @@ g1 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   ylim(c(0,1)) + 
   xlab("Norm. score prev. round") +
   ylab("Consistency") +
-  scale_color_discrete(name = TeX('$\\delta$')) +
+  scale_color_discrete(name = TeX('$\\delta$                    ')) +
   geom_smooth(method = lm) +
   theme(legend.position="top")
 
+legend <- get_legend(g1)
+
 g1 <- g1 + theme_sjplot()
 
-legend <- get_legend(g1)
 g1 <- g1 + theme(legend.position="none")
 
-expTex = TeX('$bias$_{focal}=0.05, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}\\epsilon{=}\\zeta{=}0$')
+expTex = TeX('bias$_{focal}=0.05$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}\\epsilon{=}\\zeta{=}0$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 gAlpha <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
 
-gWSLS <- grid.arrange(gRS, gAlpha, ncol = 2,  widths = c(2/3, 1/3))
+gWSLS <- grid.arrange(gRS, gAlpha, ncol = 2,  widths = c(0.6, 0.4))
 
 ###############################################
 # Epsilon = 1
@@ -231,18 +232,29 @@ g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   #  scale_colour_manual(values = c("0" = "#999999", "70" = "#E69F00", "150" = "#56B4E9")) +  
   #  scale_y_continuous(limits = c(0, 3)) + 
   #  ggtitle(TeX('$\\epsilon{=}0.3$')) + 
-  labs(color = TeX('$\\zeta$')) +
+  labs(color = TeX('$\\zeta$                 ')) +
   theme_bw() +
   theme(legend.position="top")               # Position legend in bottom right
 
 #g1
 
+g2 <- ggplot(df, aes(log(Distancias_LAG1), Consistency, color=Exp)) +
+  geom_point(alpha = 1/8) +
+  xlab("Log of max similarity w.r.t.\nfocal regions on Round n-1") +
+  ylab("Consistency") +
+  geom_smooth(method = lm)
+
+g2 <- g2 + theme_sjplot()
+
+#g2
+
 legend <- get_legend(g1)
 g1 <- g1 + theme(legend.position="none")
+g2 <- g2 + theme(legend.position="none")
 
 expTex = TeX('$bias$_{focal}=0.03, $\\beta{=}500$, $\\gamma{=}0.98$, $\\epsilon{=}1$, $\\delta{=}\\zeta{=}0$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
-gZeta <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
+gZeta <- grid.arrange(g1, g2, ncol = 2, top=legend, bottom=title1)
 
 ###############################################
 # Eta = 1
@@ -299,7 +311,18 @@ g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
 
 #g1
 
-model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df2)
+legend <- get_legend(g1)
+g1 <- g1 + theme(legend.position="none")
+
+expTex = TeX('$bias$_{focal}=0.03, $\\beta{=}500$, $\\gamma{=}0.98$, $\\zeta{=}1$, $\\epsilon{=}1$, $\\eta{=}1.2$')
+title1=textGrob(expTex, gp=gpar(fontface="bold"))
+gDelta <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
+
+gFRA <- grid.arrange(gZeta, gDelta, ncol = 2,  widths = c(0.6, 0.4))
+
+g <- grid.arrange(gWSLS, gFRA, nrow = 2)
+
+model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df1)
 summary(model3h)
 
 g2 <- plot_model(model3h, 
@@ -311,4 +334,18 @@ g2 <- plot_model(model3h,
                  axis.title = c("Absolute difference\nin consistency", "DLindex"))
 
 g2
+
+model4h <- lm(Consistency ~ Distancias_LAG1, data = df1)
+summary(model4h) # => Positive correlation is significant
+
+g3 <- ggplot(df1, aes(log(Distancias_LAG1), Consistency)) +
+  geom_point(alpha = 1/8) +
+  xlab("Log of max similarity w.r.t.\nfocal regions on Round n-1") +
+  ylab("Consistency on Round n") +
+  geom_smooth(method = lm)
+
+g3 <- g3 + theme_sjplot()
+
+g3 
+
 

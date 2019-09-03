@@ -7,11 +7,10 @@ from random import choice, uniform, random, sample, randint
 from math import floor
 import numpy as np
 import pandas as pd
-# from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-DEB = False
+DEB = True
 
 ############################################################
 # Define function that initializes regions and strategies
@@ -336,8 +335,9 @@ class Experiment(object):
 
 		attractiveness += np.multiply(delta, simils)
 
-		# attactPrint = ["%.2f" % v for v in attractiveness]
-		# print('final attractiveness\n', attactPrint)
+		if DEB:
+			attactPrint = ["%.3f" % v for v in attractiveness]
+			print('Attractiveness to complement\n', attactPrint)
 
 		# print('jV ', jV)
 		simils = [0] * 9
@@ -351,12 +351,14 @@ class Experiment(object):
 			print('Similarity to region\n', similsPrint)
 
 		attractiveness += np.multiply(zeta, simils)
+		if DEB:
+			attactPrint = ["%.3f" % v for v in attractiveness]
+			print('final attractiveness\n', attactPrint)
 
-		# attactPrint = ["%.2f" % v for v in attractiveness]
-		# print('final attractiveness\n', attactPrint)
-
-		sum = np.sum(attractiveness)
-		probs = [x/sum for x in attractiveness]
+		sum = np.sum(np.exp(attractiveness/0.4))
+		probs = [np.exp(x/0.4)/sum for x in attractiveness]
+		# sum = np.sum(attractiveness)
+		# probs = [x/sum for x in attractiveness]
 
 		return probs
 
@@ -378,13 +380,16 @@ class Experiment(object):
 		# print('newStrategy', newStrategy)
 		# Determines if should not randomize RS
 		if newStrategy == 0:
+			print('Determines if should randomize RS')
 			n = (s + 128) / 160 # normalizing score
 			beta = self.modelParameters[2] # amplitude of the sigmoid function
 			gamma = self.modelParameters[3] # position of the sigmoid function
 			if uniform(0,1) > self.sigmoid(n, beta, gamma):
-				return newStrategy, True
-			else:
+				print('It should')
 				return newStrategy, False
+			else:
+				print('It should not')
+				return newStrategy, True
 		else:
 			return newStrategy, False
 		# return newStrategy, False

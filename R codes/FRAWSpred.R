@@ -1,5 +1,8 @@
 source('ClassifyRegions.R')
 
+specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
+imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
+
 sigmoid <- function(x, beta, gamma) {
   # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
   
@@ -37,8 +40,8 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-#  print("bias")
-#  print(bias)
+  print("bias")
+  imprimir(bias)
   
   n <- (s + 128) / 160 # Normalizing score
   
@@ -46,14 +49,14 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
   attractiveness <- bias # Start from bias
 
   # Add attractiveness to current region according to score
-  if (i != 'RS') {
-    index <- which(regions == i)
-    # adding win stay
-    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
-    # Regions collapsed. Cannot measure similarity between region 'i' and focal region, or trivial {1, 0}
-
-  }
-
+  index <- which(regions == i)
+#  print('i')
+#  print(regionsCoded[index - 1])
+  # adding win stay
+  attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
+  print('Attractiveness with WS:')
+  imprimir(attractiveness)
+  
 #  print(attractiveness)
   
   # Consider distance from j to complementary k and augment attractiveness
@@ -72,7 +75,12 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
   })
   similarity2Complement <- as.numeric(unlist(similarity2Complement))
   similarity2Complement <- c(0, 0, similarity2Complement)
+  print('Similarity to complement:')
+  imprimir(similarity2Complement)
+  
   attractiveness <- attractiveness + delta * similarity2Complement
+  print('Attractiveness to complement:')
+  imprimir(attractiveness)
 
   # Consider distance from i to each focal region k and augment attractiveness
   index <- which(regions == i) # WARNING: REGIONS COLLAPSED!
@@ -82,8 +90,8 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
 #    print(iV)
     iV <- code2Vector(iV)
     kVector <- lapply(regions[2:9], function(k) {
-      index <- which(regions == k)
-      kCoded <- regionsCoded[index - 1] # regionsCoded does not have 'RS'
+      index1 <- which(regions == k)
+      kCoded <- regionsCoded[index1 - 1] # regionsCoded does not have 'RS'
       kV <- code2Vector(kCoded)
     })
     similarities <- lapply(kVector, function(x) {
@@ -93,10 +101,11 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
     similarities <- c(0, similarities)
     attractiveness <- attractiveness + zeta * similarities
   }
+  print('Similarity to region:')
+  imprimir(similarities)
+  print('Final attractiveness:')
+  imprimir(attractiveness)
   
-  
-#  print('attractiveness final')
-#  print(attractiveness)
   
 #  negative <- which(attractiveness < 0)
 #  if (length(negative) > 0) {
@@ -111,8 +120,8 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
   return(probs)
 }
 
-#i <- 'LEFT'
-#s <- 32
-#j <- 'rBCHIJQRS'
-#p <- FRAWSpred(i,s, j, 0.05, 150, 500, 0.98, 0, 0, 0, 0, regions)
-
+i <- 'LEFT'
+s <- 16
+j <- 'GHIJOPQRWXYZ4567'
+p <- FRAWSpred(i,s, j, 0.03, 150, 500, 0.98, 120, 1, 2, 1.2, regions)
+imprimir(p)

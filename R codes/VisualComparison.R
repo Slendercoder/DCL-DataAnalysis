@@ -10,8 +10,8 @@ df2 = read.csv("WSLS.csv")
 df2$Exp <- as.character("WSLS")
 # head(df2)
 
-df3 = read.csv("out_Delta50-Zeta1.csv")
-#df3 = read.csv("FRA.csv")
+# df3 = read.csv("out_Delta50-Zeta1.csv")
+df3 = read.csv("FRA.csv")
 df3$Exp <- as.character("FRA")
 # head(df3)
 
@@ -54,7 +54,7 @@ p1 <- ggplot(dfc_DLIndex, aes(x = Round, y = DLIndex, colour=Exp, group=Exp)) +
 p2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   geom_density(size=1) +
   scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
-  scale_y_continuous(limits = c(0, 5)) + 
+#  scale_y_continuous(limits = c(0, 5)) + 
   labs(color = "Source of data") +
   theme_bw() +
   theme(legend.position="bottom")               # Position legend in bottom right
