@@ -133,11 +133,11 @@ regions <- c('RS',
 
 # To search for best parameters WSLS model
 w1 <- 0.035 # bias FOCAL
-w2 <- 140 # win stay 
+w2 <- 10 # win stay 
 fitresWSLS <- nmkb(par=c(w1, w2),
                fn = function(theta) FRAWSutil(c(theta, 500, 0.98, 0, 0, 0, 0), args, regions),
                lower=c(0,
-                       130),
+                       0),
                upper=c(0.05,
                        150),
                control=list(trace=0))
@@ -154,11 +154,11 @@ aic <- 2*8 + dev
 
 # To search for best parameters FRA model
 w1 <- 0.02 # bias FOCAL
-w2 <- 7.5 # win stay 
-w3 <- 1.33 # attraction similarity to complement
-w4 <- 1 # epsilon
-w5 <- 1.5 # stubborness
-w6 <- 1.2 # eta
+w2 <- 0.5 # win stay 
+w3 <- 0.5 # attraction similarity to complement
+w4 <- 1.5 # epsilon
+w5 <- 4 # stubborness
+w6 <- 2 # eta
 fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6),
                fn = function(theta) FRAWSutil(c(theta[1], 
                                                 theta[2],
@@ -169,24 +169,24 @@ fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6),
                                                 theta[5],
                                                 theta[6]), 
                                               args, regions),
-               lower=c(0,
-                       5,
-                       1,
-                       0.5,
-                       1,
-                       0.5),
-               upper=c(0.075,
-                       15,
-                       15,
+               lower=c(0.01,
+                       0,
+                       0,
                        1.5,
-                       15,
+                       1,
                        1.5),
+               upper=c(0.075,
+                       1,
+                       1,
+                       2.5,
+                       5,
+                       2.5),
                control=list(trace=0))
 
 beep()
 print(fitresFRA$par) 
 print(fitresFRA$value) 
 
-theta <- c(0.02, 7.5, 500, 0.98, 1.33, 1, 1.5, 1.2)
-dev <- FRAWSutil(theta, args, regions) # 2691
+theta <- c(0.025, 5, 500, 0.98, 1, 1.5, 1.9, 1.5)
+dev <- FRAWSutil(theta, args, regions) # 2825
 aic <- 2*8 + dev

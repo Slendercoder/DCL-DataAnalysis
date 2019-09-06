@@ -11,6 +11,7 @@ df2$Exp <- as.character("WSLS")
 # head(df2)
 
 # df3 = read.csv("out_Delta50-Zeta1.csv")
+#df3 = read.csv("output.csv")
 df3 = read.csv("FRA.csv")
 df3$Exp <- as.character("FRA")
 # head(df3)
@@ -61,4 +62,4 @@ p2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
 
 grid.arrange(p1, p2, nrow = 2, layout_matrix = rbind(c(1), c(2)))
 
-ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)
+# ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)

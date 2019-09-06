@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-DEB = True
+DEB = False
 
 ############################################################
 # Define function that initializes regions and strategies
@@ -355,10 +355,10 @@ class Experiment(object):
 			attactPrint = ["%.3f" % v for v in attractiveness]
 			print('final attractiveness\n', attactPrint)
 
-		sum = np.sum(np.exp(attractiveness/0.4))
-		probs = [np.exp(x/0.4)/sum for x in attractiveness]
-		# sum = np.sum(attractiveness)
-		# probs = [x/sum for x in attractiveness]
+		# sum = np.sum(np.exp(attractiveness/0.4))
+		# probs = [np.exp(x/0.4)/sum for x in attractiveness]
+		sum = np.sum(attractiveness)
+		probs = [x/sum for x in attractiveness]
 
 		return probs
 
@@ -380,15 +380,15 @@ class Experiment(object):
 		# print('newStrategy', newStrategy)
 		# Determines if should not randomize RS
 		if newStrategy == 0:
-			print('Determines if should randomize RS')
+			# print('Determines if should randomize RS')
 			n = (s + 128) / 160 # normalizing score
 			beta = self.modelParameters[2] # amplitude of the sigmoid function
 			gamma = self.modelParameters[3] # position of the sigmoid function
 			if uniform(0,1) > self.sigmoid(n, beta, gamma):
-				print('It should')
+				# print('It should')
 				return newStrategy, False
 			else:
-				print('It should not')
+				# print('It should not')
 				return newStrategy, True
 		else:
 			return newStrategy, False

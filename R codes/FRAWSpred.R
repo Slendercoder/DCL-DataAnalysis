@@ -40,8 +40,8 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-  print("bias")
-  imprimir(bias)
+#  print("bias")
+#  imprimir(bias)
   
   n <- (s + 128) / 160 # Normalizing score
   
@@ -54,8 +54,8 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
 #  print(regionsCoded[index - 1])
   # adding win stay
   attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
-  print('Attractiveness with WS:')
-  imprimir(attractiveness)
+#  print('Attractiveness with WS:')
+#  imprimir(attractiveness)
   
 #  print(attractiveness)
   
@@ -75,12 +75,12 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
   })
   similarity2Complement <- as.numeric(unlist(similarity2Complement))
   similarity2Complement <- c(0, 0, similarity2Complement)
-  print('Similarity to complement:')
-  imprimir(similarity2Complement)
+#  print('Similarity to complement:')
+#  imprimir(similarity2Complement)
   
   attractiveness <- attractiveness + delta * similarity2Complement
-  print('Attractiveness to complement:')
-  imprimir(attractiveness)
+#  print('Attractiveness to complement:')
+#  imprimir(attractiveness)
 
   # Consider distance from i to each focal region k and augment attractiveness
   index <- which(regions == i) # WARNING: REGIONS COLLAPSED!
@@ -101,10 +101,10 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
     similarities <- c(0, similarities)
     attractiveness <- attractiveness + zeta * similarities
   }
-  print('Similarity to region:')
-  imprimir(similarities)
-  print('Final attractiveness:')
-  imprimir(attractiveness)
+#  print('Similarity to region:')
+#  imprimir(similarities)
+#  print('Final attractiveness:')
+#  imprimir(attractiveness)
   
   
 #  negative <- which(attractiveness < 0)
@@ -120,8 +120,8 @@ FRAWSpred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta,
   return(probs)
 }
 
-i <- 'LEFT'
-s <- 16
-j <- 'GHIJOPQRWXYZ4567'
-p <- FRAWSpred(i,s, j, 0.03, 150, 500, 0.98, 120, 1, 2, 1.2, regions)
-imprimir(p)
+#i <- 'LEFT'
+#s <- 16
+#j <- 'GHIJOPQRWXYZ4567'
+#p <- FRAWSpred(i,s, j, 0.03, 150, 500, 0.98, 120, 1, 2, 1.2, regions)
+#imprimir(p)

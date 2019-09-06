@@ -2,6 +2,8 @@ library(sjPlot)
 library(ggplot2)
 library(gridExtra)
 library(Rmisc)
+library(latex2exp)
+library(grid)
 
 get_legend<-function(myggplot){
   tmp <- ggplot_gtable(ggplot_build(myggplot))
@@ -50,18 +52,6 @@ df <- rbind(
 df$Exp <- as.factor(df$Exp)
 df$Exp <- factor(df$Exp, levels = c('0', '0.05', '0.075'))
 
-dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
-# head(dfDLI)
-
-g1 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
-  geom_line() +
-  xlab("Round (unicorn absent)") +
-  ylab("Av. DLIndex") +
-  labs(color = TeX('bias$_{focal}$')) +
-  ylim(c(0,1)) + 
-  theme_bw() +
-  theme(legend.position="top") 
-
 df$Strategy <- lapply(df$Strategy, function(x) {
   if(x=='0' || x=='9') {
     return('RS')
@@ -98,6 +88,7 @@ df$Strategy <- factor(df$Strategy, levels = c('RS',
                                               'IN', 
                                               'OUT'))
 
+
 g2 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) + 
   geom_bar(aes(y = ..prop..), stat="count", position="dodge") +
   #  geom_text(aes(label = scales::percent(..prop..),
@@ -114,12 +105,12 @@ g2 <- ggplot(df, aes(x=Strategy,  group=Exp, fill=Exp)) +
 # g2
 
 legend <- get_legend(g2)
-g1 <- g1 + theme(legend.position="none")
+# g1 <- g1 + theme(legend.position="none")
 g2 <- g2 + theme(legend.position="none")
 
 expTex = TeX('$\\alpha{=}150$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}\\epsilon{=}\\zeta{=}0$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
-gRS <- grid.arrange(g2, g1, ncol = 2, top=legend, bottom=title1)
+gRS <- grid.arrange(g2, ncol = 1, top=legend, bottom=title1)
 
 ###############################################
 # Focal = 0.05; Beta = 500; Gamma = 0.98
@@ -181,7 +172,7 @@ expTex = TeX('bias$_{focal}=0.05$, $\\beta{=}500$, $\\gamma{=}0.98$, $\\delta{=}
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 gAlpha <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
 
-gWSLS <- grid.arrange(gRS, gAlpha, ncol = 2,  widths = c(0.6, 0.4))
+gWSLS <- grid.arrange(gRS, gAlpha, ncol = 2,  widths = c(0.5, 0.5))
 
 ###############################################
 # Epsilon = 1
@@ -265,7 +256,8 @@ df1$Exp <- as.character("0")
 df2 = read.csv("out_Delta10-Zeta1.csv")
 df2$Exp <- as.character("10")
 # head(df2)
-df3 = read.csv("out_Delta50-Zeta1.csv")
+df3 = read.csv("output.csv")
+#df3 = read.csv("out_Delta50-Zeta1.csv")
 df3$Exp <- as.character("50")
 # head(df3)
 
@@ -314,15 +306,59 @@ g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
 legend <- get_legend(g1)
 g1 <- g1 + theme(legend.position="none")
 
-expTex = TeX('$bias$_{focal}=0.03, $\\beta{=}500$, $\\gamma{=}0.98$, $\\zeta{=}1$, $\\epsilon{=}1$, $\\eta{=}1.2$')
+expTex = TeX('$bias$_{focal}=0.03, $\\beta{=}500$, $\\gamma{=}0.98$, $\\zeta{=}\\epsilon{=}1$, $\\eta{=}1.2$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 gDelta <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
 
-gFRA <- grid.arrange(gZeta, gDelta, ncol = 2,  widths = c(0.6, 0.4))
+#######################################################
+# MODELS WORK
+######################################################
 
-g <- grid.arrange(gWSLS, gFRA, nrow = 2)
+df1 = read.csv("humans.csv")
+df1$Exp <- as.character("Humans")
+df2 = read.csv("WSLSworks.csv")
+df2$Exp <- as.character("WSLS")
+df3 = read.csv("FRAworks.csv")
+df3$Exp <- as.character("FRA")
 
-model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df1)
+df <- rbind(
+  df1[c('Round', 
+        'DLIndex',
+        'Strategy',
+        'Consistency',
+        'Norm_Score_LAG1',
+        'Exp')],
+  df2[c('Round', 
+        'DLIndex',
+        'Strategy',
+        'Consistency',
+        'Norm_Score_LAG1',
+        'Exp')]
+)
+df$Exp <- as.factor(df$Exp)
+df$Exp <- factor(df$Exp, levels = c('WSLS', 'FRA'))
+
+dfDLI <- summarySE(df, measurevar="DLIndex", groupvars=c("Round", "Exp"))
+# head(dfDLI)
+
+g1 <- ggplot(dfDLI, aes(Round, DLIndex, group=Exp, color=Exp)) +
+  geom_line() +
+  xlab("Round (unicorn absent)") +
+  ylab("Av. DLIndex") +
+  labs(color = 'Model') +
+  ylim(c(0,1)) + 
+  theme_bw() +
+  theme(legend.position="top") 
+
+#g1
+
+gFRA <- grid.arrange(gDelta, g1, ncol = 2,  widths = c(0.5, 0.5))
+
+g <- grid.arrange(gWSLS, gDelta, gFRA, nrow = 3)
+
+
+
+model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df3)
 summary(model3h)
 
 g2 <- plot_model(model3h, 
@@ -335,10 +371,10 @@ g2 <- plot_model(model3h,
 
 g2
 
-model4h <- lm(Consistency ~ Distancias_LAG1, data = df1)
+model4h <- lm(Consistency ~ Distancias_LAG1, data = df3)
 summary(model4h) # => Positive correlation is significant
 
-g3 <- ggplot(df1, aes(log(Distancias_LAG1), Consistency)) +
+g3 <- ggplot(df3, aes(log(Distancias_LAG1), Consistency)) +
   geom_point(alpha = 1/8) +
   xlab("Log of max similarity w.r.t.\nfocal regions on Round n-1") +
   ylab("Consistency on Round n") +
