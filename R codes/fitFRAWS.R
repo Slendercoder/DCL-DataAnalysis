@@ -153,34 +153,28 @@ dev
 aic <- 2*8 + dev
 
 # To search for best parameters FRA model
-w1 <- 0.02 # bias FOCAL
-w2 <- 0.5 # win stay 
-w3 <- 0.5 # attraction similarity to complement
-w4 <- 1.5 # epsilon
-w5 <- 4 # stubborness
-w6 <- 2 # eta
-fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6),
+w1 <- 0.005 # bias FOCAL
+w2 <- 150 # win stay 
+w3 <- 400 # attraction similarity to complement
+w4 <- 2 # stubborness
+fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
                fn = function(theta) FRAWSutil(c(theta[1], 
                                                 theta[2],
                                                 500,
                                                 0.98,
                                                 theta[3],
+                                                1,
                                                 theta[4],
-                                                theta[5],
-                                                theta[6]), 
+                                                1.5), 
                                               args, regions),
-               lower=c(0.01,
-                       0,
-                       0,
-                       1.5,
-                       1,
-                       1.5),
-               upper=c(0.075,
-                       1,
-                       1,
-                       2.5,
-                       5,
-                       2.5),
+               lower=c(0.0001,
+                       100,
+                       100,
+                       0),
+               upper=c(0.07,
+                       160,
+                       410,
+                       10),
                control=list(trace=0))
 
 beep()

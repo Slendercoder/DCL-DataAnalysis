@@ -303,15 +303,14 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
-# modelParameters = [0.038, 5.19, 500, 0.98, 0, 0, 0, 0]
+# modelParameters = [?, ?, 500, 0.98, 0, 0, 0, 0]
 # FRA optim
-# modelParameters = [0.025, 5, 500, 0.98, 1, 1.5, 1.9, 1.5]
-modelParameters = [0.023, 0.5, 500, 0.98, 0.5, 2, 4.1, 1.9] # DEV=2749
+# modelParameters = [?, ?, 500, 0.98, ?, 1, ?, 1.5]
 # Trying out things
 # gameParameters = [0.5, 2, 8, 60, 45]
 # modelParameters = [0.02, 150, 500, 0.98, 400, 1, 2, 1.5] # Good parameters for FRA
-# modelParameters = [0.02, 150, 500, 0.98, 0, 0, 0, 0] # How WSLS works...
-modelParameters = [0.005, 150, 500, 0.98, 400, 1, 2, 1.5] # ... as compared to FRA
+# modelParameters = [0.038, 100, 500, 0.98, 0, 0, 0, 0] # How WSLS works...
+modelParameters = [0.019, 100, 500, 0.98, 100, 1, 4.7, 1.5] # ... as compared to FRA
 ifDistances = 1
 ifClassify = 0
 

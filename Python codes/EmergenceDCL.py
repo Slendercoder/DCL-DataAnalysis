@@ -848,38 +848,41 @@ class Experiment(object):
 		            categoria.append(regionClassified)
 
 		dictionary = dict((i,j) for i,j in enumerate(regions))
+		dictionary[9] = 'RS'
 		data['Category'] = data['Strategy'].map(dictionary)
 
 		# --------------------------------------------------
 		# Finding distance to closest focal region per round, per player
 		# --------------------------------------------------
 		if ifDistances == 1:
-		    print("Finding distances to focal paths...")
+			print("Finding distances to focal paths...")
 
-		    # Deterimining list of columns
-		    cols1 = ['a' + str(i) + str(j) \
-		            for i in range(1, Num_Loc + 1) \
-		            for j in range(1, Num_Loc + 1) \
-		            ]
-		    cols = cols1 + ['Player', 'Round']
+			# Deterimining list of columns
+			cols1 = ['a' + str(i) + str(j) \
+			for i in range(1, Num_Loc + 1) \
+			for j in range(1, Num_Loc + 1) \
+			]
+			cols = cols1 + ['Player', 'Round']
 
-		    print("Sorting by Player, Round...")
-		    data = data.sort_values(['Player', 'Round'], \
-		                    ascending=[True, True]).reset_index()
+			print("Sorting by Player, Round...")
+			data = data.sort_values(['Player', 'Round'], \
+			ascending=[True, True]).reset_index()
 
-		    distancias = []
-		    for player, Grp in data[cols].groupby(['Player']):
-		        print("Working with player " + str(player) + "...")
-		        for ronda, grp in Grp.groupby(['Round']):
-		            # print "Obtaining path from round " + str(ronda) + "..."
-		            path = [int(list(grp[c])[0]) for c in cols1]
-		            # print path
-		            # print "finding region..."
-		            minDist = self.minDist2Focal(path, self.regions, 0.3)
-		            # print "Min: " + str(minDist)
-		            distancias.append(minDist)
+			distancias = []
+			for player, Grp in data[cols].groupby(['Player']):
+				print("Working with player " + str(player) + "...")
+				for ronda, grp in Grp.groupby(['Round']):
+					# print "Obtaining path from round " + str(ronda) + "..."
+					path = [int(list(grp[c])[0]) for c in cols1]
+					# print path
+					# print "finding region..."
+					minDist = self.minDist2Focal(path, self.regions, 0.3)
+					# print "Min: " + str(minDist)
+					distancias.append(minDist)
 
-		    data['Distancias'] = distancias
+			print('len distancias', len(distancias))
+			print('len data[Distacias]', len(data))
+			data['Distancias'] = distancias
 
 		# --------------------------------------------------
 		# Finding the lag variables
