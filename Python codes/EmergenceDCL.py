@@ -213,7 +213,7 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 8), "Model parameters incorrect length!"
+		assert(len(modelParameters) == 9), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 
@@ -302,6 +302,7 @@ class Experiment(object):
 		epsilon = self.modelParameters[5] # for similarity to complementary focal region
 		zeta = self.modelParameters[6] # for the steepness of the similarity to focal region
 		eta = self.modelParameters[7] # for the steepness of the similarity to complementary focal region
+		FOCAL = self.modelParameters[8]
 
 		regionsCoded = self.regions
 		strategies = self.strategies
@@ -316,7 +317,13 @@ class Experiment(object):
 
 		n = (score + 128) / 160 # normalizing score
 
-		attractiveness[i] += alpha * self.sigmoid(n, beta, gamma) # Adding 'Win Stay'
+		# Adding 'Win Stay'
+		if FOCAL == 1:
+			if i != 0:
+				attractiveness[i] += alpha * self.sigmoid(n, beta, gamma)
+		else:
+			attractiveness[i] += alpha * self.sigmoid(n, beta, gamma)
+
 		if DEB:
 			attactPrint = ["%.3f" % v for v in attractiveness]
 			print('attractiveness with WS\n', attactPrint)
@@ -849,7 +856,9 @@ class Experiment(object):
 
 		dictionary = dict((i,j) for i,j in enumerate(regions))
 		dictionary[9] = 'RS'
+		# print(dictionary)
 		data['Category'] = data['Strategy'].map(dictionary)
+		# print(data[['Category', 'Strategy']])
 
 		# --------------------------------------------------
 		# Finding distance to closest focal region per round, per player
@@ -909,10 +918,10 @@ class Experiment(object):
 		self.df = data
 
 		# ifSave = input("Do you want to save data to a file? (1=Yes/0=No): ")
-		# ifSave = 0
+		# ifSave = 1
 		# if ifSave == 1:
 		# 	outputFile = 'output.csv'
 		# 	data.to_csv(outputFile, index=False)
-		# 	print("Results saved to " + outputFile)
-
-		print("Done!")
+		# 	print("Results saved to: " + outputFile)
+		#
+		# print("Done!")

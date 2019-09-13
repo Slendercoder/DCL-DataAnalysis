@@ -1,4 +1,4 @@
-source("FRAWSpred.R")
+source("FRApred.R")
 library(dfoptim)
 library(beepr)
 
@@ -131,34 +131,13 @@ regions <- c('RS',
              'OUT')
 
 
-# To search for best parameters WSLS model
-w1 <- 0.035 # bias FOCAL
-w2 <- 10 # win stay 
-fitresWSLS <- nmkb(par=c(w1, w2),
-               fn = function(theta) FRAWSutil(c(theta, 500, 0.98, 0, 0, 0, 0), args, regions),
-               lower=c(0,
-                       0),
-               upper=c(0.05,
-                       150),
-               control=list(trace=0))
-
-beep()
-print(fitresWSLS$par) 
-print(fitresWSLS$value) 
-
-theta <- c(0.035, 100, 500, 0.98, 0, 0, 0, 0)
-dev <- FRAWSutil(theta, args, regions) # 3689
-dev
-#dev <- 3689
-aic <- 2*8 + dev
-
 # To search for best parameters FRA model
 w1 <- 0.005 # bias FOCAL
 w2 <- 150 # win stay 
 w3 <- 400 # attraction similarity to complement
 w4 <- 2 # stubborness
 fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
-               fn = function(theta) FRAWSutil(c(theta[1], 
+               fn = function(theta) FRAutil(c(theta[1], 
                                                 theta[2],
                                                 500,
                                                 0.98,
@@ -171,7 +150,7 @@ fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
                        100,
                        100,
                        0),
-               upper=c(0.07,
+               upper=c(0.01,
                        160,
                        410,
                        10),
@@ -181,6 +160,8 @@ beep()
 print(fitresFRA$par) 
 print(fitresFRA$value) 
 
-theta <- c(0.025, 5, 500, 0.98, 1, 1.5, 1.9, 1.5)
-dev <- FRAWSutil(theta, args, regions) # 2825
+theta <- c(0.001, 130, 500, 0.98, 300, 1, 2, 1.5)
+dev <- FRAWSutil(theta, args, regions)
+dev # ???
 aic <- 2*8 + dev
+aic # ???

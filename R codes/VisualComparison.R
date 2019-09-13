@@ -15,13 +15,14 @@ df1 = read.csv("humans.csv")
 df1$Exp <- as.character("Observed behavior")
 head(df1)
 # df2 = read.csv("out_Focal0.05-Alpha150.csv")
-df2 = read.csv("WSLS.csv")
+df2 = read.csv("output1.csv")
+#df2 = read.csv("WSLS.csv")
 df2$Exp <- as.character("WSLS")
 df2$Strategy <- df2$Category
 head(df2)
 # df3 = read.csv("out_Delta50-Zeta1.csv")
-#df3 = read.csv("output.csv")
-df3 = read.csv("FRA.csv")
+df3 = read.csv("output.csv")
+#df3 = read.csv("FRA.csv")
 df3$Exp <- as.character("FRA")
 df3$Strategy <- df3$Category
 head(df3)
@@ -151,7 +152,8 @@ g5 <- g5 + theme(legend.position="none")
 
 grid.arrange(g1, g2, g3, g4, g5, 
              nrow = 3, 
-             layout_matrix = rbind(c(1, 3), c(2, 4), c(5)),
+             layout_matrix = rbind(c(2, 3), c(4, 5), c(1)),
              bottom=legend)
 
 # ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)
+

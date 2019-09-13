@@ -28,6 +28,8 @@ def standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify
     print('delta: ', modelParameters[4])
     print('epsilon: ', modelParameters[5])
     print('zeta: ', modelParameters[6])
+    print('eta: ', modelParameters[7])
+    print('FOCAL: ', modelParameters[8])
     print("\n")
     print('--- Game parameters ---')
     print('Probabilit of a unicorn: ', gameParameters[0])
@@ -68,6 +70,8 @@ def parameter_sweep1(gameParameters, modelParameters, ifDistances, ifClassify):
     print('delta: ', modelParameters[4])
     print('epsilon: ', modelParameters[5])
     print('zeta: ', modelParameters[6])
+    print('eta: ', modelParameters[7])
+    print('FOCAL: ', modelParameters[8])
     print("\n")
     print("Sweeping Focal and Gamma parameters...")
 
@@ -119,6 +123,8 @@ def parameter_sweep2(gameParameters, modelParameters, ifDistances, ifClassify):
     print('delta: ', modelParameters[4])
     print('epsilon: ', modelParameters[5])
     print('zeta: ', modelParameters[6])
+    print('eta: ', modelParameters[7])
+    print('FOCAL: ', modelParameters[8])
     print("\n")
     print("Sweeping Focal and alpha parameters...")
 
@@ -169,6 +175,8 @@ def parameter_sweep3(gameParameters, modelParameters, ifDistances, ifClassify):
     # print('delta: ', modelParameters[4])
     print('epsilon: ', modelParameters[5])
     # print('zeta: ', modelParameters[6])
+    print('eta: ', modelParameters[7])
+    print('FOCAL: ', modelParameters[8])
     print("\n")
     print("Sweeping delta and zeta parameters...")
 
@@ -218,6 +226,8 @@ def parameter_sweep4(gameParameters, modelParameters, ifDistances, ifClassify):
     print('delta: ', modelParameters[4])
     # print('epsilon: ', modelParameters[5])
     # print('zeta: ', modelParameters[6])
+    print('eta: ', modelParameters[7])
+    print('FOCAL: ', modelParameters[8])
     print("\n")
     print("Sweeping epsilon and zeta parameters...")
 
@@ -268,6 +278,7 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
     print('epsilon: ', modelParameters[5])
     print('zeta: ', modelParameters[6])
     print('eta: ', modelParameters[7])
+    print('FOCAL: ', modelParameters[8])
     print("\n")
     print("Sweeping delta and eta parameters...")
 
@@ -301,16 +312,17 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 45]
+gameParameters = [0.5, 2, 8, 60, 1000]
 # WSLS optim
-# modelParameters = [?, ?, 500, 0.98, 0, 0, 0, 0]
+# modelParameters = [0.054, 3.5, 500, 0.98, 0, 0, 0, 0, 0]
+modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
 # FRA optim
-# modelParameters = [?, ?, 500, 0.98, ?, 1, ?, 1.5]
+# modelParameters = [0.01, 100, 500, 0.98, 100, 1, 5, 1.5, 1]
 # Trying out things
-# gameParameters = [0.5, 2, 8, 60, 45]
+# gameParameters = [0.5, 2, 8, 20, 1]
+# modelParameters = [0.055, 130, 500, 0.98, 0, 0, 0, 0, 0] # How WSLS works...
+# modelParameters = [0.001, 130, 500, 0.98, 300, 1, 2, 1.5, 1] # ... as compared to FRA
 # modelParameters = [0.02, 150, 500, 0.98, 400, 1, 2, 1.5] # Good parameters for FRA
-# modelParameters = [0.038, 100, 500, 0.98, 0, 0, 0, 0] # How WSLS works...
-modelParameters = [0.019, 100, 500, 0.98, 100, 1, 4.7, 1.5] # ... as compared to FRA
 ifDistances = 1
 ifClassify = 0
 
