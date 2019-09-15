@@ -305,6 +305,43 @@ def parameter_sweep5(gameParameters, modelParameters, ifDistances, ifClassify):
             E.df.to_csv(outputFile, index=False)
             print("Results saved to " + outputFile)
 
+def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, ifClassify):
+
+    for l in lst:
+        gameParameters = gameParameters[:4] + [l]
+        print("****************************")
+        print('Starting simulation', l)
+        print("****************************")
+        print('--- Model parameters ----')
+        print('wALL: ', modelParameters[0])
+        print('wNOTHING: ', modelParameters[0])
+        print('wDOWN: ', modelParameters[0])
+        print('wIN: ', modelParameters[0])
+        print('alpha: ', modelParameters[1])
+        print('beta: ', modelParameters[2])
+        print('gamma: ', modelParameters[3])
+        print('delta: ', modelParameters[4])
+        print('epsilon: ', modelParameters[5])
+        print('zeta: ', modelParameters[6])
+        print('eta: ', modelParameters[7])
+        print('FOCAL: ', modelParameters[8])
+        print("\n")
+        print('--- Game parameters ---')
+        print('Probabilit of a unicorn: ', gameParameters[0])
+        print('Number of players: ', gameParameters[1])
+        print('Grid size: ', str(gameParameters[2]) + ' x ' + str(gameParameters[2]))
+        print('Number of rounds: ', gameParameters[3])
+        print('Number of dyads: ', gameParameters[4])
+        print("\n")
+
+        E = DL.Experiment(gameParameters, modelParameters)
+        E.run_simulation()
+        E.get_measures(ifDistances, ifClassify)
+        f = 'output_' + str(l) + '.csv'
+        E.df.to_csv(f, index=False)
+        print('Data saved to', f)
+
+
 ##########################################################################
 #
 #  Simulation starts here
@@ -326,6 +363,9 @@ modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
 ifDistances = 1
 ifClassify = 0
 
-standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
+# standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
 
 # parameter_sweep4(gameParameters, modelParameters, ifDistances, ifClassify)
+
+lst = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
+exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, ifClassify)
