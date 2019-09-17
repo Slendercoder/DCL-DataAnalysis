@@ -349,7 +349,7 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, i
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 1000]
+gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
 # modelParameters = [0.054, 3.5, 500, 0.98, 0, 0, 0, 0, 0]
 modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
@@ -363,9 +363,9 @@ modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
 ifDistances = 1
 ifClassify = 0
 
-# standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
+standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
 
 # parameter_sweep4(gameParameters, modelParameters, ifDistances, ifClassify)
 
-lst = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
-exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, ifClassify)
+# lst = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
+# exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, ifClassify)

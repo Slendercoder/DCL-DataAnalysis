@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 DEB = False
+IMPR = True
 
 ############################################################
 # Define function that initializes regions and strategies
@@ -382,9 +383,20 @@ class Experiment(object):
 			probsPrint = ["%.3f" % v for v in probs]
 			print('probs\n', probsPrint)
 		# print('Suma: ', np.sum(probs))
+
 		# get the selected strategy
 		newStrategy = np.random.choice(range(9), p=probs)
 		# print('newStrategy', newStrategy)
+
+		if IMPR:
+			probsPrint = ["%.3f" % v for v in probs]
+			with open('fileFreqs.csv', 'a') as data_file:
+				data_file.write(str(nameRegion(i)) + ',' + str(s) + ',')
+				for p in probsPrint:
+					data_file.write(str(p) + ',')
+				data_file.write(str(nameRegion(newStrategy)) + '\n')
+			data_file.close()
+
 		# Determines if should not randomize RS
 		if newStrategy == 0:
 			# print('Determines if should randomize RS')
