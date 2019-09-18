@@ -1,3 +1,4 @@
+specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
 imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
 
 regiones <- c('RS',
@@ -21,7 +22,7 @@ getFreq <- function(i, s, df) {
   regs <- df[which(df$Region == i), ]
   regsGo <- regs$RegionGo[which(regs$Score == s)]
   regsGo <- as.factor(regsGo)
-  levels(regsGo) <- regiones
+#  levels(regsGo) <- regiones
 #  print(regsGo)
   auxDF <- t(as.data.frame(table(regsGo)))
 #  print(auxDF)
@@ -54,6 +55,53 @@ WSpred <- function(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regio
   return(probs)
 }
 
+# A function to get deviance from WSLS and FRA models
+WSutil <- function(theta, args, regiones){
+  # Input: theta, parameter vector of length 11
+  #        data, the dataframe from which frequencies are obtained
+  # Output: Deviance of WSLSpred for all regions and scores
+  
+  if (any(is.na(theta))) {
+    print('Incorrect parameters: ')
+    print(theta)
+    return(10000)
+  }
+  
+  w <- theta[1]
+  alpha <- theta[2]
+  beta <- theta[3]
+  gamma <- theta[4]
+  delta <- theta[5]
+  epsilon <- theta[6]
+  zeta <- theta[7]
+  eta <- theta[8]
+  
+  # Calculate the probabilities based on FRAWSpred
+  # print('Calculating probabilities')
+  args$probs <- lapply(args$pair, function(x) {
+    i <- as.character(x[[1]][1])
+    s <- as.numeric(x[[2]][1])
+    return(WSpred(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions))
+  })
+
+    # Calculate deviance
+  #  print('Calculating deviances')
+  args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
+  
+  print(args$dev)
+
+  if (any(is.infinite(args$dev) | is.na(args$dev))) {
+    print('Incorrect dev: ')
+    return(10000)
+  }
+  
+  return(-2*sum(args$dev))
+}
+
+
+##################################################################
+##################################################################
+
 data = read.csv("fileFreqs.csv")
 head(data)
 
@@ -76,25 +124,51 @@ args$freq <- lapply(args$pair, function(x) {
 head(args)
 
 # Get relative frequencies
-args$sumFreq <- lapply(args$freq, function(x) {
-  a <- sum(x)
-  return(a)
-})
+#args$sumFreq <- lapply(args$freq, function(x) {
+#  a <- sum(x)
+#  return(a)
+#})
 
-args$relFreq <- mapply(function(x, y) {
-  if (y==0) {
-    return(list(rep(0, 9)))
-  } else {
-    return(list(imprimir(1/y*x)))
-  }
-}, args$freq, args$sumFreq)
+#head(args)
+#args <- args[args$sumFreq != 0, ]
+
+#args$relFreq <- mapply(function(x, y) {
+#  if (y==0) {
+#    return(list(rep(0, 9)))
+#  } else {
+#    return(list(imprimir(1/y*x)))
+#  }
+#}, args$freq, args$sumFreq)
+
+# args <- args[c('pair', 'relFreq', 'probs')]
+
+#head(args)
+
+theta <- c(0.05, 150, 500, 0.98, 0, 0, 0, 0, 0)
+w <- theta[1]
+alpha <- theta[2]
+beta <- theta[3]
+gamma <- theta[4]
+delta <- theta[5]
+epsilon <- theta[6]
+zeta <- theta[7]
+eta <- theta[8]
 
 args$probs <- lapply(args$pair, function(x) {
   i <- as.character(x[[1]][1])
   s <- as.numeric(x[[2]][1])
-  return(imprimir(WSpred(i, s, 0.05, 150, 500, 0.98, 0, 0, 0, 0, regiones)))
+  return(WSpred(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones))
 })
 
-args <- args[c('pair', 'relFreq', 'probs')]
-
 head(args)
+
+args1 <- args[args$s == -80, ]
+
+# Calculate deviance
+#  print('Calculating deviances')
+args1$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args1$freq, args1$probs)
+
+-2*sum(args1$dev)
+
+WSutil(theta, args, regiones)
+
