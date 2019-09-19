@@ -5,11 +5,11 @@ library(beepr)
 data = read.csv('../Python Codes/frequencies_test.csv')
 data = read.csv('frequencies.csv')
 data = read.csv("../Python Codes/fileFreqs.csv")
-head(data)
+#head(data)
 
 args <- getArgs(data, regiones)
+#args <- args[order(args$s),] 
 head(args)
-
 
 # To search for best parameters WSLS model
 w1 <- 0.035 # bias FOCAL
