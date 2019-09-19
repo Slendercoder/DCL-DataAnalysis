@@ -704,8 +704,8 @@ class Experiment(object):
 		# --------------------------------------------------
 		# Working only with trials with "Unicorn_Absent"
 		# --------------------------------------------------
+		# print(data['Is_there'].unique())
 		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
-		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))
 
 
 		# --------------------------------------------------

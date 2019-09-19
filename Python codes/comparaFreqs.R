@@ -81,9 +81,9 @@ WSutil <- function(theta, args, regiones){
   args$probs <- lapply(args$pair, function(x) {
     i <- as.character(x[[1]][1])
     s <- as.numeric(x[[2]][1])
-    return(WSpred(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions))
+    return(WSpred(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones))
   })
-
+  
     # Calculate deviance
   #  print('Calculating deviances')
   args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
@@ -124,13 +124,13 @@ args$freq <- lapply(args$pair, function(x) {
 head(args)
 
 # Get relative frequencies
-#args$sumFreq <- lapply(args$freq, function(x) {
-#  a <- sum(x)
-#  return(a)
-#})
+args$sumFreq <- lapply(args$freq, function(x) {
+  a <- sum(x)
+  return(a)
+})
 
-#head(args)
-#args <- args[args$sumFreq != 0, ]
+args <- args[args$sumFreq != 0, ]
+head(args)
 
 #args$relFreq <- mapply(function(x, y) {
 #  if (y==0) {
@@ -162,7 +162,15 @@ args$probs <- lapply(args$pair, function(x) {
 
 head(args)
 
-args1 <- args[args$s == -80, ]
+args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
+
+head(args)
+
+-2*sum(args$dev)
+
+WSutil(theta, args, regiones)
+
+args1 <- args
 
 # Calculate deviance
 #  print('Calculating deviances')
@@ -170,5 +178,4 @@ args1$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args1$freq, args1
 
 -2*sum(args1$dev)
 
-WSutil(theta, args, regiones)
-
+z <- args1[is.infinite(args1$dev), ]

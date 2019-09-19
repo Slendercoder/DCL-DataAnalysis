@@ -1,7 +1,8 @@
 library(dplyr)
 source("ClassifyRegions.R")
 
-df1 = read.csv("_with_lag.csv")
+#df1 = read.csv("_with_lag.csv")
+df1 = read.csv("../Python Codes/output.csv")
 head(df1)
 
 # Get visited tiles for each player
@@ -33,8 +34,9 @@ auxDF <- data.frame(c('Dyad', NA),
                     c('Score', NA))
 colnames(auxDF) = as.character(unlist(auxDF[1, ])) # the first row will be the header
 auxDF = auxDF[-1, ]          # removing the first row.
-auxDF$RJoint <- list(0)
-auxDF$Score <- 0
+auxDF = auxDF[-1, ]          # removing the first row.
+#auxDF$RJoint <- list(0)
+#auxDF$Score <- 0
 
 for (pareja in unique(df1$Dyad)) {
   # Create the joint region
@@ -63,7 +65,7 @@ for (pareja in unique(df1$Dyad)) {
   
   # Add dataframe to big dataframe
   auxDF <- rbind(auxDF, DF)
-  auxDF <- na.omit(auxDF)
+#  auxDF <- na.omit(auxDF)
   
   # Create dataframe for second player
   DF <- data.frame(seq(1, length(r2), by=1))
@@ -79,7 +81,7 @@ for (pareja in unique(df1$Dyad)) {
   
   # Add dataframe to big dataframe
   auxDF <- rbind(auxDF, DF)
-  auxDF <- na.omit(auxDF)
+#  auxDF <- na.omit(auxDF)
 }
 head(auxDF)
 dim(auxDF)

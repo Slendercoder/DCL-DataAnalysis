@@ -2,30 +2,34 @@ source("WSpred.R")
 library(dfoptim)
 library(beepr)
 
-data = read.csv('frequencies_test.csv')
+data = read.csv('../Python Codes/frequencies_test.csv')
+data = read.csv('frequencies.csv')
+data = read.csv("../Python Codes/fileFreqs.csv")
 head(data)
 
-args <- getArgs(data)
+args <- getArgs(data, regiones)
 head(args)
+
 
 # To search for best parameters WSLS model
 w1 <- 0.035 # bias FOCAL
 w2 <- 110 # win stay 
 fitresWSLS <- nmkb(par=c(w1, w2),
-               fn = function(theta) WSutil(c(theta, 500, 0.98, 0, 0, 0, 0), args, regions),
+               fn = function(theta) WSutil(c(theta, 500, 0.98, 0, 0, 0, 0), args, regiones),
                lower=c(0,
                        0),
                upper=c(0.075,
-                       150),
+                       200),
                control=list(trace=0))
 
 beep()
 print(fitresWSLS$par) 
 print(fitresWSLS$value) 
 
-theta <- c(0.03, 150, 500, 0.98, 0, 0, 0, 0)
-dev <- WSutil(theta, args, regions) 
-dev # 4758
+dev <-fitresWSLS$value 
+#theta <- c(0.03, 150, 500, 0.98, 0, 0, 0, 0)
+#dev <- WSutil(theta, args, regions) 
+#dev # 4758
 aic <- 2*4 + dev
 aic # 4766
 

@@ -349,7 +349,7 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, i
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 45]
+gameParameters = [1, 2, 8, 60, 45]
 # WSLS optim
 # modelParameters = [0.054, 3.5, 500, 0.98, 0, 0, 0, 0, 0]
 modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
