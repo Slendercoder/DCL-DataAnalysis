@@ -12,10 +12,17 @@ import matplotlib.patches as patches
 
 DEB = False
 IMPR = True
+TOLERANCIA = 1
 
 ############################################################
 # Define function that initializes regions and strategies
 ############################################################
+
+def nas(x, y):
+	if x == 'Unicorn_Present':
+		return np.nan
+	else:
+		return y
 
 def nameRegion(r):
 	if r == 0 or r == 9:
@@ -261,7 +268,20 @@ class Experiment(object):
 	    distance = np.sqrt(np.sum(squares))
 	    return(np.exp(- o * distance))
 
-	def minDist2Focal(self, r, regionsCoded, eta):
+	def dist(self, k, i):
+	    # Returns similarity between regions k and i
+	    # Input: k, which is a region coded as a vector of 0s and 1s of length 64
+	    #        i, which is a region coded as a vector of 0s and 1s of length 64
+	    #        o, which is a parameter for the exponential
+	    # Output: number representing the similarity between k and i
+
+	    k = np.array(k)
+	    i = np.array(i)
+	    dif = np.subtract(k, i)
+	    squares = np.multiply(dif, dif)
+	    return(np.sqrt(np.sum(squares)))
+
+	def maxSim2Focal(self, r, regionsCoded, eta):
 	    # Returns closest distance to focal region
 	    # Input: r, which is a region coded as a vector of 0s and 1s of length 64
 	    # Output: number representing the closest distance
@@ -274,8 +294,39 @@ class Experiment(object):
 	        distances[contador] = self.simil(r, kV, eta)
 	        contador = contador + 1
 
-	    valor = np.min(np.array(distances))
+	    valor = np.max(np.array(distances))
 	    return(valor)
+
+	def minDist2Focal(self, r, regionsCoded):
+		# Returns closest distance to focal region
+		# Input: r, which is a region coded as a vector of 0s and 1s of length 64
+		# Output: number representing the closest distance
+
+		distances = [0] * 8
+		contador = 0
+
+		# print('r:\n', list(r))
+		for k in regionsCoded:
+			# kV = self.code2Vector(k)
+			# print('k:\n', k)
+			distances[contador] = self.dist(list(r), k)
+			contador = contador + 1
+
+		# dist_print = ["%.3f" % v for v in distances]
+		# print('distancias:\n', dist_print)
+
+		valor = np.min(np.array(distances))
+		indiceMin = np.argmin(np.array(distances))
+		# print('argmin:', indiceMin, 'vale?:', valor < np.sqrt(3))
+
+		if valor < np.sqrt(TOLERANCIA):
+			reg = nameRegion(indiceMin + 1)
+			return(reg)
+		else:
+			return('RS')
+
+	    # valor = np.min(np.array(distances))
+	    # return(valor)
 
 	def probabilities(self, i, score, j):
 
@@ -698,19 +749,25 @@ class Experiment(object):
 		# Find the accumulated score
 		print("Finding accumulated score...")
 		data['Score'] = data['Score'].map(lambda x: int(x))
-		data['Ac_Score'] = data.sort_values(['Dyad','Player']).groupby('Player')['Score'].cumsum()
-		# print data
 
-		# --------------------------------------------------
-		# Working only with trials with "Unicorn_Absent"
-		# --------------------------------------------------
-		# print(data['Is_there'].unique())
-		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+		# # --------------------------------------------------
+		# # Working only with trials with "Unicorn_Absent"
+		# # --------------------------------------------------
+		# # print(data['Is_there'].unique())
+		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
 
+		cols = ['Score', 'Joint']
+		cols = cols + ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
+
+		for c in cols:
+			data[c] = data.apply(lambda x: nas(x['Is_there'], x[c]), axis=1)
 
 		# --------------------------------------------------
 		# Continue obtaining measures
 		# --------------------------------------------------
+		data['Ac_Score'] = data.sort_values(['Dyad','Player']).groupby('Player')['Score'].cumsum()
+		# print data
+
 		Dyads = data.Dyad.unique()
 
 		# Find the normalized score
@@ -726,7 +783,7 @@ class Experiment(object):
 		# print('cols: ', cols)
 		data['Size_visited'] = data[cols].sum(axis=1)
 		# print(data[['Player', 'Round', 'Size_visited', 'Joint']][:10])
-		assert(all(data['Size_visited'] >= data['Joint']))
+		# assert(all(data['Size_visited'] >= data['Joint']))
 
 
 		print("Sorting by Player...")
@@ -774,9 +831,9 @@ class Experiment(object):
 		# data['Consistency'] = data['Consistency'].fillna(0)
 		# print data
 
-		# Filling NA in Consistency
-		print("Filling NA in Consistency")
-		data['Consistency'] = data['Consistency'].fillna(1)
+		# # Filling NA in Consistency
+		# print("Filling NA in Consistency")
+		# data['Consistency'] = data['Consistency'].fillna(1)
 
 		print("Sorting by Dyad, Player, Round...")
 		data = data.sort_values(['Dyad','Player','Round'], \
@@ -807,10 +864,10 @@ class Experiment(object):
 		    #     total.append(j)
 		    #     total.append(j)
 		    aux1['Total'] = aux1['Size_visited'] + aux2['Size_visited'] - aux1['Joint']
-		    assert(all(aux1['Joint'] == aux2['Joint']))
-		    assert(all(aux1['Size_visited'] >= aux1['Joint']))
-		    assert(all(aux2['Size_visited'] >= aux1['Joint']))
-		    assert(all(aux1['Total'] >= aux1['Size_visited']))
+		    # assert(all(aux1['Joint'] == aux2['Joint']))
+		    # assert(all(aux1['Size_visited'] >= aux1['Joint']))
+		    # assert(all(aux2['Size_visited'] >= aux1['Joint']))
+		    # assert(all(aux1['Total'] >= aux1['Size_visited']))
 		    # print "aux1['Total']: \n", aux1['Total']
 		    total += list(aux1['Total']) + list(aux1['Total'])
 		    # Finding difference between consistencies
@@ -835,42 +892,46 @@ class Experiment(object):
 
 		# Division of labor Index (Goldstone)
 		data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
-		assert(all(data['DLIndex'] >= 0))
+		# assert(all(data['DLIndex'] >= 0))
 
 		if ifClassify == 1:
-		    # --------------------------------------------------
-		    # Classify region per round, per player
-		    # --------------------------------------------------
-		    print("Classifying regions...")
+			# --------------------------------------------------
+			# Classify region per round, per player
+			# --------------------------------------------------
+			print("Classifying regions...")
 
-		    # Deterimining list of columns
-		    cols1 = ['a' + str(i) + str(j) \
-		            for i in range(1, Num_Loc + 1) \
-		            for j in range(1, Num_Loc + 1) \
-		            ]
-		    cols = cols1 + ['Player', 'Round']
+			# Deterimining list of columns
+			cols1 = ['a' + str(i) + str(j) \
+			for i in range(1, Num_Loc + 1) \
+			for j in range(1, Num_Loc + 1) \
+			]
 
-		    print("Sorting by Player, Round...")
-		    data = data.sort_values(['Player', 'Round'], \
-		                    ascending=[True, True]).reset_index()
+			data['Category'] = data.apply(lambda x: self.minDist2Focal(x[cols1], self.regions), axis=1)
 
-		    categoria = []
-		    for player, Grp in data[cols].groupby(['Player']):
-		        print("Working with player " + str(player) + "...")
-		        for ronda, grp in Grp.groupby(['Round']):
-		            # print "Obtaining path from round " + str(ronda) + "..."
-		            path = [int(list(grp[c])[0]) for c in cols1]
-		            # print path
-		            # print "finding region..."
-		            regionClassified = self.classifyRegion(path, 0.3, 0.55)
-		            # print "Min: " + str(regionClassified)
-		            categoria.append(regionClassified)
+			data['Category1'] = data.apply(lambda x: nameRegion(x['Strategy']), axis=1)
 
-		dictionary = dict((i,j) for i,j in enumerate(regions))
-		dictionary[9] = 'RS'
-		# print(dictionary)
-		data['Category'] = data['Strategy'].map(dictionary)
-		# print(data[['Category', 'Strategy']])
+		#     cols = cols1 + ['Player', 'Round']
+		#
+		#     print("Sorting by Player, Round...")
+		#     data = data.sort_values(['Player', 'Round'], \
+		#                     ascending=[True, True]).reset_index()
+		#
+		#     categoria = []
+		#
+	    #     for ronda, grp in data.groupby(['Round']):
+	    #         # print "Obtaining path from round " + str(ronda) + "..."
+	    #         path = [int(list(grp[c])[0]) for c in cols1]
+	    #         # print path
+	    #         # print "finding region..."
+	    #         regionClassified = self.classifyRegion(path, 0.3, 0.55)
+	    #         # print "Min: " + str(regionClassified)
+	    #         categoria.append(regionClassified)
+		#
+		# dictionary = dict((i,j) for i,j in enumerate(regions))
+		# dictionary[9] = 'RS'
+		# # print(dictionary)
+		# data['Category'] = data['Strategy'].map(dictionary)
+		# # print(data[['Category', 'Strategy']])
 
 		# --------------------------------------------------
 		# Finding distance to closest focal region per round, per player
@@ -883,27 +944,30 @@ class Experiment(object):
 			for i in range(1, Num_Loc + 1) \
 			for j in range(1, Num_Loc + 1) \
 			]
-			cols = cols1 + ['Player', 'Round']
 
-			print("Sorting by Player, Round...")
-			data = data.sort_values(['Player', 'Round'], \
-			ascending=[True, True]).reset_index()
+			data['Distancias'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 0.3), axis=1)
 
-			distancias = []
-			for player, Grp in data[cols].groupby(['Player']):
-				print("Working with player " + str(player) + "...")
-				for ronda, grp in Grp.groupby(['Round']):
-					# print "Obtaining path from round " + str(ronda) + "..."
-					path = [int(list(grp[c])[0]) for c in cols1]
-					# print path
-					# print "finding region..."
-					minDist = self.minDist2Focal(path, self.regions, 0.3)
-					# print "Min: " + str(minDist)
-					distancias.append(minDist)
-
-			print('len distancias', len(distancias))
-			print('len data[Distacias]', len(data))
-			data['Distancias'] = distancias
+			# cols = cols1 + ['Player', 'Round']
+			#
+			# print("Sorting by Player, Round...")
+			# data = data.sort_values(['Player', 'Round'], \
+			# ascending=[True, True]).reset_index()
+			#
+			# distancias = []
+			# for player, Grp in data[cols].groupby(['Player']):
+			# 	print("Working with player " + str(player) + "...")
+			# 	for ronda, grp in Grp.groupby(['Round']):
+			# 		# print "Obtaining path from round " + str(ronda) + "..."
+			# 		path = [int(list(grp[c])[0]) for c in cols1]
+			# 		# print path
+			# 		# print "finding region..."
+			# 		minDist = self.maxSim2Focal(path, self.regions, 0.3)
+			# 		# print "Min: " + str(minDist)
+			# 		distancias.append(minDist)
+			#
+			# print('len distancias', len(distancias))
+			# print('len data[Distacias]', len(data))
+			# data['Distancias'] = distancias
 
 		# --------------------------------------------------
 		# Finding the lag variables

@@ -1,14 +1,17 @@
 source("WSpred.R")
+source("getFrequencies.R")
 library(dfoptim)
 library(beepr)
 
-data = read.csv('../Python Codes/frequencies_test.csv')
+df1 = read.csv("../Python Codes/output.csv")
+getFreqFromGame(df1)
+
 data = read.csv('frequencies.csv')
 data = read.csv("../Python Codes/fileFreqs.csv")
 #head(data)
 
 args <- getArgs(data, regiones)
-#args <- args[order(args$s),] 
+args <- args[order(-args$s, args$i),] 
 head(args)
 
 # To search for best parameters WSLS model

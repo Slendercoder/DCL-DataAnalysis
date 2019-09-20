@@ -349,7 +349,7 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, i
 ##########################################################################
 
 # Create experiment
-gameParameters = [1, 2, 8, 60, 45]
+gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
 # modelParameters = [0.054, 3.5, 500, 0.98, 0, 0, 0, 0, 0]
 modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
@@ -360,8 +360,8 @@ modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
 # modelParameters = [0.055, 130, 500, 0.98, 0, 0, 0, 0, 0] # How WSLS works...
 # modelParameters = [0.001, 130, 500, 0.98, 300, 1, 2, 1.5, 1] # ... as compared to FRA
 # modelParameters = [0.02, 150, 500, 0.98, 400, 1, 2, 1.5] # Good parameters for FRA
-ifDistances = 1
-ifClassify = 0
+ifDistances = 0
+ifClassify = 1
 
 standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
 
