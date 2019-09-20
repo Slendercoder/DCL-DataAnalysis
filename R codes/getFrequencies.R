@@ -8,6 +8,9 @@ source("ClassifyRegions.R")
 # df1[df1$Category != df1$Category1]
 
 getFreqFromGame <- function(df1) {
+  
+  df1 <- df1[complete.cases(df1), ]
+  
   # Get visited tiles for each player
   perDyad <- df1 %>% group_by(Dyad)
   perPlayer <- perDyad %>% group_by(Player)
