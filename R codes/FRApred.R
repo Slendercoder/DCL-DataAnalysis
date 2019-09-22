@@ -9,6 +9,75 @@ sigmoid <- function(x, beta, gamma) {
   return(1 / (1 + exp(-beta * (x - gamma))))
 }
 
+regiones <- c('RS',
+              'ALL', 
+              'NOTHING', 
+              'DOWN', 
+              'UP', 
+              'LEFT', 
+              'RIGHT', 
+              'IN', 
+              'OUT')
+
+# USING scoreLevel
+getFreq <- function(i, s, j, df) {
+  # Obtains the requencies vector for each score s and overlapping region j
+  # Input: i, which is the region the player is in
+  #        s, which is the player's scoreLevel on the round
+  #        j, the overlapping region from players' strategies
+  #        df, the dataframe from which the observations are obtained
+  # Output: Frequency vector of length 9
+  
+  #  print(regiones)
+  df$RegionGo <- factor(df$RegionGo, levels = regiones, ordered = TRUE)
+  #  print(levels(df$RegionGo))
+  
+  regs <- df[which(df$Region == i), ]
+  scores <- regs[which(regs$Score == s), ]
+  regsGo <- scores$RegionGo[which(scores$RJcode == j)]
+  auxDF <- t(as.data.frame(table(regsGo)))
+  colnames(auxDF) <- as.character(unlist(auxDF[1, ])) # the first row will be the header
+  auxDF <- auxDF[-1, ]          # removing the first row.
+  auxDF <- auxDF[regiones]
+  return(as.numeric(auxDF[1:9]))
+}
+
+getArgs <- function(data, regiones) {
+  # Prepare dataFrame with frequencies
+  scores <- unique(data$Score)
+  joints <- unique(data$RJcode)
+  
+  # Create all combinations of regions, scores and joints
+  print('Creating triples...')
+  args <- as.data.frame(expand.grid(i = regiones, s = scores, j = joints))
+  head(args)
+  args$pair <- apply(args, 1, function(x) list(as.character(x[1]), as.numeric(x[2]), as.character(x[3])))
+  print('Number of rows:')
+  print(length(args$pair))
+  #  of the fifth row, args$pair[5][[1]][1] is the region, args$pair[5][[1]][2] is the score
+  
+  # Get the frequencies for each triple
+  print('Finding frequencies...')
+  args$freq <- lapply(args$pair, function(x) {
+    i <- as.character(x[[1]][1])
+    s <- as.numeric(x[[2]][1])
+    j <- as.character(x[[3]][1])
+    return(getFreq(i,s,j,data))
+  })
+
+  # Get the sum of frequencies for each pair
+  print('Finding sum of frequencies...')
+  args$sumFreq <- lapply(args$freq, function(x) {
+    return(sum(x))
+  })
+  
+  args <- args[args$sumFreq > 0, ]
+
+  print('Done!')
+  return(args)
+  
+}
+
 FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions){
   # Returns the transition probability vector
   # Each position in the vector represents a region
@@ -120,6 +189,71 @@ FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, r
   
   probs <- attractiveness / sum(attractiveness)
   return(probs)
+}
+
+# A function to get deviance from WSLS and FRA models
+FRAutil <- function(theta, args, regions){
+  # Input: theta, parameter vector of length 11
+  #        data, the dataframe from which frequencies are obtained
+  # Output: Deviance of WSLSpred for all regions and scores
+  
+  #  if (any(is.na(theta))) {
+  #    print('Incorrect parameters: ')
+  #    print(theta)
+  #    return(10000)
+  #  }
+  
+  w <- theta[1]
+  alpha <- theta[2]
+  beta <- theta[3]
+  gamma <- theta[4]
+  delta <- theta[5]
+  epsilon <- theta[6]
+  zeta <- theta[7]
+  eta <- theta[8]
+  
+  # Calculate the probabilities based on FRAWSpred
+  #  print('Calculating probabilities')
+  args$probs <- lapply(args$pair, function(x) {
+    i <- as.character(x[[1]][1])
+    sl <- as.numeric(x[[2]][1])
+    # Converting score level into score
+    if (sl == 1) {s <- 0}
+    else if (sl == 2) {s <- 20}
+    else {s <- 32}
+    j <- as.character(x[[3]][1])
+    return(FRApred(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions))
+  })
+  #  print(args$probs[1:6])
+  
+  #  if (any(is.na(args$probs))) {
+  #    print('Incorrect probabilities: ')
+  #    head(args$probs)
+  #    return(10000)
+  #  }
+  
+  #  args$zeros <- lapply(args$probs, function(x) {if (any(x == 0)) {return(0)} else {return(1)}})
+  #  zeroProbs <- args$pair[which(args$zeros == 0)]
+  #  if (length(zeroProbs) > 0) {
+  #    print('Some probabilities equal 0!')
+  #    print('Parameters: ')
+  #    print(theta)
+  #    print('Freqs')
+  #    print(zeroProbs)
+  #    return(10000)
+  #  }
+  
+  # Calculate deviance
+  #  print('Calculating deviances')
+  args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
+  
+  #  if (any(is.infinite(args$dev) | is.na(args$dev))) {
+  #    print('Incorrect dev: ')
+  #    head(args$dev)
+  #    return(10000)
+  #  }
+  
+  return(-2*sum(args$dev))
 }
 
 #i <- 'LEFT'

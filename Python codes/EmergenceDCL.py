@@ -290,8 +290,8 @@ class Experiment(object):
 	    contador = 0
 
 	    for k in regionsCoded:
-	        kV = self.code2Vector(k)
-	        distances[contador] = self.simil(r, kV, eta)
+	        # kV = self.code2Vector(k)
+	        distances[contador] = self.simil(r, k, eta)
 	        contador = contador + 1
 
 	    valor = np.max(np.array(distances))
@@ -945,7 +945,7 @@ class Experiment(object):
 			for j in range(1, Num_Loc + 1) \
 			]
 
-			data['Distancias'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 0.3), axis=1)
+			data['Similarity'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 1), axis=1)
 
 			# cols = cols1 + ['Player', 'Round']
 			#
@@ -967,7 +967,7 @@ class Experiment(object):
 			#
 			# print('len distancias', len(distancias))
 			# print('len data[Distacias]', len(data))
-			# data['Distancias'] = distancias
+			# data['Similarity'] = distancias
 
 		# --------------------------------------------------
 		# Finding the lag variables
@@ -984,8 +984,8 @@ class Experiment(object):
 		data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
 		                            ['Joint'].transform('shift', LAG)
 		if ifDistances == 1:
-			data['Distancias_LAG1'] = data.groupby(['Dyad', 'Player'])\
-		                            ['Distancias'].transform('shift', LAG)
+			data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Similarity'].transform('shift', LAG)
 
 		print("Sorting by Dyad, Player, Round...")
 		data = data.sort_values(['Dyad', 'Player', 'Round'], \
