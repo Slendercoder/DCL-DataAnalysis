@@ -33,7 +33,7 @@ print(fitresWSLS$value)
 
 dev <-fitresWSLS$value 
 aic <- 2*4 + dev
-aic # 4766
+aic # 2443
 
 # To search for best parameters WSLS model
 w1 <- 0.035 # bias FOCAL

@@ -78,7 +78,7 @@ getArgs <- function(data, regiones) {
   
 }
 
-FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions){
+FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones){
   # Returns the transition probability vector
   # Each position in the vector represents a region
   # and the value represents the probability of going to that region
@@ -192,7 +192,7 @@ FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, r
 }
 
 # A function to get deviance from WSLS and FRA models
-FRAutil <- function(theta, args, regions){
+FRAutil <- function(theta, args, regiones){
   # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
   # Output: Deviance of WSLSpred for all regions and scores
@@ -216,13 +216,9 @@ FRAutil <- function(theta, args, regions){
   #  print('Calculating probabilities')
   args$probs <- lapply(args$pair, function(x) {
     i <- as.character(x[[1]][1])
-    sl <- as.numeric(x[[2]][1])
-    # Converting score level into score
-    if (sl == 1) {s <- 0}
-    else if (sl == 2) {s <- 20}
-    else {s <- 32}
+    s <- as.numeric(x[[2]][1])
     j <- as.character(x[[3]][1])
-    return(FRApred(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regions))
+    return(FRApred(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones))
   })
   #  print(args$probs[1:6])
   

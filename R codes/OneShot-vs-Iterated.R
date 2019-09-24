@@ -12,7 +12,7 @@ sd(DLIRound60)
 DLIRound1 <- df1$DLIndex[which(df1$Round == 1)]
 mean(DLIRound1)
 sd(DLIRound1)
-t.test(DLIRound60, DLIRound1) # => Difference one-shot task vs iterated task is significant
+wilcox.test(DLIRound60, DLIRound1) # => Difference one-shot task vs iterated task is significant
 
 
 # Plot frequencies of regions

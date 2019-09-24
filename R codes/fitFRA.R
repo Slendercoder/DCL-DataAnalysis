@@ -7,16 +7,16 @@ head(data)
 
 args <- getArgs(data, regiones)
 args <- args[order(-args$s, args$i),] 
+beep()
 head(args)
 dim(args)
 
 # To search for best parameters FRA model
 w1 <- 0.001 # bias FOCAL
 w2 <- 5 # win stay 
-w3 <- 7 # delta
+w3 <- 0.5 # delta
 w4 <- 1 # zeta
-w5 <- 1.2 # eta
-fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5),
+fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
                    fn = function(theta) FRAutil(c(theta[1], 
                                                  theta[2], 
                                                  500, 
@@ -24,17 +24,15 @@ fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5),
                                                  theta[3], 
                                                  1, 
                                                  theta[4], 
-                                                 theta[5]), args, regiones),
+                                                 1.2), args, regiones),
                    lower=c(0,
                            0,
                            0,
-                           0,
-                           1),
+                           0),
                    upper=c(0.075,
                            10,
                            10,
-                           10,
-                           3),
+                           10),
                    control=list(trace=0))
 
 beep()
