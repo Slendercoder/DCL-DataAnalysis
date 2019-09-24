@@ -29,7 +29,6 @@ def standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify
     print('epsilon: ', modelParameters[5])
     print('zeta: ', modelParameters[6])
     print('eta: ', modelParameters[7])
-    print('FOCAL: ', modelParameters[8])
     print("\n")
     print('--- Game parameters ---')
     print('Probabilit of a unicorn: ', gameParameters[0])
@@ -351,15 +350,14 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, i
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
-# modelParameters = [0.054, 3.5, 500, 0.98, 0, 0, 0, 0, 0]
-modelParameters = [0.05, 150, 500, 0.98, 0, 0, 0, 0, 0]
+# modelParameters = [0.035, 8.42, 500, 0.98, 0, 0, 0, 0]
 # FRA optim
-# modelParameters = [0.01, 100, 500, 0.98, 100, 1, 5, 1.5, 1]
+# modelParameters = [0.018, 10, 500, 0.98, 0, 1, 1.76, 1.2]
 # Trying out things
 # gameParameters = [0.5, 2, 8, 20, 1]
 # modelParameters = [0.055, 130, 500, 0.98, 0, 0, 0, 0, 0] # How WSLS works...
 # modelParameters = [0.001, 130, 500, 0.98, 300, 1, 2, 1.5, 1] # ... as compared to FRA
-# modelParameters = [0.02, 150, 500, 0.98, 400, 1, 2, 1.5] # Good parameters for FRA
+modelParameters = [0.02, 150, 500, 0.98, 400, 1, 2, 1.5] # Good parameters for FRA
 ifDistances = 0
 ifClassify = 1
 

@@ -15,7 +15,6 @@ letterCode <- function(x, letras) {
 #df1 = read.csv("_with_lag.csv")
 #df1 = read.csv("../Python Codes/output.csv")
 #head(df1)
-
 # df1[df1$Category != df1$Category1]
 
 getFreqFromGameWS <- function(df1) {
@@ -56,7 +55,7 @@ getFreqFromGameWS <- function(df1) {
   #auxDF$Score <- 0
   
 #  parejas <- unique(df1$Dyad)
-#  pareja <- parejas[1]
+#  pareja <- parejas[36]
   
   for (pareja in unique(df1$Dyad)) {
     # Create the joint region
@@ -169,6 +168,9 @@ getFreqFromGameFRA <- function(df1) {
   auxDF = auxDF[-1, ]          # removing the first row.
   #auxDF$RJoint <- list(0)
   #auxDF$Score <- 0
+  
+  parejas <- unique(df1$Dyad)
+  pareja <- parejas[2]
   
   for (pareja in unique(df1$Dyad)) {
     # Create the joint region

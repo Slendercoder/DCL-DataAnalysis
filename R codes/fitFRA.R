@@ -1,6 +1,11 @@
+source("getFrequencies.R")
 source("FRApred.R")
 library(dfoptim)
 library(beepr)
+
+df1 = read.csv("../Python Codes/output.csv")
+head(df1)
+getFreqFromGameFRA(df1)
 
 data = read.csv("frequencies.csv")
 head(data)
@@ -38,10 +43,14 @@ fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
 beep()
 print(fitresFRA$par) 
 print(fitresFRA$value) 
+dev <- fitresFRA$value
 
-
-theta <- c(0.018, 5.56, 500, 0.98, 0.006, 1, 2, 1.2)
+theta <- c(0.018, 13, 500, 0.98, 0, 1, 1.76, 1.2)
 dev <- FRAutil(theta, args, regiones)
-dev # ???
+dev # 2227
+
 aic <- 2*8 + dev
-aic # ???
+aic # 2246
+
+2443 - 2246
+2435 - 2230

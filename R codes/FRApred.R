@@ -118,7 +118,7 @@ FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, r
   attractiveness <- bias # Start from bias
 
   # Add attractiveness to current region according to score
-  index <- which(regions == i)
+  index <- which(regiones == i)
 #  print('i')
 #  print(regionsCoded[index - 1])
   # adding win stay only to focal regions
@@ -134,8 +134,8 @@ FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, r
   jV <- code2Vector(j)
 #  print("jV")
 #  print(jV)
-  kVcompVector <- lapply(regions[3:9], function(k) {
-    index <- which(regions == k)
+  kVcompVector <- lapply(regiones[3:9], function(k) {
+    index <- which(regiones == k)
     kCoded <- regionsCoded[index - 1] # regionsCoded does not have 'RS'
 #    print('kCoded')
 #    print(kCoded)
@@ -154,14 +154,14 @@ FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, r
 #  imprimir(attractiveness)
 
   # Consider distance from i to each focal region k and augment attractiveness
-  index <- which(regions == i) # WARNING: REGIONS COLLAPSED!
+  index <- which(regiones == i) # WARNING: REGIONS COLLAPSED!
   if (index != 1) {
     iV <- regionsCoded[index - 1]
 #    print("iV")
 #    print(iV)
     iV <- code2Vector(iV)
-    kVector <- lapply(regions[2:9], function(k) {
-      index1 <- which(regions == k)
+    kVector <- lapply(regiones[2:9], function(k) {
+      index1 <- which(regiones == k)
       kCoded <- regionsCoded[index1 - 1] # regionsCoded does not have 'RS'
       kV <- code2Vector(kCoded)
     })
