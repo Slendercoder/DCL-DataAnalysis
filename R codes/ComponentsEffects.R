@@ -13,15 +13,75 @@ get_legend<-function(myggplot){
 }
 
 ###############################################
-# Alpha = 150; Beta = 500; Gamma = 0.98
+# Focal = 0.05
 ###############################################
-df1 = read.csv("out_Focal0-Alpha150.csv")
+df1 = read.csv("../Python Codes/Sweeps/out_Alpha_0.csv")
 df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Focal0.05-Alpha150.csv")
+df2 = read.csv("../Python Codes/Sweeps/out_Alpha_70.csv")
+df2$Exp <- as.character("70")
+# head(df2)
+df3 = read.csv("../Python Codes/Sweeps/out_Alpha_150.csv")
+df3$Exp <- as.character("150")
+# head(df3)
+
+df1 <- df1[complete.cases(df1), ]
+df2 <- df2[complete.cases(df2), ]
+df3 <- df3[complete.cases(df3), ]
+
+df <- rbind(
+  df1[c('Round', 
+        'DLIndex',
+        'Strategy',
+        'Consistency',
+        'Norm_Score_LAG1',
+        'Exp')],
+  df2[c('Round', 
+        'DLIndex',
+        'Strategy',
+        'Consistency',
+        'Norm_Score_LAG1',
+        'Exp')],
+  df3[c('Round', 
+        'DLIndex',
+        'Strategy',
+        'Consistency',
+        'Norm_Score_LAG1',
+        'Exp')]
+)
+df$Exp <- as.factor(df$Exp)
+df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
+
+g1 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
+  geom_point(alpha = 1/5) +
+  xlim(c(0.6,1)) + 
+  ylim(c(0,1)) + 
+  xlab("Norm. score prev. round") +
+  ylab("Consistency") +
+  scale_color_discrete(name = TeX('$\\alpha$                    ')) +
+  geom_smooth(method = lm) +
+  theme(legend.position="top")
+
+legend <- get_legend(g1)
+
+g1 <- g1 + theme_sjplot()
+
+g1 <- g1 + theme(legend.position="none")
+
+expTex = TeX('bias$_{focal}=0.05$, $\\delta{=}\\zeta{=}0$')
+title1=textGrob(expTex, gp=gpar(fontface="bold"))
+gAlpha <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
+
+###############################################
+# Alpha = 150
+###############################################
+df1 = read.csv("../Python Codes/Sweeps/out_RS_0.csv")
+df1$Exp <- as.character("0")
+# head(df1)
+df2 = read.csv("../Python Codes/Sweeps/out_RS_0.05.csv")
 df2$Exp <- as.character("0.05")
 # head(df2)
-df3 = read.csv("out_Focal0.075-Alpha150.csv")
+df3 = read.csv("../Python Codes/Sweeps/out_RS_0.075.csv")
 df3$Exp <- as.character("0.075")
 # head(df3)
 
@@ -126,78 +186,18 @@ expTex = TeX('$\\alpha{=}150$, $\\delta{=}\\zeta{=}0$')
 title1=textGrob(expTex, gp=gpar(fontface="bold"))
 gRS <- grid.arrange(g1, g2, ncol = 2, top=legend, bottom=title1)
 
-###############################################
-# Focal = 0.05; Beta = 500; Gamma = 0.98
-###############################################
-df1 = read.csv("out_Focal0.05-Alpha0.csv")
-df1$Exp <- as.character("0")
-# head(df1)
-df2 = read.csv("out_Focal0.05-Alpha70.csv")
-df2$Exp <- as.character("70")
-# head(df2)
-df3 = read.csv("out_Focal0.05-Alpha150.csv")
-df3$Exp <- as.character("150")
-# head(df3)
-
-df1 <- df1[complete.cases(df1), ]
-df2 <- df2[complete.cases(df2), ]
-df3 <- df3[complete.cases(df3), ]
-
-df <- rbind(
-  df1[c('Round', 
-        'DLIndex',
-        'Strategy',
-        'Consistency',
-        'Norm_Score_LAG1',
-        'Exp')],
-  df2[c('Round', 
-        'DLIndex',
-        'Strategy',
-        'Consistency',
-        'Norm_Score_LAG1',
-        'Exp')],
-  df3[c('Round', 
-        'DLIndex',
-        'Strategy',
-        'Consistency',
-        'Norm_Score_LAG1',
-        'Exp')]
-)
-df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0', '70', '150'))
-
-g1 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
-  geom_point(alpha = 1/5) +
-  xlim(c(0.6,1)) + 
-  ylim(c(0,1)) + 
-  xlab("Norm. score prev. round") +
-  ylab("Consistency") +
-  scale_color_discrete(name = TeX('$\\alpha$                    ')) +
-  geom_smooth(method = lm) +
-  theme(legend.position="top")
-
-legend <- get_legend(g1)
-
-g1 <- g1 + theme_sjplot()
-
-g1 <- g1 + theme(legend.position="none")
-
-expTex = TeX('bias$_{focal}=0.05$, $\\delta{=}\\zeta{=}0$')
-title1=textGrob(expTex, gp=gpar(fontface="bold"))
-gAlpha <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
-
 gWSLS <- grid.arrange(gAlpha, gRS, ncol = 2,  widths = c(0.33, 0.6))
 
 ###############################################
-# Epsilon = 1
+# Focal = 0.03; Alpha = 150; Delta = 0
 ###############################################
-df1 = read.csv("out_Epsilon1-Zeta0.csv")
+df1 = read.csv("../Python Codes/Sweeps/out_Zeta_0.csv")
 df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Epsilon1-Zeta1.csv")
+df2 = read.csv("../Python Codes/Sweeps/out_Zeta_1.csv")
 df2$Exp <- as.character("1")
 # head(df2)
-df3 = read.csv("out_Epsilon1-Zeta10.csv")
+df3 = read.csv("../Python Codes/Sweeps/out_Zeta_10.csv")
 df3$Exp <- as.character("10")
 # head(df3)
 
@@ -211,21 +211,21 @@ df <- rbind(
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
-        'Distancias_LAG1',
+        'Similarity_LAG1',
         'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
-        'Distancias_LAG1',
+        'Similarity_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
-        'Distancias_LAG1',
+        'Similarity_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
@@ -243,7 +243,7 @@ g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
 
 #g1
 
-g2 <- ggplot(df, aes(log(Distancias_LAG1), Consistency, color=Exp)) +
+g2 <- ggplot(df, aes(log(Similarity_LAG1), Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
   xlab("Log of max similarity w.r.t.\nfocal regions prev. round") +
   ylab("Consistency") +
@@ -262,16 +262,15 @@ title1=textGrob(expTex, gp=gpar(fontface="bold"))
 gZeta <- grid.arrange(g2, g1, ncol = 2, top=legend, bottom=title1)
 
 ###############################################
-# Eta = 1
+# Focal = 0.03; Alpha = 150; Zeta = 1
 ###############################################
-df1 = read.csv("out_Delta0-Zeta1.csv")
+df1 = read.csv("../Python Codes/Sweeps/out_Delta_0.csv")
 df1$Exp <- as.character("0")
 # head(df1)
-df2 = read.csv("out_Delta10-Zeta1.csv")
+df2 = read.csv("../Python Codes/Sweeps/out_Delta_10.csv")
 df2$Exp <- as.character("10")
 # head(df2)
-df3 = read.csv("output.csv")
-#df3 = read.csv("out_Delta50-Zeta1.csv")
+df3 = read.csv("../Python Codes/Sweeps/out_Delta_50.csv")
 df3$Exp <- as.character("50")
 # head(df3)
 
@@ -285,21 +284,21 @@ df <- rbind(
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
-        'Distancias_LAG1',
+        'Similarity_LAG1',
         'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
-        'Distancias_LAG1',
+        'Similarity_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Strategy',
         'Consistency',
         'Norm_Score_LAG1',
-        'Distancias_LAG1',
+        'Similarity_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
@@ -327,5 +326,4 @@ gDelta <- grid.arrange(g1, ncol = 1, top=legend, bottom=title1)
 gFRA <- grid.arrange(gZeta, gDelta, ncol = 2,  widths = c(0.66, 0.33))
 
 g <- grid.arrange(gWSLS, gFRA, nrow = 2)
-
 

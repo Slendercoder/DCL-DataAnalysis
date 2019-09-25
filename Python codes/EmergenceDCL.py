@@ -749,13 +749,13 @@ class Experiment(object):
 		# # Working only with trials with "Unicorn_Absent"
 		# # --------------------------------------------------
 		# # print(data['Is_there'].unique())
-		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
 
-		cols = ['Score', 'Joint']
-		cols = cols + ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-
-		for c in cols:
-			data[c] = data.apply(lambda x: nas(x['Is_there'], x[c]), axis=1)
+		# cols = ['Score', 'Joint']
+		# cols = cols + ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
+		#
+		# for c in cols:
+		# 	data[c] = data.apply(lambda x: nas(x['Is_there'], x[c]), axis=1)
 
 		# --------------------------------------------------
 		# Continue obtaining measures
