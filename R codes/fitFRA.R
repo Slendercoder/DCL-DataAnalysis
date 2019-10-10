@@ -21,21 +21,19 @@ w1 <- 0.001 # bias FOCAL
 w2 <- 5 # win stay 
 w3 <- 0.5 # delta
 w4 <- 1 # zeta
-fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
-                   fn = function(theta) FRAutil(c(theta[1], 
-                                                 theta[2], 
+fitresFRA <- nmkb(par=c(w2, w3, w4),
+                   fn = function(theta) FRAutil(c(0, 
+                                                 theta[1], 
                                                  500, 
                                                  0.98, 
-                                                 theta[3], 
+                                                 theta[2], 
                                                  1, 
-                                                 theta[4], 
+                                                 theta[3], 
                                                  1.2), args, regiones),
                    lower=c(0,
                            0,
-                           0,
                            0),
-                   upper=c(0.075,
-                           10,
+                   upper=c(10,
                            10,
                            10),
                    control=list(trace=0))
