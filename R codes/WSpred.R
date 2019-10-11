@@ -72,7 +72,8 @@ getArgs <- function(data, regiones) {
 }
 
 WSpred <- function(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones){
-  aux <- rep(w, 8)
+  aux <- c(0.1, 0.15, 0.1, 0.1, 0.09, 0.09, 0.01, 0.01)*w
+#  aux <- rep(w, 8)
   # The probability of region 'RS' is 1 - the sum of the other probabilities
   if (sum(aux) > 1) {
     aux <- aux/sum(aux)
@@ -131,6 +132,10 @@ WSutil <- function(theta, args, regiones){
   
   if (any(is.infinite(args$dev) | is.na(args$dev))) {
     print('Incorrect dev: ')
+    print(theta)
+    print(head(args$probs))
+    print(head(args$freq))
+    print(head(args$dev))
     return(10000)
   }
   

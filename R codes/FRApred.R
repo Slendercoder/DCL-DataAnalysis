@@ -104,7 +104,7 @@ FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, r
   # w[2] is the probability of regions 'DOWN', 'UP', 'LEFT', 'RIGHT'
   # w[3] is the probability of regions 'IN', 'OUT'
 #  aux <- rep(w, 8)
-  aux <- c(0.16, 0.16, 0.20, 0.20, 0.18, 0.18, 0.02, 0.02)
+  aux <- c(0.1, 0.15, 0.1, 0.1, 0.09, 0.09, 0.01, 0.01)*w
   # The probability of region 'RS' is 1 - the sum of the other probabilities
   if (sum(aux) > 1) {
     aux <- aux/sum(aux)

@@ -330,14 +330,14 @@ class Experiment(object):
 
 	def probabilities(self, i, score, j):
 
-		wALL = float(self.modelParameters[0])
-		wNOTHING = float(self.modelParameters[0])
-		wDOWN = float(self.modelParameters[0])
-		wUP = float(self.modelParameters[0])
-		wLEFT = float(self.modelParameters[0])
-		wRIGHT = float(self.modelParameters[0])
-		wIN = float(self.modelParameters[0])
-		wOUT = float(self.modelParameters[0])
+		wALL = 0.1 * float(self.modelParameters[0])
+		wNOTHING = 0.15 * float(self.modelParameters[0])
+		wDOWN = 0.1 * float(self.modelParameters[0])
+		wUP = 0.1 * float(self.modelParameters[0])
+		wLEFT = 0.09 * float(self.modelParameters[0])
+		wRIGHT = 0.09 * float(self.modelParameters[0])
+		wIN = 0.01 * float(self.modelParameters[0])
+		wOUT = 0.01 * float(self.modelParameters[0])
 		bias = [0, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
 		# print('biases:', bias)
 		# print('sum', np.sum(bias))
@@ -749,7 +749,7 @@ class Experiment(object):
 		# # Working only with trials with "Unicorn_Absent"
 		# # --------------------------------------------------
 		# # print(data['Is_there'].unique())
-		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
 
 		# cols = ['Score', 'Joint']
 		# cols = cols + ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]

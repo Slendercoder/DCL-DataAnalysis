@@ -324,13 +324,20 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, i
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
-# modelParameters = [0.035, 8.42, 500, 0.98, 0, 0, 0, 0]
+# modelParameters = [0.43, 8.33, 500, 0.98, 0, 0, 0, 0] # optimos
+# modelParameters = [0.43*0.61, 8.33*95.91, 500, 0.98, 0, 0, 0, 0] # optimos corregidos
 # FRA optim
-# modelParameters = [0.018, 10, 500, 0.98, 0, 1, 1.76, 1.2]
-# WSLS just for kicks
-# modelParameters = [0.035, 150, 500, 0.98, 0, 0, 0, 0]
-# FRA just for kicks
-modelParameters = [0.001, 150, 500, 0.98, 10, 1, 1.76, 1.2]
+# modelParameters = [0.022, 13.22, 500, 0.98, 0.00000007, 1, 1.72, 1.2]
+# modelParameters = [0.022*0.19, 13.22*15.75, 500, 0.98, 0.00000007*1.29, 1, 1.72*1.35, 1.2]
+
+# Para tofitWSLS
+modelParameters = [0.5, 150, 500, 0.98, 0, 0, 0, 0]
+modelParameters = [0.52, 3.9, 500, 0.98, 0, 0, 0, 0] # Estimado de OnlyAbsent
+
+
+# Para tofitFRA
+# modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
+# modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 
 ifDistances = 1
 ifClassify = 1
