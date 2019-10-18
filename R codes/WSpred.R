@@ -1,4 +1,4 @@
-source('ClassifyRegions.R')
+library(dplyr)
 
 specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
 imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
@@ -19,17 +19,18 @@ regiones <- c('RS',
               'IN', 
               'OUT')
 
+lowerEps2=.00001
+highEps2 =.999999999999999999999
+
 getFreq <- function(i, s, df, regiones) {
-  # Obtains the requencies vector for each score s and overlapping region j
+  # Obtains the frequencies vector for each starting region region i and score s 
   # Input: i, which is the region the player is in
-  #        s, which is the player's scoreLevel on the round
-  #        j, the overlapping region from players' strategies
+  #        s, which is the player's score obtained on the previous round
   #        df, the dataframe from which the observations are obtained
+  #        regions, which is the vector with the regions names
   # Output: Frequency vector of length 9
   
-#  print(regiones)
   df$RegionGo <- factor(df$RegionGo, levels = regiones, ordered = TRUE)
-#  print(levels(df$RegionGo))
   
   regs <- df[which(df$Region == i), ]
   regsGo <- regs$RegionGo[which(regs$Score == s)]
@@ -42,7 +43,7 @@ getFreq <- function(i, s, df, regiones) {
   return(as.numeric(auxDF[1:9]))
 }
 
-getArgs <- function(data, regiones) {
+getArgs <- function(data) {
   # Prepare dataFrame with frequencies
 #  regions <- unique(data$Region)
   scores <- unique(data$Score)
@@ -82,16 +83,56 @@ WSpred <- function(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regio
   #  print("bias")
   #  imprimir(bias)
   
-  n <- (s + 128) / 160 # Normalizing score
+#  n <- (s + 128) / 160 # Normalizing score
+  n <- s
+    
+  # Find the attractivenes:
+  attractiveness <- bias # Start from bias
+  
+  # Add attractiveness to current region according to score
+  if (i != 'RS') {
+    index <- which(regiones == i)
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
+  }
+  
+  probs <- attractiveness / sum(attractiveness)
+  probs <- replace(probs,probs<lowerEps2,lowerEps2)
+  probs <- replace(probs,probs>highEps2,highEps2)
+  
+  return(probs)
+}
+
+WSpredSL <- function(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones){
+  aux <- c(0.1, 0.15, 0.1, 0.1, 0.09, 0.09, 0.01, 0.01)*w
+  #  aux <- rep(w, 8)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  print("bias")
+  #  imprimir(bias)
+  #  n <- (s + 128) / 160 # Normalizing score
+  if(s == 1){
+    n <- 10
+  } else {
+    n <- 32
+  }
+#  n <- s
   
   # Find the attractivenes:
   attractiveness <- bias # Start from bias
   
   # Add attractiveness to current region according to score
-  index <- which(regiones == i)
-  attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
+  if (i != 'RS') {
+    index <- which(regiones == i)
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
+  }
   
   probs <- attractiveness / sum(attractiveness)
+  probs <- replace(probs,probs<lowerEps2,lowerEps2)
+  probs <- replace(probs,probs>highEps2,highEps2)
+  
   return(probs)
 }
 
@@ -122,8 +163,9 @@ WSutil <- function(theta, args, regiones){
     i <- as.character(x[[1]][1])
     s <- as.numeric(x[[2]][1])
     return(WSpred(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones))
+    # return(WSpredSL(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones))
   })
-  
+
   # Calculate deviance
   #  print('Calculating deviances')
   args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
@@ -132,12 +174,21 @@ WSutil <- function(theta, args, regiones){
   
   if (any(is.infinite(args$dev) | is.na(args$dev))) {
     print('Incorrect dev: ')
-    print(theta)
-    print(head(args$probs))
-    print(head(args$freq))
-    print(head(args$dev))
+    new_DF <- args[is.infinite(args$dev),]
+    print(new_DF)
+#    print(theta)
+#    print(head(args$probs))
+#    print(head(args$freq))
+#    print(head(args$dev))
     return(10000)
   }
   
   return(-2*sum(args$dev))
+}
+
+WSutil1 <- function(a, b){
+
+  theta <- c(a, b, 10, 31, 0, 0, 0, 0)
+  return(WSutil(theta, args, regiones))
+
 }

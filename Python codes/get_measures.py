@@ -94,9 +94,9 @@ def minDist2Focal(r):
         distances[contador] = dist(list(r), kV)
         contador = contador + 1
 
-	valor = np.min(np.array(distances))
-	indiceMin = np.argmin(np.array(distances))
-	# print('argmin:', indiceMin, 'vale?:', valor < np.sqrt(3))
+    valor = np.min(np.array(distances))
+    indiceMin = np.argmin(np.array(distances))
+    # print('argmin:', indiceMin, 'vale?:', valor < np.sqrt(3))
 
     reg = regions[indiceMin + 1]
     if valor < np.sqrt(3):
@@ -377,6 +377,9 @@ data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Joint'].transform('shift', LAG)
 data['Category_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Category'].transform('shift', LAG)
+data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
+                            ['Category'].transform('shift', -LAG)
+
 if ifDistances == 1:
     data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
                                 ['Similarity'].transform('shift', LAG)

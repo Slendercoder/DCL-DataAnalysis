@@ -6,13 +6,14 @@ print('Importing packages...')
 import numpy as np
 import pandas as pd
 import EmergenceDCL as DL
+import os
 print('Done!')
 
 ##########################################################################
 # DEFINE FUNCTIONS
 ##########################################################################
 
-def standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify):
+def standard_simulation(gameParameters, modelParameters):
 
     print("****************************")
     print('Starting simulation')
@@ -40,13 +41,18 @@ def standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify
 
     E = DL.Experiment(gameParameters, modelParameters)
     E.run_simulation()
-    E.get_measures(ifDistances, ifClassify)
-    E.df.to_csv('output.csv', index=False)
-    print('Data saved to output.csv')
+    E.get_measures()
+    count = 0
+    archivo = './output' + str(count) + '.csv'
+    while os.path.isfile(archivo):
+        count += 1
+        archivo = './output' + str(count) + '.csv'
+    E.df.to_csv(archivo, index=False)
+    print('Data saved to' + archivo + '.csv')
 
     # print(E.df)
 
-def parameter_sweep_alpha(gameParameters, modelParameters, ifDistances, ifClassify):
+def parameter_sweep_alpha(gameParameters, modelParameters):
 
     # Sweep alpha
 
@@ -85,13 +91,13 @@ def parameter_sweep_alpha(gameParameters, modelParameters, ifDistances, ifClassi
         modelParameters[1] = i
         E = DL.Experiment(gameParameters, modelParameters)
         E.run_simulation()
-        E.get_measures(ifDistances, ifClassify)
+        E.get_measures()
         E.df['Alpha'] = [i]*len(E.df['Dyad'])
         outputFile = 'Sweeps/out_Alpha_' + str(i) + '.csv'
         E.df.to_csv(outputFile, index=False)
         print("Results saved to " + outputFile)
 
-def parameter_sweep_Focal(gameParameters, modelParameters, ifDistances, ifClassify):
+def parameter_sweep_Focal(gameParameters, modelParameters):
 
     # Sweep RS
 
@@ -130,13 +136,13 @@ def parameter_sweep_Focal(gameParameters, modelParameters, ifDistances, ifClassi
         modelParameters[0] = i
         E = DL.Experiment(gameParameters, modelParameters)
         E.run_simulation()
-        E.get_measures(ifDistances, ifClassify)
+        E.get_measures()
         E.df['RS'] = [i]*len(E.df['Dyad'])
         outputFile = 'Sweeps/out_RS_' + str(i) + '.csv'
         E.df.to_csv(outputFile, index=False)
         print("Results saved to " + outputFile)
 
-def parameter_sweep_Zeta(gameParameters, modelParameters, ifDistances, ifClassify):
+def parameter_sweep_Zeta(gameParameters, modelParameters):
 
     # Sweep RS
 
@@ -175,13 +181,13 @@ def parameter_sweep_Zeta(gameParameters, modelParameters, ifDistances, ifClassif
         modelParameters[6] = i
         E = DL.Experiment(gameParameters, modelParameters)
         E.run_simulation()
-        E.get_measures(ifDistances, ifClassify)
+        E.get_measures()
         E.df['Zeta'] = [i]*len(E.df['Dyad'])
         outputFile = 'Sweeps/out_Zeta_' + str(i) + '.csv'
         E.df.to_csv(outputFile, index=False)
         print("Results saved to " + outputFile)
 
-def parameter_sweep_Delta(gameParameters, modelParameters, ifDistances, ifClassify):
+def parameter_sweep_Delta(gameParameters, modelParameters):
 
     # Sweep RS
 
@@ -220,13 +226,13 @@ def parameter_sweep_Delta(gameParameters, modelParameters, ifDistances, ifClassi
         modelParameters[4] = i
         E = DL.Experiment(gameParameters, modelParameters)
         E.run_simulation()
-        E.get_measures(ifDistances, ifClassify)
+        E.get_measures()
         E.df['Delta'] = [i]*len(E.df['Dyad'])
         outputFile = 'Sweeps/out_Delta_' + str(i) + '.csv'
         E.df.to_csv(outputFile, index=False)
         print("Results saved to " + outputFile)
 
-def parameter_sweep_2(gameParameters, modelParameters, ifDistances, ifClassify):
+def parameter_sweep_2(gameParameters, modelParameters):
 
     # Sweep epsilon vs zeta
 
@@ -270,7 +276,7 @@ def parameter_sweep_2(gameParameters, modelParameters, ifDistances, ifClassify):
             modelParameters[6] = j
             E = DL.Experiment(gameParameters, modelParameters)
             E.run_simulation()
-            E.get_measures(ifDistances, ifClassify)
+            E.get_measures()
             E.df['Epsilon'] = [i]*len(E.df['Dyad'])
             E.df['Zeta'] = [j]*len(E.df['Dyad'])
             outputFile = 'Sweeps/out_Epsilon' + str(i) + '-Zeta' + str(j) + '.csv'
@@ -278,7 +284,7 @@ def parameter_sweep_2(gameParameters, modelParameters, ifDistances, ifClassify):
             print("Results saved to " + outputFile)
 
 
-def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, ifClassify):
+def exploreSampleSizeEffect(gameParameters, modelParameters, lst):
 
     for l in lst:
         gameParameters = gameParameters[:4] + [l]
@@ -309,7 +315,7 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, i
 
         E = DL.Experiment(gameParameters, modelParameters)
         E.run_simulation()
-        E.get_measures(ifDistances, ifClassify)
+        E.get_measures()
         f = 'Sweeps/output_' + str(l) + '.csv'
         E.df.to_csv(f, index=False)
         print('Data saved to', f)
@@ -331,34 +337,31 @@ gameParameters = [0.5, 2, 8, 60, 45]
 # modelParameters = [0.022*0.19, 13.22*15.75, 500, 0.98, 0.00000007*1.29, 1, 1.72*1.35, 1.2]
 
 # Para tofitWSLS
-modelParameters = [0.5, 150, 500, 0.98, 0, 0, 0, 0]
-modelParameters = [0.52, 3.9, 500, 0.98, 0, 0, 0, 0] # Estimado de OnlyAbsent
+modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
+# modelParameters = [0.52, 3.9, 500, 0.98, 0, 0, 0, 0] # Estimado de OnlyAbsent
 
 
 # Para tofitFRA
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 
-ifDistances = 1
-ifClassify = 1
-
-standard_simulation(gameParameters, modelParameters, ifDistances, ifClassify)
+standard_simulation(gameParameters, modelParameters)
 
 # # Sweep alpha
 # modelParameters = [0.05, 0, 500, 0.98, 0, 0, 0, 0]
-# parameter_sweep_alpha(gameParameters, modelParameters, ifDistances, ifClassify)
+# parameter_sweep_alpha(gameParameters, modelParameters)
 
 # # Sweep RS
 # modelParameters = [0, 150, 500, 0.98, 0, 0, 0, 0]
-# parameter_sweep_Focal(gameParameters, modelParameters, ifDistances, ifClassify)
+# parameter_sweep_Focal(gameParameters, modelParameters)
 
 # # Sweep Zeta
 # modelParameters = [0.03, 150, 500, 0.98, 0, 1, 0, 1.2]
-# parameter_sweep_Zeta(gameParameters, modelParameters, ifDistances, ifClassify)
+# parameter_sweep_Zeta(gameParameters, modelParameters)
 
 # # Sweep Delta
 # modelParameters = [0.03, 150, 500, 0.98, 0, 1, 1, 1.2]
-# parameter_sweep_Delta(gameParameters, modelParameters, ifDistances, ifClassify)
+# parameter_sweep_Delta(gameParameters, modelParameters)
 
 # lst = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
-# exploreSampleSizeEffect(gameParameters, modelParameters, lst, ifDistances, ifClassify)
+# exploreSampleSizeEffect(gameParameters, modelParameters, lst)

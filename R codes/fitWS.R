@@ -1,34 +1,63 @@
 source("WSpred.R")
-source("getFrequencies.R")
 library(dfoptim)
+library(bbmle)
 library(beepr)
 
-df1 = read.csv("../Python Codes/tofitWSLS-ALL.csv")
-#df1 = read.csv("../Python Codes/humans.csv")
+df2 = read.csv("../Python Codes/fileFreqs.csv", na.strings=c("","NA"))
+args2 <- getArgs(df2)
+args2 <- args2[c('i', 's', 'freq', 'sumFreq')]
+args2 <- args2[order(-args2$s, args2$i),] 
+args2
+
+df1 = read.csv("../Python Codes/output0.csv", na.strings=c("","NA"))
+df1 <- df1[complete.cases(df1), ]
+df1$Region <- df1$Category
+
+df1$sL <- lapply(df1$Score, function(x) {
+  s <- as.numeric(x)
+  if(s < 31){
+    return(1)
+  } else {
+    return(2)
+  }
+})
+
+df1$Score <- df1$sL
+
+df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df1)
-getFreqFromGameWS(df1)
 
-data = read.csv('frequencies.csv')
-#data = read.csv("../Python Codes/fileFreqs.csv")
-head(data)
+args <- getArgs(df1)
+args <- args[c('pair', 'freq', 'sumFreq')]
+#args <- args[order(-args$s, args$i),] 
+args
 
-args <- getArgs(data, regiones)
-args <- args[order(-args$s, args$i),] 
-head(args)
-dim(args)
+#args <- args[args$i != 'RS', ]
+#head(args)
+#dim(args)
 
-# To search for best parameters WSLS model
+# To search for best parameters WSLS model with mle2
+fitresWSLS <- mle2(minuslogl=WSutil1,
+                   start=list(a=0.1,b=1),
+                   lower=c(a=0,b=.01),
+                   upper=c(a=1.5,b=200),
+                   method="L-BFGS-B")
+
+print(summary(fitresWSLS))
+
+
+# To search for best parameters WSLS model with optim
 w1 <- 0.1 # w
-w2 <- 100 # win stay 
+w2 <- 10 # win stay 
 fitresWSLS <- nmkb(par=c(w1, w2),
                fn = function(theta) WSutil(c(theta, 500, 0.98, 0, 0, 0, 0), args, regiones),
                lower=c(0,
-                       1),
-               upper=c(1,
+                       0),
+               upper=c(1.5,
                        200),
                control=list(trace=0))
 
-beep()
+#beep()
 print(fitresWSLS$par) 
 print(fitresWSLS$value) 
 
