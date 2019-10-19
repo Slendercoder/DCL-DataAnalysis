@@ -94,12 +94,16 @@ data = np.array([['Is', 'Score', 'Region'],
 
 data = pd.DataFrame(data, columns=data[0,:])
 data = data[1:]
+
+data = pd.read_csv('output1.csv')
+data = data.dropna()
 data['Score'] = data['Score'].map(lambda x: int(x))
 data['indice'] = data.index
+data['Region'] = data['Category']
+data = data[['indice', 'Is_there', 'Score', 'Region']]
+print(data[:6])
 
-print(data)
-
-data.apply(lambda x: nextRegion(x['Is'], x['Score'], x['Region'], x['indice']), axis=1)
+data.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Region'], x['indice']), axis=1)
 
 print(indicesIncluir)
 
@@ -109,15 +113,15 @@ for k in range(len(indicesIncluir)):
         row_number = c[0] - 1
         row_value = [x for x in data.loc[row_number - 1]]
         print(row_value)
-        row_value[0] = 'Ausente'
+        row_value[0] = 'Unicorn_Absent'
         row_value[2] = c[1]
         print(row_value)
         data = Insert_row(row_number, data, row_value)
 
-print(data)
+print(data[:6])
 
 data['leadScore'] = data['Score'].transform('shift', periods=1)
-data = pd.DataFrame(data.groupby('Is').get_group('Ausente')).reset_index()
+data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
 data['correctedScore'] = data['leadScore'].transform('shift', periods=-1)
 
-print(data[['Score', 'Region']])
+print(data[['Score', 'Region']][:6])

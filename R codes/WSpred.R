@@ -20,7 +20,7 @@ regiones <- c('RS',
               'OUT')
 
 lowerEps2=.00001
-highEps2 =.999999999999999999999
+highEps2 =.99999
 
 getFreq <- function(i, s, df, regiones) {
   # Obtains the frequencies vector for each starting region region i and score s 
@@ -174,7 +174,7 @@ WSutil <- function(theta, args, regiones){
   
   if (any(is.infinite(args$dev) | is.na(args$dev))) {
     print('Incorrect dev: ')
-    new_DF <- args[is.infinite(args$dev),]
+    new_DF <- args[is.infinite(args$dev), ]
     print(new_DF)
 #    print(theta)
 #    print(head(args$probs))
