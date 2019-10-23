@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 DEB = False
-IMPR = True
+IMPR = False
 TOLERANCIA = 1
 
 SUM_SCORE = 0
@@ -23,6 +23,26 @@ indicesIncluir = []
 ############################################################
 # Define function that initializes regions and strategies
 ############################################################
+
+def calcula_total_visited(x, y):
+    total_visited = np.add(x,y)
+    total_visited = total_visited.astype(float)
+    total_visited = total_visited * 0.5
+    total_visited = np.ceil(total_visited)
+    return np.sum(total_visited)
+
+def calcula_consistencia(x, y):
+    joint = np.multiply(x,y)
+    total_visited = np.add(x,y)
+    total_visited = total_visited.astype(float)
+    total_visited = total_visited * 0.5
+    total_visited = np.ceil(total_visited)
+    j = np.sum(joint)
+    t = np.sum(total_visited)
+    if t != 0:
+        return j/t
+    else:
+        return 1
 
 def nextRegion(si, s, r, i):
 	global SUM_SCORE
@@ -783,6 +803,10 @@ class Experiment(object):
 		# --------------------------------------------------
 		# Keep only rounds with Unicorn_Absent and correct score
 		# --------------------------------------------------
+		if IMPR:
+			f = './output_Prev.csv'
+			data[['Dyad', 'Player', 'Round', 'Is_there', 'Score', 'Category1', 'RegionGo']].to_csv(f, index=False)
+
 		print('Correcting scores...')
 		# 1. Create column of indexes
 		# data = data.reset_index()
@@ -855,107 +879,60 @@ class Experiment(object):
 		# print(data[['Player', 'Round', 'Size_visited', 'Joint']][:10])
 		# assert(all(data['Size_visited'] >= data['Joint']))
 		#
-		# print("Sorting by Player...")
-		# data = data.sort_values(['Player', 'Round'], \
-		#                 ascending=[True, True])
+		print("Sorting by Player...")
+		data = data.sort_values(['Player', 'Round'], \
+		                ascending=[True, True])
 
-		# # Find consistency
-		# print("Finding consistency...")
+		# Find consistency
+		print("Finding consistency...")
 		# # print data[:10]
-		# cols2 = ['a' + str(i + 1) + str(j + 1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
-		# dts = []
-		# cols22 = ['Inters-' + c for c in cols2]
-		# # print data[cols22]
-		# cols222 = ['Unions-' + c for c in cols2]
-		# # print data[cols222]
-		# for key, grp in data[cols2 + ['Player']].groupby(['Player']):
-		# 	# print "Processing player: ", key
-		# 	aux1 = pd.DataFrame(np.floor(grp[cols2].rolling(2).mean()))
-		# 	aux2 = pd.DataFrame(np.ceil(grp[cols2].rolling(2).mean()))
-		# 	AAAA = pd.concat([aux1, aux2], axis=1)
-		# 	AAAA.columns = cols22 + cols222
-		# 	AAAA['Inters'] = AAAA[cols22].sum(axis=1)
-		# 	AAAA['Unions'] = AAAA[cols222].sum(axis=1)
-		# 	AAAA['Consistency'] = AAAA['Inters']/AAAA['Unions']
-		# 	# print AAAA['Consistency']
-		# 	dts.append(AAAA['Consistency'])
-		#
-		# # rerer = pd.merge(dts[0], dts[1], left_index=True, right_index=True, how='outer')
-		# rerer = pd.concat(dts, axis=1)
-		# # print rerer.columns.values
-		# columnas = []
-		# nombres = list(rerer.columns.values)
-		# # print nombres
-		# for i in range(len(nombres)):
-		# 	columnas.append(str(i))
-		# # print columnas
-		# rerer.columns = columnas
-		# # print rerer.columns.values
-		# # print rerer.shape
-		# rerer['Consistency'] = rerer['0']
-		# for i in range(1, len(nombres)):
-		# 	rerer['Consistency'] = rerer['Consistency'].combine_first(rerer[str(i)])
-		#
-		# data['Consistency'] = rerer['Consistency']
-		# data['Consistency'] = data['Consistency'].fillna(1)
-		# data['Consistency'] = data['Consistency'].fillna(0)
-		# print data
+		cols2 = ['a' + str(i + 1) + str(j + 1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
+		data['Vector'] = data.apply(lambda x: np.array(x[cols]), axis=1)
+		data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
+		data = data.dropna()
+		data['Consistency'] = data.apply(lambda x: calcula_consistencia(x['Vector'], x['VectorLAG1']), axis=1)
+		del data['VectorLAG1']
 
-		# # Find difference in consistency and Total_visited_dyad ----
-		# print("Finding difference in consistency and Total_visited_dyad...")
-		# # Find the tiles visited by each player ----
-		# cols = ['Dyad','Player','Consistency','Round','Joint','Size_visited']
-		# cols += ['a' + str(i+1) + str(j+1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
-		# total = []
-		# dif_cons = []
-		# for key, grp in data[cols].groupby(['Dyad']):
-		#     Players = grp.Player.unique()
-		#     # print "The players in dyad " + str(key) + " are: " + str(Players)
-		#     Grp_player = grp.groupby(['Player'])
-		#     aux1 = pd.DataFrame(Grp_player.get_group(Players[0])).reset_index()
-		#     # print "aux1: \n", aux1
-		#     aux2 = pd.DataFrame(Grp_player.get_group(Players[1])).reset_index()
-		#     # print "aux2: \n", aux2
-		#     # print "len(aux1)", len(aux1)
-		#     assert(len(aux1) == len(aux2)), "Something wrong with players!"
-		#     # a = [np.where(aux1['a' + str(i + 1) + str(j + 1)] + aux2['a' + str(i + 1) + str(j + 1)] >= 1, 1, 0) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
-		#     # a = [np.where(aux1['a' + str(i + 1) + str(j + 1)] + aux2['a' + str(i + 1) + str(j + 1)] >= 1, 1, 0) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
-		#     # aux3 = sum(a)
-		#     # assert(len(aux3) == len(aux1)), "Something wrong with the sums!"
-		#     # for j in aux3:
-		#     #     # print "j: " + str(j) + " comp. dist.: " + str(1-float(j)/Num_Loc)
-		#     #     total.append(j)
-		#     #     total.append(j)
-		#     aux1['Total'] = aux1['Size_visited'] + aux2['Size_visited'] - aux1['Joint']
-		#     # assert(all(aux1['Joint'] == aux2['Joint']))
-		#     # assert(all(aux1['Size_visited'] >= aux1['Joint']))
-		#     # assert(all(aux2['Size_visited'] >= aux1['Joint']))
-		#     # assert(all(aux1['Total'] >= aux1['Size_visited']))
-		#     # print "aux1['Total']: \n", aux1['Total']
-		#     total += list(aux1['Total']) + list(aux1['Total'])
-		#     # Finding difference between consistencies
-		#     # print "La consistencia de uno es " + str(aux1['Consistency'])
-		#     # print "La consistencia de otro es " + str(aux2['Consistency'])
-		#     aux4 = np.absolute(aux1['Consistency'] - aux2['Consistency'])
-		#     # print "La dif consistencia es " + str(aux4)
-		#     # print "El total de locaciones visitas por los dos jugadores en" + \
-		#     # "la pareja " + str(d) + " es: " + str(aux3)
-		#     # preparing to add dif_cons
-		#     for j in aux4:
-		#         dif_cons.append(j)
-		#         dif_cons.append(j)
-		#
-		# # print(str(len(data)) + " " + str(len(total)))
-		# assert(len(total) == len(data)), "Something wrong with finding Size_visited!"
-		# data['Total_visited_dyad'] = total
-		# # #print data[:3]
-		# assert(len(dif_cons) == len(data)), "Something wrong with finding dif_cons!"
-		# data['Dif_consist'] = dif_cons
-		# # print data['Dif_consist'][:3]
-		#
-		# # Division of labor Index (Goldstone)
-		# data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
-		# # assert(all(data['DLIndex'] >= 0))
+		# Find difference in consistency and Total_visited_dyad ----
+		print("Finding difference in consistency and Total_visited_dyad...")
+		cols = ['Dyad','Player','Consistency','Round','Joint','Size_visited']
+		total = {}
+		dif_cons = {}
+		for key, grp in data[cols].groupby(['Dyad']):
+			Players = grp.Player.unique()
+			# print "The players in dyad " + str(key) + " are: " + str(Players)
+			Grp_player = grp.groupby(['Player'])
+			aux1 = pd.DataFrame(Grp_player.get_group(Players[0])).reset_index()
+			# print "aux1: \n", aux1
+			aux2 = pd.DataFrame(Grp_player.get_group(Players[1])).reset_index()
+			# print "aux2: \n", aux2
+			# print "len(aux1)", len(aux1)
+			assert(len(aux1) == len(aux2)), "Something wrong with players!"
+			assert(all(aux1['Joint'] == aux2['Joint'])), "Something wrong with players!"
+			aux3 = pd.DataFrame({'Dyad':aux1['Dyad'],\
+			'Round':aux1['Round'],\
+			'C1':aux1['Consistency'],\
+			'C2':aux2['Consistency'],\
+			'V1':aux1['Size_visited'],\
+			'V2':aux2['Size_visited'],\
+			'Joint':aux1['Joint']})
+			aux3['total_visited'] = aux3.apply(lambda x: x['V1'] + x['V2'] - x['Joint'], axis=1)
+			aux3['Dif_consist'] = aux3.apply(lambda x: np.abs(x['C1'] - x['C2']), axis=1)
+			aux3['Pair'] = aux3.apply(lambda x: tuple([x['Dyad'], x['Round']]), axis=1)
+			total1 = dict(zip(aux3.Pair, aux3.total_visited))
+			total = {**total, **total1}
+			dif_cons1 = dict(zip(aux3.Pair, aux3.Dif_consist))
+			dif_cons = {**dif_cons, **dif_cons1}
+
+		data['Pair'] = data.apply(lambda x: tuple([x['Dyad'], x['Round']]), axis=1)
+		data['Total_visited_dyad'] = data['Pair'].map(total)
+		data['Dif_consist'] = data['Pair'].map(dif_cons)
+		del data['Vector']
+		del data['Pair']
+
+		# Division of labor Index (Goldstone)
+		data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
+		assert(all(data['DLIndex'] >= 0))
 		#
 		# # --------------------------------------------------
 		# # Finding distance to closest focal region per round, per player
@@ -992,22 +969,22 @@ class Experiment(object):
 		# # print('len data[Distacias]', len(data))
 		# # data['Similarity'] = distancias
 		#
-		# # --------------------------------------------------
-		# # Finding the lag and lead variables
-		# # --------------------------------------------------
-		# LAG = 1
-		#
-		# print("Finding the lag variables...")
-		# data['Norm_Score_LAG1'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Norm_Score'].transform('shift', LAG)
-		# data['Consistency_LAG1'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Consistency'].transform('shift', LAG)
-		# data['Dif_consist_LAG1'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Dif_consist'].transform('shift', LAG)
-		# data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Joint'].transform('shift', LAG)
-		# data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Category'].transform('shift', -LAG)
+		# --------------------------------------------------
+		# Finding the lag and lead variables
+		# --------------------------------------------------
+		LAG = 1
+
+		print("Finding the lag variables...")
+		data['Norm_Score_LAG1'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Norm_Score'].transform('shift', LAG)
+		data['Consistency_LAG1'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Consistency'].transform('shift', LAG)
+		data['Dif_consist_LAG1'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Dif_consist'].transform('shift', LAG)
+		data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Joint'].transform('shift', LAG)
+		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Category'].transform('shift', -LAG)
 		# data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
 	    #                         ['Similarity'].transform('shift', LAG)
 		#

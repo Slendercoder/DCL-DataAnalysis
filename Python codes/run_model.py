@@ -328,7 +328,7 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 2]
+gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
 # modelParameters = [0.43, 8.33, 500, 0.98, 0, 0, 0, 0] # optimos
 # modelParameters = [0.43*0.61, 8.33*95.91, 500, 0.98, 0, 0, 0, 0] # optimos corregidos
@@ -337,7 +337,7 @@ gameParameters = [0.5, 2, 8, 60, 2]
 # modelParameters = [0.022*0.19, 13.22*15.75, 500, 0.98, 0.00000007*1.29, 1, 1.72*1.35, 1.2]
 
 # Para tofitWSLS
-modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
+modelParameters = [0.438, 22.5, 10, 31, 0, 0, 0, 0]
 # modelParameters = [0.52, 3.9, 500, 0.98, 0, 0, 0, 0] # Estimado de OnlyAbsent
 
 

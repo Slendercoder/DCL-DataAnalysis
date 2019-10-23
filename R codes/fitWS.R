@@ -10,6 +10,7 @@ args2 <- args2[c('pair', 'freq', 'sumFreq')]
 head(args2)
 
 df1 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category1
 #df1$sL <- lapply(df1$Score, function(x) {
