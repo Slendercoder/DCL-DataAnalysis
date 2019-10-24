@@ -11,24 +11,14 @@ get_legend<-function(myggplot){
 
 ###############################################
 
-#df1 = read.csv("humans.csv")
-#df1$Exp <- as.character("Observed behavior")
-#head(df1)
-#df2 = read.csv("../Python Codes/WSLS.csv")
-#df2$Exp <- as.character("WSLS")
-#head(df2)
-#df3 = read.csv("../Python Codes/FRA.csv")
-#df3$Exp <- as.character("FRA")
-#head(df3)
-
 df1 = read.csv("../Python Codes/tofitWSLS.csv")
 df1$Exp <- as.character("Model")
 head(df1)
 df2 = read.csv("../Python Codes/modelRecoveryFull.csv")
-df2$Exp <- as.character("WSLS")
+df2$Exp <- as.character("Full data")
 head(df2)
-df3 = read.csv("../Python Codes/FRA.csv")
-df3$Exp <- as.character("FRA")
+df3 = read.csv("../Python Codes/modelRecoveryAbsent.csv")
+df3$Exp <- as.character("Only unicorn absent")
 head(df3)
 
 
@@ -39,25 +29,25 @@ df <- rbind(
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('Observed behavior', 'WSLS', 'FRA'))
+df$Exp <- factor(df$Exp, levels = c('Model', 'Full data', 'Only unicorn absent'))
 head(df)
 # levels(df$Exp)
 # Summarize data
@@ -69,7 +59,7 @@ g1 <- ggplot(dfc_DLIndex, aes(x = Round, y = DLIndex, colour=Exp, group=Exp)) +
   geom_line(size=0.7) +
   geom_ribbon(aes(ymin = DLIndex - sd,
                   ymax = DLIndex + sd), alpha = 0.2) +
-  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
+  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
   labs(color = "Source") +
   xlab("Round (unicorn absent)") +
   ylab("Division of labor") +
@@ -80,7 +70,7 @@ g1
 # Density plot
 g2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   geom_density(size=1) +
-  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
+  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
 #  scale_y_continuous(limits = c(0, 5)) + 
   labs(color = "Source of data") +
   theme_bw()
@@ -129,7 +119,7 @@ g3 <- ggplot(df, aes(x=Category,  group=Exp, fill=Exp)) +
   #  geom_text(aes(label = scales::percent(..prop..),
   #                 y= ..prop.. ), stat= "count", vjust = -.5) +
   #  labs(y = "Percent", fill="Region") +
-  scale_fill_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
+  scale_fill_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
   xlab("Region") +
   ylab("Instances (%)") +
 #  labs(fill = TeX('bias$_{focal}$')) +
@@ -142,7 +132,7 @@ g3
 
 g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
+  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
   scale_y_continuous(limits = c(0, 1)) + 
   xlab("Score prev. round") +
   ylab("Consistency") +
@@ -154,7 +144,7 @@ g4
 
 g5 <- ggplot(df, aes(log(Similarity_LAG1), Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
+  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
   xlab("Log of max similarity w.r.t.\nfocal regions prev. round") +
   ylab("Consistency") +
   geom_smooth(method = lm)

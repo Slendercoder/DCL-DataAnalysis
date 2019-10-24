@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 DEB = False
-IMPR = False
+IMPR = True
 TOLERANCIA = 1
 
 SUM_SCORE = 0
@@ -23,13 +23,6 @@ indicesIncluir = []
 ############################################################
 # Define function that initializes regions and strategies
 ############################################################
-
-def calcula_total_visited(x, y):
-    total_visited = np.add(x,y)
-    total_visited = total_visited.astype(float)
-    total_visited = total_visited * 0.5
-    total_visited = np.ceil(total_visited)
-    return np.sum(total_visited)
 
 def calcula_consistencia(x, y):
     joint = np.multiply(x,y)
@@ -800,14 +793,14 @@ class Experiment(object):
 		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
 		                            ['Category1'].transform('shift', -1)
 
-		# --------------------------------------------------
-		# Keep only rounds with Unicorn_Absent and correct score
-		# --------------------------------------------------
-		if IMPR:
-			f = './output_Prev.csv'
-			data[['Dyad', 'Player', 'Round', 'Is_there', 'Score', 'Category1', 'RegionGo']].to_csv(f, index=False)
+		# if IMPR:
+		# 	f = './output_Prev.csv'
+		# 	data[['Dyad', 'Player', 'Round', 'Is_there', 'Score', 'Category1', 'RegionGo']].to_csv(f, index=False)
 
-		print('Correcting scores...')
+		# --------------------------------------------------
+		# Correcting scores
+		# --------------------------------------------------
+		# print('Correcting scores...')
 		# 1. Create column of indexes
 		# data = data.reset_index()
 		# data['indice'] = data.index
@@ -843,17 +836,19 @@ class Experiment(object):
 		#         data = Insert_row(row_number, data, row_value)
 		#
 		# # 6. Obtaining score from previous round
-		# data['lagScore'] = data['Score'].transform('shift', periods=1)
+		# data['lagScore'] = data.groupby(['Dyad', 'Player'])\
+		#                             ['Score'].transform('shift', periods=1)
 		# # print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
-		# 7. Keep only rounds with Unicorn_Absent
-		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
-		# finding corrected scores (part 2)
-		# 8. Obtaining lagScore from next round
-		# data['Score'] = data['lagScore'].transform('shift', periods=-1)
-		# print(data[['Is_there', 'Score', 'Category']])
-		data = data.dropna()
-		print('Done!')
-
+		# # 7. Keep only rounds with Unicorn_Absent
+		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+		# # finding corrected scores (part 2)
+		# # 8. Obtaining lagScore from next round
+		# data['Score'] = data.groupby(['Dyad', 'Player'])\
+		#                             ['lagScore'].transform('shift', periods=-1)
+		# # print(data[['Is_there', 'Score', 'Category']])
+		# data = data.dropna()
+		# print('Done!')
+        #
 		# --------------------------------------------------
 		# Obtaining measures from players' performance
 		# --------------------------------------------------
@@ -878,11 +873,11 @@ class Experiment(object):
 		data['Size_visited'] = data[cols].sum(axis=1)
 		# print(data[['Player', 'Round', 'Size_visited', 'Joint']][:10])
 		# assert(all(data['Size_visited'] >= data['Joint']))
-		#
-		print("Sorting by Player...")
-		data = data.sort_values(['Player', 'Round'], \
-		                ascending=[True, True])
-
+		# #
+		# print("Sorting by Player...")
+		# data = data.sort_values(['Player', 'Round'], \
+		#                 ascending=[True, True])
+        #
 		# Find consistency
 		print("Finding consistency...")
 		# # print data[:10]
@@ -933,42 +928,20 @@ class Experiment(object):
 		# Division of labor Index (Goldstone)
 		data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
 		assert(all(data['DLIndex'] >= 0))
-		#
-		# # --------------------------------------------------
-		# # Finding distance to closest focal region per round, per player
-		# # --------------------------------------------------
-		# print("Finding distances to focal paths...")
-		#
-		# # Deterimining list of columns
-		# cols1 = ['a' + str(i) + str(j) \
-		# for i in range(1, Num_Loc + 1) \
-		# for j in range(1, Num_Loc + 1) \
-		# ]
-		#
-		# data['Similarity'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 1), axis=1)
-		#
-		# # cols = cols1 + ['Player', 'Round']
 		# #
-		# # print("Sorting by Player, Round...")
-		# # data = data.sort_values(['Player', 'Round'], \
-		# # ascending=[True, True]).reset_index()
+		# # # --------------------------------------------------
+		# # # Finding distance to closest focal region per round, per player
+		# # # --------------------------------------------------
+		# # print("Finding distances to focal paths...")
 		# #
-		# # distancias = []
-		# # for player, Grp in data[cols].groupby(['Player']):
-		# # 	print("Working with player " + str(player) + "...")
-		# # 	for ronda, grp in Grp.groupby(['Round']):
-		# # 		# print "Obtaining path from round " + str(ronda) + "..."
-		# # 		path = [int(list(grp[c])[0]) for c in cols1]
-		# # 		# print path
-		# # 		# print "finding region..."
-		# # 		minDist = self.maxSim2Focal(path, self.regions, 0.3)
-		# # 		# print "Min: " + str(minDist)
-		# # 		distancias.append(minDist)
+		# # # Deterimining list of columns
+		# # cols1 = ['a' + str(i) + str(j) \
+		# # for i in range(1, Num_Loc + 1) \
+		# # for j in range(1, Num_Loc + 1) \
+		# # ]
 		# #
-		# # print('len distancias', len(distancias))
-		# # print('len data[Distacias]', len(data))
-		# # data['Similarity'] = distancias
-		#
+		# # data['Similarity'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 1), axis=1)
+		# #
 		# --------------------------------------------------
 		# Finding the lag and lead variables
 		# --------------------------------------------------
@@ -983,15 +956,11 @@ class Experiment(object):
 		                            ['Dif_consist'].transform('shift', LAG)
 		data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
 		                            ['Joint'].transform('shift', LAG)
-		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
-		                            ['Category'].transform('shift', -LAG)
-		# data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
-	    #                         ['Similarity'].transform('shift', LAG)
-		#
-		# print("Sorting by Dyad, Player, Round...")
-		# data = data.sort_values(['Dyad', 'Player', 'Round'], \
-		#                 ascending=[True, True, True])#.reset_index(drop=True)
-		#
+		# data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
+		#                             ['Category'].transform('shift', -LAG)
+		# # data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
+	    # #                         ['Similarity'].transform('shift', LAG)
+
 		self.df = data
 
 		# ifSave = input("Do you want to save data to a file? (1=Yes/0=No): ")

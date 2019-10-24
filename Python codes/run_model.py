@@ -330,16 +330,17 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst):
 # Create experiment
 gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
-# modelParameters = [0.43, 8.33, 500, 0.98, 0, 0, 0, 0] # optimos
+# modelParameters = [0.438, 22.5, 10, 31, 0, 0, 0, 0] # optimos
 # modelParameters = [0.43*0.61, 8.33*95.91, 500, 0.98, 0, 0, 0, 0] # optimos corregidos
 # FRA optim
 # modelParameters = [0.022, 13.22, 500, 0.98, 0.00000007, 1, 1.72, 1.2]
 # modelParameters = [0.022*0.19, 13.22*15.75, 500, 0.98, 0.00000007*1.29, 1, 1.72*1.35, 1.2]
 
 # Para tofitWSLS
-modelParameters = [0.438, 22.5, 10, 31, 0, 0, 0, 0]
+# modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
+modelParameters = [0.88, 167, 10, 31, 0, 0, 0, 0] # full data
+# modelParameters = [0.94, 19, 10, 31, 0, 0, 0, 0] # only unicorn absent
 # modelParameters = [0.52, 3.9, 500, 0.98, 0, 0, 0, 0] # Estimado de OnlyAbsent
-
 
 # Para tofitFRA
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
