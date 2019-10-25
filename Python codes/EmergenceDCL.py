@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 DEB = False
-IMPR = True
+IMPR = False
 TOLERANCIA = 1
 
 SUM_SCORE = 0
@@ -133,7 +133,6 @@ def nameRegion(r):
 		return 'IN'
 	elif r == 8:
 		return 'OUT'
-
 
 def create_regions_and_strategies(Num_Loc):
 	size = int(Num_Loc * Num_Loc)
@@ -790,8 +789,8 @@ class Experiment(object):
 
 		data['Category'] = data.apply(lambda x: self.minDist2Focal(x[cols1], self.regions), axis=1)
 		data['Category1'] = data.apply(lambda x: nameRegion(x['Strategy']), axis=1)
-		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
-		                            ['Category1'].transform('shift', -1)
+		# data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
+		#                             ['Category1'].transform('shift', -1)
 
 		# if IMPR:
 		# 	f = './output_Prev.csv'
@@ -800,7 +799,7 @@ class Experiment(object):
 		# --------------------------------------------------
 		# Correcting scores
 		# --------------------------------------------------
-		# print('Correcting scores...')
+		print('Correcting scores...')
 		# 1. Create column of indexes
 		# data = data.reset_index()
 		# data['indice'] = data.index
@@ -835,19 +834,19 @@ class Experiment(object):
 		#         # print(row_value)
 		#         data = Insert_row(row_number, data, row_value)
 		#
-		# # 6. Obtaining score from previous round
-		# data['lagScore'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Score'].transform('shift', periods=1)
-		# # print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
-		# # 7. Keep only rounds with Unicorn_Absent
-		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
-		# # finding corrected scores (part 2)
-		# # 8. Obtaining lagScore from next round
-		# data['Score'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['lagScore'].transform('shift', periods=-1)
-		# # print(data[['Is_there', 'Score', 'Category']])
-		# data = data.dropna()
-		# print('Done!')
+		# 6. Obtaining score from previous round
+		data['lagScore'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Score'].transform('shift', periods=1)
+		# print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
+		# 7. Keep only rounds with Unicorn_Absent
+		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+		# finding corrected scores (part 2)
+		# 8. Obtaining lagScore from next round
+		data['Score'] = data.groupby(['Dyad', 'Player'])\
+		                            ['lagScore'].transform('shift', periods=-1)
+		# print(data[['Is_there', 'Score', 'Category']])
+		data = data.dropna()
+		print('Done!')
         #
 		# --------------------------------------------------
 		# Obtaining measures from players' performance
@@ -956,8 +955,8 @@ class Experiment(object):
 		                            ['Dif_consist'].transform('shift', LAG)
 		data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
 		                            ['Joint'].transform('shift', LAG)
-		# data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Category'].transform('shift', -LAG)
+		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Category'].transform('shift', -LAG)
 		# # data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
 	    # #                         ['Similarity'].transform('shift', LAG)
 

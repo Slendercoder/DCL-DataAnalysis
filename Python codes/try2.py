@@ -7,6 +7,154 @@ N_OBS = 0
 AV_SCORE = 0
 CONTINUO = False
 indicesIncluir = []
+TOLERANCIA = 1
+
+def nameRegion(r):
+	if r == 0 or r == 9:
+		return 'RS'
+	elif r == 1:
+		return 'ALL'
+	elif r == 2:
+		return 'NOTHING'
+	elif r == 3:
+		return 'DOWN'
+	elif r == 4:
+		return 'UP'
+	elif r == 5:
+		return 'LEFT'
+	elif r == 6:
+		return 'RIGHT'
+	elif r == 7:
+		return 'IN'
+	elif r == 8:
+		return 'OUT'
+
+def create_regions_and_strategies(Num_Loc):
+	size = int(Num_Loc * Num_Loc)
+	half_size = int(Num_Loc * Num_Loc / 2)
+	half_Num_Loc = int(Num_Loc / 2)
+
+	# ALL and NOTHING
+	all = [1] * size
+	nothing = [0] * size
+	# print('ALL ', all)
+	# print('NOTHING ', nothing)
+
+	# UP and DOWN
+	up = [1] * half_size + [0] * half_size
+	down = [1 - i for i in up]
+	# print('DOWN ', down)
+	# print('UP ', up)
+
+	# LEFT and RIGHT
+	right = []
+	for i in range(0, Num_Loc):
+		right += [0] * half_Num_Loc + [1] * half_Num_Loc
+
+	left = [1 - i for i in right]
+	# print('LEFT ', left)
+	# print('RIGHT ', right)
+
+	# IN and OUT
+	In = [0] * Num_Loc
+	for i in range(Num_Loc - 2):
+		In += [0] + [1] * (Num_Loc - 2) + [0]
+
+	In += [0] * Num_Loc
+
+	out = [1 - i for i in In]
+
+	# print('IN ', In)
+	# print('OUT ', out)
+
+	# Create a set of n pairwise disjoint paths in the board
+
+	# Define the strategies
+	UP = []
+	DOWN = []
+	LEFT = []
+	RIGHT = []
+	IN = []
+	OUT = []
+	ALL = []
+	NOTHING = []
+
+	for i in range(int(Num_Loc * Num_Loc)):
+		if up[i] == 1:
+			UP.append(i)
+		if down[i] == 1:
+			DOWN.append(i)
+		if left[i] == 1:
+			LEFT.append(i)
+		if right[i] == 1:
+			RIGHT.append(i)
+		if all[i] == 1:
+			ALL.append(i)
+		if nothing[i] == 1:
+			NOTHING.append(i)
+		if In[i] == 1:
+			IN.append(i)
+		if out[i] == 1:
+			OUT.append(i)
+
+	strategies = {}
+
+	strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+	strategies[1] = ALL
+	strategies[2] = NOTHING
+	strategies[3] = DOWN
+	strategies[4] = UP
+	strategies[5] = LEFT
+	strategies[6] = RIGHT
+	strategies[7] = IN
+	strategies[8] = OUT
+	strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+
+	return [all, nothing, down, up, left, right, In, out], strategies
+
+def dist(k, i):
+    # Returns similarity between regions k and i
+    # Input: k, which is a region coded as a vector of 0s and 1s of length 64
+    #        i, which is a region coded as a vector of 0s and 1s of length 64
+    #        o, which is a parameter for the exponential
+    # Output: number representing the similarity between k and i
+
+    k = np.array(k)
+    i = np.array(i)
+    dif = np.subtract(k, i)
+    squares = np.multiply(dif, dif)
+    return(np.sqrt(np.sum(squares)))
+
+def minDist2Focal(r, regionsCoded):
+	# Returns closest distance to focal region
+	# Input: r, which is a region coded as a vector of 0s and 1s of length 64
+	# Output: number representing the closest distance
+
+	distances = [0] * 8
+	contador = 0
+
+	# print('r:\n', list(r))
+	for k in regionsCoded:
+		# kV = self.code2Vector(k)
+		# print('k:\n', k)
+		distances[contador] = dist(list(r), k)
+		contador = contador + 1
+
+	# dist_print = ["%.3f" % v for v in distances]
+	# print('distancias:\n', dist_print)
+
+	valor = np.min(np.array(distances))
+	indiceMin = np.argmin(np.array(distances))
+	# print('argmin:', indiceMin, 'vale?:', valor < np.sqrt(3))
+
+	if valor < np.sqrt(TOLERANCIA):
+		reg = nameRegion(indiceMin + 1)
+		return(reg)
+	else:
+		return('RS')
+
+    # valor = np.min(np.array(distances))
+    # return(valor)
 
 def calcula_consistencia(x, y):
     joint = np.multiply(x,y)
@@ -42,13 +190,13 @@ def nextRegion(si, s, r, i):
 			if AV_SCORE > 30:
 				SUM_SCORE = 0
 				N_OBS = 0
-				indicesIncluir.append([i, r])
+				indicesIncluir.append([i, AV_SCORE, r])
 				CONTINUO = False
 				return r
 			else:
 				SUM_SCORE = 0
 				N_OBS = 0
-				indicesIncluir.append([i, 'RS'])
+				indicesIncluir.append([i, AV_SCORE, 'RS'])
 				CONTINUO = False
 				return r
 		else:
@@ -98,41 +246,77 @@ data = data.dropna()
 
 print(data[:3])
 
-print('Correcting scores...')
-# # 1. Create column of indexes
-# data = data.reset_index()
-# data['indice'] = data.index
-# # 2. Obtain number of columns for Is_there and Category
-# columnas = list(data.columns)
-# Is_there_index = columnas.index('Is_there')
-# # print('Is_there_index', Is_there_index)
-# Strategy_index = columnas.index('Category')
-# # print('Is_there_index', Strategy_index)
-#
-# # Indices de comienzo de jugador
-# indiceJugador = []
-# for key, grp in data.groupby('Player'):
-# 	indiceJugador.append(list(grp['indice'])[0])
-# 	# print(grp[['indice', 'Is_there', 'Score', 'Category']])
-# 	# 3. Obtain indices from Unicorn_Absent after block of Unicorn_Present
-# 	# 4. Estimate region based on average score
-# 	grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
-# 	# print('List of blocks', indicesIncluir)
-#
-# # print('indiceJugador', indiceJugador)
-#
-# # 5. Include new row of Unicorn_Absent with estimated region and previous score
-# for k in range(len(indicesIncluir)):
-#     c = indicesIncluir[len(indicesIncluir) - k - 1]
-#     if c[0] not in indiceJugador:
-#         row_number = c[0]
-#         row_value = [x for x in data.loc[row_number - 1]]
-#         # print(row_value)
-#         row_value[Is_there_index] = 'Unicorn_Absent'
-#         row_value[Strategy_index] = c[1]
-#         # print(row_value)
-#         data = Insert_row(row_number, data, row_value)
+regions1 = ['RS', \
+           'ALL', \
+           'NOTHING', \
+           'DOWN', \
+           'UP', \
+           'LEFT', \
+           'RIGHT', \
+           'IN', \
+           'OUT']
 
+regions, strategies = create_regions_and_strategies(Num_Loc)
+
+print("Sorting by Dyad, Player, Round...")
+data = data.sort_values(['Dyad', 'Player', 'Round'], \
+                ascending=[True, True, True]).reset_index(drop=True)
+
+# --------------------------------------------------
+# Classify region per round, per player
+# --------------------------------------------------
+print("Classifying regions...")
+
+# Deterimining list of columns
+cols1 = ['a' + str(i) + str(j) \
+for i in range(1, Num_Loc + 1) \
+for j in range(1, Num_Loc + 1) \
+]
+
+data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1], regions), axis=1)
+
+print('Correcting scores...')
+# 1. Create column of indexes
+data = data.reset_index()
+data['indice'] = data.index
+print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
+
+# 2. Obtain number of columns for Is_there and Category
+columnas = list(data.columns)
+Is_there_index = columnas.index('Is_there')
+# print('Is_there_index', Is_there_index)
+Strategy_index = columnas.index('Category')
+# print('Is_there_index', Strategy_index)
+Score_index = columnas.index('Score')
+# print('Is_there_index', Score_index)
+
+# Indices de comienzo de jugador
+indiceJugador = []
+for key, grp in data.groupby('Player'):
+	indiceJugador.append(list(grp['indice'])[0])
+	print(grp[['indice', 'Is_there', 'Score', 'Category']])
+	# 3. Obtain indices from Unicorn_Absent after block of Unicorn_Present
+	# 4. Estimate region based on average score
+	grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
+	print('List of blocks', indicesIncluir)
+
+# print('indiceJugador', indiceJugador)
+#
+# 5. Include new row of Unicorn_Absent with estimated region and previous score
+for k in range(len(indicesIncluir)):
+    c = indicesIncluir[len(indicesIncluir) - k - 1]
+    if c[0] not in indiceJugador:
+        row_number = c[0]
+        row_value = [x for x in data.loc[row_number - 1]]
+        # print(row_value)
+        row_value[Is_there_index] = 'Unicorn_Absent'
+        row_value[Score_index] = c[1]
+        row_value[Strategy_index] = c[2]
+        # print(row_value)
+        data = Insert_row(row_number, data, row_value)
+#
+print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
+#
 # 6. Obtaining score from previous round
 data['lagScore'] = data.groupby(['Dyad', 'Player'])\
                             ['Score'].transform('shift', periods=1)
@@ -145,6 +329,7 @@ data['Score'] = data.groupby(['Dyad', 'Player'])\
                             ['lagScore'].transform('shift', periods=-1)
 # print(data[['Is_there', 'Score', 'Category']])
 data = data.dropna()
+print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
 print('Done!')
 
 # --------------------------------------------------

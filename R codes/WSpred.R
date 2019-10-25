@@ -173,9 +173,9 @@ WSutil <- function(theta, args, regiones){
 #  print(args$dev)
   
   if (any(is.infinite(args$dev) | is.na(args$dev))) {
-    print('Incorrect dev: ')
-    new_DF <- args[is.infinite(args$dev), ]
-    print(new_DF)
+#    print('Incorrect dev: ')
+#    new_DF <- args[is.infinite(args$dev), ]
+#    print(new_DF)
 #    print(theta)
 #    print(head(args$probs))
 #    print(head(args$freq))

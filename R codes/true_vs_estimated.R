@@ -11,32 +11,42 @@ get_legend<-function(myggplot){
 
 ###############################################
 
-df2 = read.csv("../Python Codes/tofitWSLS.csv")
-df2$Exp <- as.character("True")
+df1 = read.csv("../Python Codes/tofitWSLS.csv")
+df1$Exp <- as.character("True")
+head(df1)
+df2 = read.csv("../Python Codes/modelRecoveryFull.csv")
+df2$Exp <- as.character("Estimated full")
 head(df2)
-df3 = read.csv("../Python Codes/fittedWSLS.csv")
-df3$Exp <- as.character("Estimated")
+df3 = read.csv("../Python Codes/modelRecoveryAbsent.csv")
+df3$Exp <- as.character("Estimated absent")
 head(df3)
 
 # Create single data frame with DLIndexes
 df <- rbind(
+  df1[c('Round', 
+        'DLIndex',
+        'Consistency',
+        'Category',
+        'Norm_Score_LAG1',
+#        'Similarity_LAG1',
+        'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('True', 'Estimated'))
+df$Exp <- factor(df$Exp, levels = c('True', 'Estimated full', 'Estimated absent'))
 head(df)
 # levels(df$Exp)
 # Summarize data
@@ -48,7 +58,7 @@ g1 <- ggplot(dfc_DLIndex, aes(x = Round, y = DLIndex, colour=Exp, group=Exp)) +
   geom_line(size=0.7) +
   geom_ribbon(aes(ymin = DLIndex - sd,
                   ymax = DLIndex + sd), alpha = 0.2) +
-  scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_colour_manual(values = c("True" = "#999999", "Estimated full" = "#E69F00", "Estimated absent" = "#56B4E9")) +  
   labs(color = "Source") +
   xlab("Round (unicorn absent)") +
   ylab("Division of labor") +
@@ -59,7 +69,7 @@ g1
 # Density plot
 g2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   geom_density(size=1) +
-  scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_colour_manual(values = c("True" = "#999999", "Estimated full" = "#E69F00", "Estimated absent" = "#56B4E9")) +  
   #  scale_y_continuous(limits = c(0, 5)) + 
   labs(color = "Source of data") +
   theme_bw()
@@ -108,7 +118,7 @@ g3 <- ggplot(df, aes(x=Category,  group=Exp, fill=Exp)) +
   #  geom_text(aes(label = scales::percent(..prop..),
   #                 y= ..prop.. ), stat= "count", vjust = -.5) +
   #  labs(y = "Percent", fill="Region") +
-  scale_fill_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_fill_manual(values = c("True" = "#999999", "Estimated full" = "#E69F00", "Estimated absent" = "#56B4E9")) +  
   xlab("Region") +
   ylab("Instances (%)") +
   #  labs(fill = TeX('bias$_{focal}$')) +
@@ -121,7 +131,7 @@ g3
 
 g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_colour_manual(values = c("True" = "#999999", "Estimated full" = "#E69F00", "Estimated absent" = "#56B4E9")) +  
   scale_y_continuous(limits = c(0, 1)) + 
   xlab("Score prev. round") +
   ylab("Consistency") +
@@ -133,7 +143,7 @@ g4
 
 g5 <- ggplot(df, aes(log(Similarity_LAG1), Consistency, color=Exp)) +
   geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_colour_manual(values = c("True" = "#999999", "Estimated full" = "#E69F00", "Estimated absent" = "#56B4E9")) +  
   xlab("Log of max similarity w.r.t.\nfocal regions prev. round") +
   ylab("Consistency") +
   geom_smooth(method = lm)

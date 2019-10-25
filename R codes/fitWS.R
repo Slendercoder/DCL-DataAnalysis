@@ -3,7 +3,7 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-df2 = read.csv("../Python Codes/fileFreqs.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/fileFreqs0.csv", na.strings=c("","NA"))
 args2 <- getArgs(df2)
 args2 <- args2[order(-args2$s, args2$i),] 
 args2 <- args2[c('pair', 'freq', 'sumFreq')]
@@ -12,31 +12,18 @@ head(args2)
 #df1 = read.csv("../Python Codes/output_Prev.csv", na.strings=c("","NA"))
 #df1 <- df1[complete.cases(df1), ]
 #df1$Region <- df1$Category1
-# df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/tofitWSLS.csv", na.strings=c("","NA"))
 df1 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
-
-a <- df1[df1$Is_there == 'Unicorn_Present', ]
-#df1$sL <- lapply(df1$Score, function(x) {
-#  s <- as.numeric(x)
-#  if(s < 31){
-#    return(1)
-#  } else {
-#    return(2)
-#  }
-#})
-# df1$Score <- df1$sL
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df1)
 
 args <- getArgs(df1)
 args <- args[order(-args$s, args$i),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
-#args
-#args <- args[args$i != 'RS', ]
 head(args)
-#dim(args)
 head(args2)
 
 sum(unlist(args$sumFreq))
