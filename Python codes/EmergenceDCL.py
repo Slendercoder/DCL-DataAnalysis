@@ -19,10 +19,39 @@ N_OBS = 0
 AV_SCORE = 0
 CONTINUO = False
 indicesIncluir = []
+indicesAvScore = {}
+TOLERANCIA = 1
 
 ############################################################
 # Define function that initializes regions and strategies
 ############################################################
+
+def averageScorePresentBlocks(si, s, ind):
+    global AV_SCORE
+    global CONTINUO
+    global N_OBS
+    global indicesIncluir
+    global indicesAvScore
+    if si == 'Unicorn_Present':
+        if CONTINUO:
+            AV_SCORE += s
+            N_OBS += 1
+        else:
+            AV_SCORE = s
+            N_OBS = 1
+            CONTINUO = True
+            if ind not in indiceJugador:
+                indicesIncluir.append(ind - 1)
+    else:
+        if CONTINUO:
+            indicesAvScore[indicesIncluir[-1]] = float(AV_SCORE)/N_OBS
+            CONTINUO = False
+
+def nextScore(si, siLead, s, ind):
+    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s == 32:
+        return indicesAvScore[ind]
+    else:
+        return s
 
 def calcula_consistencia(x, y):
     joint = np.multiply(x,y)
@@ -36,39 +65,6 @@ def calcula_consistencia(x, y):
         return j/t
     else:
         return 1
-
-def nextRegion(si, s, r, i):
-	global SUM_SCORE
-	global N_OBS
-	global AV_SCORE
-	global CONTINUO
-	global indicesIncluir
-	if si == 'Unicorn_Present':
-		SUM_SCORE += s
-		N_OBS += 1
-		AV_SCORE = SUM_SCORE/N_OBS
-		CONTINUO = True
-		return r
-	else:
-		if CONTINUO:
-			# print('r', r)
-			# print('AV_SCORE', AV_SCORE)
-			# print('i', i)
-			# print('SUM_SCORE', SUM_SCORE)
-			if AV_SCORE > 30:
-				SUM_SCORE = 0
-				N_OBS = 0
-				indicesIncluir.append([i, r])
-				CONTINUO = False
-				return r
-			else:
-				SUM_SCORE = 0
-				N_OBS = 0
-				indicesIncluir.append([i, 'RS'])
-				CONTINUO = False
-				return r
-		else:
-			return r
 
 # Function to insert row in the dataframe
 def Insert_row(row_number, df, row_value):
@@ -775,6 +771,8 @@ class Experiment(object):
 
 		print("Sorting by Dyad, Player, Round...")
 		data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True]).reset_index(drop=True)
+        data['Is_there_LEAD'] = data.groupby(['Dyad', 'Player'])\
+                                    ['Is_there'].transform('shift', periods=-1)
 
 		# --------------------------------------------------
 		# Classify region per round, per player
@@ -797,60 +795,29 @@ class Experiment(object):
 		# Correcting scores
 		# --------------------------------------------------
 		print('Correcting scores...')
-		# # 1. Create column of indexes
-		# data = data.reset_index()
-		# data['indice'] = data.index
-		# # 2. Obtain number of columns for Is_there and Category
-		# columnas = list(data.columns)
-		# Is_there_index = columnas.index('Is_there')
-		# # print('Is_there_index', Is_there_index)
-		# Strategy_index = columnas.index('Category')
-		# # print('Is_there_index', Strategy_index)
-		# Score_index = columnas.index('Score')
-        #
-		# # Indices de comienzo de jugador
-		# indiceJugador = []
-		# for key, grp in data.groupby('Player'):
-		# 	indiceJugador.append(list(grp['indice'])[0])
-		# 	# print(grp[['indice', 'Is_there', 'Score', 'Category']])
-		# 	# 3. Obtain indices from Unicorn_Absent after block of Unicorn_Present
-		# 	# 4. Estimate region based on average score
-		# 	grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
-		# 	# print('List of blocks', indicesIncluir)
+		# 1. Create column of indexes
+		data = data.reset_index()
+		data['indice'] = data.index
+		# Indices de comienzo de jugador
+		indiceJugador = []
+		for key, grp in data.groupby('Player'):
+			indiceJugador.append(list(grp['indice'])[0])
+			# print(grp[['indice', 'Is_there', 'Score', 'Category']])
+			# 2. Obtain indices of blocks of Unicorn_Present
+			grp.apply(lambda x: averageScorePresentBlocks(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
+			# print('List of blocks', indicesIncluir)
         #
 		# # print('indiceJugador', indiceJugador)
-        #
-		# # 5. Include new row of Unicorn_Absent with estimated region and previous score
-		# for k in range(len(indicesIncluir)):
-		#     c = indicesIncluir[len(indicesIncluir) - k - 1]
-		#     if c[0] not in indiceJugador:
-		#         row_number = c[0]
-		#         row_value = [x for x in data.loc[row_number - 1]]
-		#         # print(row_value)
-		#         row_value[Is_there_index] = 'Unicorn_Absent'
-		#         row_value[Score_index] = c[1]
-		#         row_value[Strategy_index] = c[2]
-		#         # print(row_value)
-		#         data = Insert_row(row_number, data, row_value)
-        #
-		# # 6. Obtaining score from previous round
-		# data['lagScore'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Score'].transform('shift', periods=1)
-		# # print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
-		# # 7. Keep only rounds with Unicorn_Absent
-		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
-		# # finding corrected scores (part 2)
-		# # 8. Obtaining lagScore from next round
-		# data['Score'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['lagScore'].transform('shift', periods=-1)
-		# # print(data[['Is_there', 'Score', 'Category']])
-		# data = data.dropna()
-		# print('Done!')
+        # 3. Correct score from last round absent to average score next block present
+        data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['indice']), axis=1)
+		# 4. Keep only rounds with Unicorn_Absent
+		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+		print('Done!')
         #
 		# --------------------------------------------------
 		# Obtaining measures from players' performance
 		# --------------------------------------------------
-		data['Score'] = data['Score'].map(lambda x: int(x))
+		data['Score'] = data['Score'].map(lambda x: int(x), na_action='ignore')
 		# Find the accumulated score
 		print("Finding accumulated score...")
 		data['Ac_Score'] = data.sort_values(['Dyad','Player']).groupby('Player')['Score'].cumsum()
@@ -882,7 +849,7 @@ class Experiment(object):
 		cols2 = ['a' + str(i + 1) + str(j + 1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
 		data['Vector'] = data.apply(lambda x: np.array(x[cols]), axis=1)
 		data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
-		# data = data.dropna()
+		data = data.dropna()
 		data['Consistency'] = data.apply(lambda x: calcula_consistencia(x['Vector'], x['VectorLAG1']), axis=1)
 		del data['VectorLAG1']
 

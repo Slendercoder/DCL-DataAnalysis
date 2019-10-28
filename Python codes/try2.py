@@ -7,6 +7,7 @@ N_OBS = 0
 AV_SCORE = 0
 CONTINUO = False
 indicesIncluir = []
+indicesAvScore = {}
 TOLERANCIA = 1
 
 def nameRegion(r):
@@ -169,6 +170,33 @@ def calcula_consistencia(x, y):
     else:
         return 1
 
+def averageScorePresentBlocks(si, s, ind):
+    global AV_SCORE
+    global CONTINUO
+    global N_OBS
+    global indicesIncluir
+    global indicesAvScore
+    if si == 'Unicorn_Present':
+        if CONTINUO:
+            AV_SCORE += s
+            N_OBS += 1
+        else:
+            AV_SCORE = s
+            N_OBS = 1
+            CONTINUO = True
+            if ind not in indiceJugador:
+                indicesIncluir.append(ind - 1)
+    else:
+        if CONTINUO:
+            indicesAvScore[indicesIncluir[-1]] = float(AV_SCORE)/N_OBS
+        CONTINUO = False
+
+def nextScore(si, siLead, s, ind):
+    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s == 32:
+        return indicesAvScore[ind]
+    else:
+        return s
+
 def nextRegion(si, s, r, i):
 	global SUM_SCORE
 	global N_OBS
@@ -240,11 +268,17 @@ def Insert_row(row_number, df, row_value):
     # return the dataframe
     return df
 
+###################################################################
+###################################################################
+###################################################################
+###################################################################
+
 # data = pd.read_csv('output1.csv')
 data = pd.read_csv('output_Prev.csv')
-data = data.dropna()
-
-print(data[:3])
+# data = data.dropna()
+for key, grp in data.groupby('Player'):
+    print('Datos jujador', key)
+    print(grp[['Round', 'Score', 'Category']])
 
 regions1 = ['RS', \
            'ALL', \
@@ -262,6 +296,17 @@ print("Sorting by Dyad, Player, Round...")
 data = data.sort_values(['Dyad', 'Player', 'Round'], \
                 ascending=[True, True, True]).reset_index(drop=True)
 
+data['Is_there_LEAD'] = data.groupby(['Dyad', 'Player'])\
+                            ['Is_there'].transform('shift', periods=-1)
+
+# print(data[:3])
+# for key, grp in data.groupby('Player'):
+#     print('Datos jugador', key)
+#     print(grp[['Round', 'Is_there', 'Is_there_LAG1', 'Score', 'Category']])
+#     # print(grp[['Round', 'Score', 'Category']])
+
+# print(data)
+
 # # --------------------------------------------------
 # # Classify region per round, per player
 # # --------------------------------------------------
@@ -276,11 +321,11 @@ data = data.sort_values(['Dyad', 'Player', 'Round'], \
 # data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1], regions), axis=1)
 
 print('Correcting scores...')
-# # 1. Create column of indexes
-# data = data.reset_index()
-# data['indice'] = data.index
-# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
-#
+# 1. Create column of indexes
+data = data.reset_index()
+data['indice'] = data.index
+print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:3])
+
 # # 2. Obtain number of columns for Is_there and Category
 # columnas = list(data.columns)
 # Is_there_index = columnas.index('Is_there')
@@ -289,21 +334,27 @@ print('Correcting scores...')
 # # print('Is_there_index', Strategy_index)
 # Score_index = columnas.index('Score')
 # # print('Is_there_index', Score_index)
-#
-# # Indices de comienzo de jugador
-# indiceJugador = []
-#
-# # Encontrando bloques de Unicorn_Present
-# for key, grp in data.groupby(['Dyad', 'Player']):
-# 	indiceJugador.append(list(grp['indice'])[0])
-# 	# print(grp[['indice', 'Is_there', 'Score', 'Category']])
-# 	# 3. Obtain indices from Unicorn_Absent after block of Unicorn_Present
-# 	# 4. Estimate region based on average score
-# 	a = len(indicesIncluir)
-# 	grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
-# 	# print('List of blocks', indicesIncluir)
-#
-# print('indiceJugador', indiceJugador)
+
+# Indices de comienzo de jugador
+indiceJugador = []
+
+# Encontrando bloques de Unicorn_Present
+for key, grp in data.groupby(['Dyad', 'Player']):
+	indiceJugador.append(list(grp['indice'])[0])
+	# print(grp[['indice', 'Is_there', 'Score', 'Category']])
+	# 3. Obtain indices from Unicorn_Absent after block of Unicorn_Present
+	# 4. Estimate region based on average score
+	# a = len(indicesIncluir)
+	# grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
+	grp.apply(lambda x: averageScorePresentBlocks(x['Is_there'], x['Score'], x['indice']), axis=1)
+	# print('List of blocks', indicesIncluir)
+
+print('List of blocks', indicesIncluir)
+print('indiceJugador', indiceJugador)
+print('indicesAvScore', indicesAvScore)
+
+data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['indice']), axis=1)
+
 # #
 # # 5. Include new row of Unicorn_Absent with estimated region and previous score
 # n = len(indicesIncluir)
@@ -324,20 +375,24 @@ print('Correcting scores...')
 #
 # print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
 #
-# 6. Obtaining score from previous round
-data['lagScore'] = data.groupby(['Dyad', 'Player'])\
-                            ['Score'].transform('shift', periods=1)
+# # 6. Obtaining score from previous round
+# data['lagScore'] = data.groupby(['Dyad', 'Player'])\
+#                             ['Score'].transform('shift', periods=1)
 # print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
 # 7. Keep only rounds with Unicorn_Absent
 data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
 # finding corrected scores (part 2)
-# 8. Obtaining lagScore from next round
-data['Score'] = data.groupby(['Dyad', 'Player'])\
-                            ['lagScore'].transform('shift', periods=-1)
-# print(data[['Is_there', 'Score', 'Category']])
-data = data.dropna()
-print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
+# # 8. Obtaining lagScore from next round
+# data['Score'] = data.groupby(['Dyad', 'Player'])\
+#                             ['lagScore'].transform('shift', periods=-1)
+# # print(data[['Is_there', 'Score', 'Category']])
+# data = data.dropna()
+# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
 print('Done!')
+
+# for key, grp in data.groupby('Player'):
+#     print('Datos jugador', key)
+#     print(grp[['Round', 'Score', 'Category']])
 
 # --------------------------------------------------
 # Obtaining measures from players' performance
@@ -364,9 +419,9 @@ data['Size_visited'] = data[cols].sum(axis=1)
 # print(data[['Player', 'Round', 'Size_visited', 'Joint']][:10])
 # assert(all(data['Size_visited'] >= data['Joint']))
 #
-print("Sorting by Player...")
-data = data.sort_values(['Player', 'Round'], \
-                ascending=[True, True])
+# print("Sorting by Player...")
+# data = data.sort_values(['Player', 'Round'], \
+#                 ascending=[True, True])
 
 # Find consistency
 print("Finding consistency...")
@@ -374,7 +429,7 @@ print("Finding consistency...")
 cols2 = ['a' + str(i + 1) + str(j + 1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
 data['Vector'] = data.apply(lambda x: np.array(x[cols]), axis=1)
 data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
-data = data.dropna()
+# data = data.dropna()
 data['Consistency'] = data.apply(lambda x: calcula_consistencia(x['Vector'], x['VectorLAG1']), axis=1)
 del data['VectorLAG1']
 
@@ -473,5 +528,8 @@ data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
 # data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
 #                         ['Similarity'].transform('shift', LAG)
 
+for key, grp in data.groupby('Player'):
+    print('Datos jugador', key)
+    print(grp[['indice', 'Round', 'Score', 'Category', 'RegionGo']])
 
 data.to_csv('output1.csv', index=False)
