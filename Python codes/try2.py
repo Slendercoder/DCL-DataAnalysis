@@ -262,65 +262,72 @@ print("Sorting by Dyad, Player, Round...")
 data = data.sort_values(['Dyad', 'Player', 'Round'], \
                 ascending=[True, True, True]).reset_index(drop=True)
 
-# --------------------------------------------------
-# Classify region per round, per player
-# --------------------------------------------------
-print("Classifying regions...")
-
-# Deterimining list of columns
-cols1 = ['a' + str(i) + str(j) \
-for i in range(1, Num_Loc + 1) \
-for j in range(1, Num_Loc + 1) \
-]
-
-data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1], regions), axis=1)
+# # --------------------------------------------------
+# # Classify region per round, per player
+# # --------------------------------------------------
+# print("Classifying regions...")
+#
+# # Deterimining list of columns
+# cols1 = ['a' + str(i) + str(j) \
+# for i in range(1, Num_Loc + 1) \
+# for j in range(1, Num_Loc + 1) \
+# ]
+#
+# data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1], regions), axis=1)
 
 print('Correcting scores...')
-# 1. Create column of indexes
-data = data.reset_index()
-data['indice'] = data.index
-print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
-
-# 2. Obtain number of columns for Is_there and Category
-columnas = list(data.columns)
-Is_there_index = columnas.index('Is_there')
-# print('Is_there_index', Is_there_index)
-Strategy_index = columnas.index('Category')
-# print('Is_there_index', Strategy_index)
-Score_index = columnas.index('Score')
-# print('Is_there_index', Score_index)
-
-# Indices de comienzo de jugador
-indiceJugador = []
-for key, grp in data.groupby('Player'):
-	indiceJugador.append(list(grp['indice'])[0])
-	print(grp[['indice', 'Is_there', 'Score', 'Category']])
-	# 3. Obtain indices from Unicorn_Absent after block of Unicorn_Present
-	# 4. Estimate region based on average score
-	grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
-	print('List of blocks', indicesIncluir)
-
+# # 1. Create column of indexes
+# data = data.reset_index()
+# data['indice'] = data.index
+# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
+#
+# # 2. Obtain number of columns for Is_there and Category
+# columnas = list(data.columns)
+# Is_there_index = columnas.index('Is_there')
+# # print('Is_there_index', Is_there_index)
+# Strategy_index = columnas.index('Category')
+# # print('Is_there_index', Strategy_index)
+# Score_index = columnas.index('Score')
+# # print('Is_there_index', Score_index)
+#
+# # Indices de comienzo de jugador
+# indiceJugador = []
+#
+# # Encontrando bloques de Unicorn_Present
+# for key, grp in data.groupby(['Dyad', 'Player']):
+# 	indiceJugador.append(list(grp['indice'])[0])
+# 	# print(grp[['indice', 'Is_there', 'Score', 'Category']])
+# 	# 3. Obtain indices from Unicorn_Absent after block of Unicorn_Present
+# 	# 4. Estimate region based on average score
+# 	a = len(indicesIncluir)
+# 	grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
+# 	# print('List of blocks', indicesIncluir)
+#
 # print('indiceJugador', indiceJugador)
+# #
+# # 5. Include new row of Unicorn_Absent with estimated region and previous score
+# n = len(indicesIncluir)
+# print('Number of estimations:', n)
+# for k in range(len(indicesIncluir)):
+#     print('Processing estimation (k)', k, '/', n)
+#     c = indicesIncluir[len(indicesIncluir) - k - 1]
+#     # print('Processing estimation (c)', c)
+#     if c[0] not in indiceJugador:
+#         row_number = c[0]
+#         row_value = [x for x in data.loc[row_number - 1]]
+#         # print(row_value)
+#         row_value[Is_there_index] = 'Unicorn_Absent'
+#         row_value[Score_index] = c[1]
+#         row_value[Strategy_index] = c[2]
+#         # print(row_value)
+#         data = Insert_row(row_number, data, row_value)
 #
-# 5. Include new row of Unicorn_Absent with estimated region and previous score
-for k in range(len(indicesIncluir)):
-    c = indicesIncluir[len(indicesIncluir) - k - 1]
-    if c[0] not in indiceJugador:
-        row_number = c[0]
-        row_value = [x for x in data.loc[row_number - 1]]
-        # print(row_value)
-        row_value[Is_there_index] = 'Unicorn_Absent'
-        row_value[Score_index] = c[1]
-        row_value[Strategy_index] = c[2]
-        # print(row_value)
-        data = Insert_row(row_number, data, row_value)
-#
-print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
+# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']])
 #
 # 6. Obtaining score from previous round
 data['lagScore'] = data.groupby(['Dyad', 'Player'])\
                             ['Score'].transform('shift', periods=1)
-# # print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
+# print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
 # 7. Keep only rounds with Unicorn_Absent
 data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
 # finding corrected scores (part 2)
@@ -384,7 +391,7 @@ for key, grp in data[cols].groupby(['Dyad']):
 	# print("aux1: \n", aux1)
 	aux2 = pd.DataFrame(Grp_player.get_group(Players[1])).reset_index()
 	# print("aux2: \n", aux2)
-	# print("len(aux1)", len(aux1), "len(aux2)", len(aux2))
+	print("len(aux1)", len(aux1), "len(aux2)", len(aux2))
 	assert(len(aux1) == len(aux2)), "Something wrong with players!"
 	assert(all(aux1['Joint'] == aux2['Joint'])), "Something wrong with players!"
 	aux3 = pd.DataFrame({'Dyad':aux1['Dyad'],\

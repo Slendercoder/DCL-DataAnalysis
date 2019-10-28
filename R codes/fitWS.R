@@ -3,7 +3,8 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-df2 = read.csv("../Python Codes/fileFreqs0.csv", na.strings=c("","NA"))
+#df2 = read.csv("../Python Codes/fileFreqs0.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/output_Prev.csv", na.strings=c("","NA"))
 args2 <- getArgs(df2)
 args2 <- args2[order(-args2$s, args2$i),] 
 args2 <- args2[c('pair', 'freq', 'sumFreq')]

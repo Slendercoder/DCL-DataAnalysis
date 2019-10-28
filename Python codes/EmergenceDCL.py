@@ -758,6 +758,7 @@ class Experiment(object):
 			print("****************************\n")
 			self.run_dyad()
 
+
 	def get_measures(self):
 
 		data = self.df
@@ -773,8 +774,7 @@ class Experiment(object):
 		           'OUT']
 
 		print("Sorting by Dyad, Player, Round...")
-		data = data.sort_values(['Dyad', 'Player', 'Round'], \
-		                ascending=[True, True, True]).reset_index(drop=True)
+		data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True]).reset_index(drop=True)
 
 		# --------------------------------------------------
 		# Classify region per round, per player
@@ -782,15 +782,12 @@ class Experiment(object):
 		print("Classifying regions...")
 
 		# Deterimining list of columns
-		cols1 = ['a' + str(i) + str(j) \
-		for i in range(1, Num_Loc + 1) \
-		for j in range(1, Num_Loc + 1) \
-		]
+		cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
 
 		data['Category'] = data.apply(lambda x: self.minDist2Focal(x[cols1], self.regions), axis=1)
 		data['Category1'] = data.apply(lambda x: nameRegion(x['Strategy']), axis=1)
-		# data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
-		#                             ['Category1'].transform('shift', -1)
+		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
+		                            ['Category1'].transform('shift', -1)
 
 		# if IMPR:
 		# 	f = './output_Prev.csv'
@@ -800,7 +797,7 @@ class Experiment(object):
 		# Correcting scores
 		# --------------------------------------------------
 		print('Correcting scores...')
-		# 1. Create column of indexes
+		# # 1. Create column of indexes
 		# data = data.reset_index()
 		# data['indice'] = data.index
 		# # 2. Obtain number of columns for Is_there and Category
@@ -809,7 +806,8 @@ class Experiment(object):
 		# # print('Is_there_index', Is_there_index)
 		# Strategy_index = columnas.index('Category')
 		# # print('Is_there_index', Strategy_index)
-		#
+		# Score_index = columnas.index('Score')
+        #
 		# # Indices de comienzo de jugador
 		# indiceJugador = []
 		# for key, grp in data.groupby('Player'):
@@ -819,9 +817,9 @@ class Experiment(object):
 		# 	# 4. Estimate region based on average score
 		# 	grp.apply(lambda x: nextRegion(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
 		# 	# print('List of blocks', indicesIncluir)
-		#
+        #
 		# # print('indiceJugador', indiceJugador)
-		#
+        #
 		# # 5. Include new row of Unicorn_Absent with estimated region and previous score
 		# for k in range(len(indicesIncluir)):
 		#     c = indicesIncluir[len(indicesIncluir) - k - 1]
@@ -830,23 +828,24 @@ class Experiment(object):
 		#         row_value = [x for x in data.loc[row_number - 1]]
 		#         # print(row_value)
 		#         row_value[Is_there_index] = 'Unicorn_Absent'
-		#         row_value[Strategy_index] = c[1]
+		#         row_value[Score_index] = c[1]
+		#         row_value[Strategy_index] = c[2]
 		#         # print(row_value)
 		#         data = Insert_row(row_number, data, row_value)
-		#
-		# 6. Obtaining score from previous round
-		data['lagScore'] = data.groupby(['Dyad', 'Player'])\
-		                            ['Score'].transform('shift', periods=1)
-		# print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
-		# 7. Keep only rounds with Unicorn_Absent
-		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
-		# finding corrected scores (part 2)
-		# 8. Obtaining lagScore from next round
-		data['Score'] = data.groupby(['Dyad', 'Player'])\
-		                            ['lagScore'].transform('shift', periods=-1)
-		# print(data[['Is_there', 'Score', 'Category']])
-		data = data.dropna()
-		print('Done!')
+        #
+		# # 6. Obtaining score from previous round
+		# data['lagScore'] = data.groupby(['Dyad', 'Player'])\
+		#                             ['Score'].transform('shift', periods=1)
+		# # print(data[['indice', 'Is_there', 'Score', 'Category', 'lagScore']])
+		# # 7. Keep only rounds with Unicorn_Absent
+		# data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+		# # finding corrected scores (part 2)
+		# # 8. Obtaining lagScore from next round
+		# data['Score'] = data.groupby(['Dyad', 'Player'])\
+		#                             ['lagScore'].transform('shift', periods=-1)
+		# # print(data[['Is_there', 'Score', 'Category']])
+		# data = data.dropna()
+		# print('Done!')
         #
 		# --------------------------------------------------
 		# Obtaining measures from players' performance
@@ -883,7 +882,7 @@ class Experiment(object):
 		cols2 = ['a' + str(i + 1) + str(j + 1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
 		data['Vector'] = data.apply(lambda x: np.array(x[cols]), axis=1)
 		data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
-		data = data.dropna()
+		# data = data.dropna()
 		data['Consistency'] = data.apply(lambda x: calcula_consistencia(x['Vector'], x['VectorLAG1']), axis=1)
 		del data['VectorLAG1']
 

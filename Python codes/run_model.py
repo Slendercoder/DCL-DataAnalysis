@@ -41,7 +41,7 @@ def standard_simulation(gameParameters, modelParameters):
 
     E = DL.Experiment(gameParameters, modelParameters)
     E.run_simulation()
-    # E.get_measures()
+    E.get_measures()
     count = 0
     archivo = './output' + str(count) + '.csv'
     while os.path.isfile(archivo):
@@ -328,7 +328,7 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 20, 1]
+gameParameters = [0.5, 2, 8, 40, 2]
 # WSLS optim
 # modelParameters = [0.438, 22.5, 10, 31, 0, 0, 0, 0] # optimos
 # modelParameters = [0.43*0.61, 8.33*95.91, 500, 0.98, 0, 0, 0, 0] # optimos corregidos
@@ -340,7 +340,6 @@ gameParameters = [0.5, 2, 8, 20, 1]
 modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
 # modelParameters = [0.8, 130, 10, 31, 0, 0, 0, 0] # full data
 # modelParameters = [0.93, 13, 10, 31, 0, 0, 0, 0] # only unicorn absent
-# modelParameters = [0.52, 3.9, 500, 0.98, 0, 0, 0, 0] # Estimado de OnlyAbsent
 
 # Para tofitFRA
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
