@@ -3,7 +3,8 @@ source("FRApred.R")
 library(dfoptim)
 library(beepr)
 
-df1 = read.csv("../Python Codes/humans.csv")
+df1 = read.csv("../Python Codes/Dyads/output-140-615.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/humans.csv")
 head(df1)
 getFreqFromGameFRA(df1)
 
@@ -17,9 +18,9 @@ head(args)
 dim(args)
 
 # To search for best parameters FRA model
-w1 <- 0.001 # bias FOCAL
-w2 <- 100 # win stay 
-w3 <- 0.5 # delta
+w1 <- 0.1 # bias FOCAL
+w2 <- 10 # win stay 
+w3 <- 0.05 # delta
 w4 <- 0.5 # zeta
 fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
                    fn = function(theta) FRAutil(c(theta[1],
@@ -37,7 +38,7 @@ fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
                    upper=c(1,
                            200,
                            15,
-                           2),
+                           10),
                    control=list(trace=0))
 
 beep()

@@ -1,5 +1,6 @@
 library(ggplot2)
 library(gridExtra)
+library(grid)
 library(Rmisc)
 
 get_legend<-function(myggplot){
@@ -11,10 +12,10 @@ get_legend<-function(myggplot){
 
 ###############################################
 
-df1 = read.csv("../Python Codes/Sweeps/sensitivity_0_simulation.csv")
+df1 = read.csv("../Python Codes/Sweeps/sensitivity_0.csv")
 df1$Exp <- as.character("True")
 head(df1)
-df2 = read.csv("../Python Codes/Sweeps/sensitivity_2_simulation.csv")
+df2 = read.csv("../Python Codes/Sweeps/sensitivity_0_simulation.csv")
 df2$Exp <- as.character("Estimated")
 head(df2)
 
@@ -36,7 +37,49 @@ df <- rbind(
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('0', '2', '4'))
+df$Exp <- factor(df$Exp, levels = c('True', 'Estimated'))
+head(df)
+# levels(df$Exp)
+
+# Density plot
+g0 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+  scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_y_continuous(limits = c(0, 6)) + 
+  labs(color = "Source of data") +
+  theme_bw() +
+  ggtitle("0%")
+
+g0
+
+####################################################################
+
+df1 = read.csv("../Python Codes/Sweeps/sensitivity_2.csv")
+df1$Exp <- as.character("True")
+head(df1)
+df2 = read.csv("../Python Codes/Sweeps/sensitivity_2_simulation.csv")
+df2$Exp <- as.character("Estimated")
+head(df2)
+
+# Create single data frame with DLIndexes
+df <- rbind(
+  df1[c('Round', 
+        'DLIndex',
+        #        'Consistency',
+        #        'Category',
+        #        'Norm_Score_LAG1',
+        #        'Similarity_LAG1',
+        'Exp')],
+  df2[c('Round', 
+        'DLIndex',
+        #        'Consistency',
+        #        'Category',
+        #        'Norm_Score_LAG1',
+        #        'Similarity_LAG1',
+        'Exp')]
+)
+df$Exp <- as.factor(df$Exp)
+df$Exp <- factor(df$Exp, levels = c('True', 'Estimated'))
 head(df)
 # levels(df$Exp)
 
@@ -44,14 +87,109 @@ head(df)
 g2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   geom_density(size=1) +
   scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
-  #  scale_y_continuous(limits = c(0, 5)) + 
+  scale_y_continuous(limits = c(0, 6)) + 
   labs(color = "Source of data") +
-  theme_bw()
+  theme_bw() +
+  ggtitle("20%")
 
 g2
 
 ####################################################################
+
+df1 = read.csv("../Python Codes/Sweeps/sensitivity_4.csv")
+df1$Exp <- as.character("True")
+head(df1)
+df2 = read.csv("../Python Codes/Sweeps/sensitivity_4_simulation.csv")
+df2$Exp <- as.character("Estimated")
+head(df2)
+
+# Create single data frame with DLIndexes
+df <- rbind(
+  df1[c('Round', 
+        'DLIndex',
+        #        'Consistency',
+        #        'Category',
+        #        'Norm_Score_LAG1',
+        #        'Similarity_LAG1',
+        'Exp')],
+  df2[c('Round', 
+        'DLIndex',
+        #        'Consistency',
+        #        'Category',
+        #        'Norm_Score_LAG1',
+        #        'Similarity_LAG1',
+        'Exp')]
+)
+df$Exp <- as.factor(df$Exp)
+df$Exp <- factor(df$Exp, levels = c('True', 'Estimated'))
+head(df)
+# levels(df$Exp)
+
+# Density plot
+g4 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+  scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_y_continuous(limits = c(0, 6)) + 
+  labs(color = "Source of data") +
+  theme_bw() +
+  theme(legend.position="bottom") +
+  ggtitle("40%")
+
+g4
+
 ####################################################################
+
+df1 = read.csv("../Python Codes/Sweeps/sensitivity_6.csv")
+df1$Exp <- as.character("True")
+head(df1)
+df2 = read.csv("../Python Codes/Sweeps/sensitivity_6_simulation.csv")
+df2$Exp <- as.character("Estimated")
+head(df2)
+
+# Create single data frame with DLIndexes
+df <- rbind(
+  df1[c('Round', 
+        'DLIndex',
+        #        'Consistency',
+        #        'Category',
+        #        'Norm_Score_LAG1',
+        #        'Similarity_LAG1',
+        'Exp')],
+  df2[c('Round', 
+        'DLIndex',
+        #        'Consistency',
+        #        'Category',
+        #        'Norm_Score_LAG1',
+        #        'Similarity_LAG1',
+        'Exp')]
+)
+df$Exp <- as.factor(df$Exp)
+df$Exp <- factor(df$Exp, levels = c('True', 'Estimated'))
+head(df)
+# levels(df$Exp)
+
+# Density plot
+g6 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+  scale_colour_manual(values = c("True" = "#999999", "Estimated" = "#E69F00")) +  
+  scale_y_continuous(limits = c(0, 6)) + 
+  labs(color = "Source of data") +
+  theme_bw() +
+  ggtitle("60%")
+
+g6
+
+####################################################################
+
+legend <- get_legend(g4)
+g0 <- g0 + theme(legend.position="none")
+g2 <- g2 + theme(legend.position="none")
+g4 <- g4 + theme(legend.position="none")
+g6 <- g6 + theme(legend.position="none")
+
+title1=textGrob("Percentage of dyads not following WSLS (N=10)", gp=gpar(fontface="bold"))
+g <- grid.arrange(g0, g2, g4, g6, ncol = 2, top=title1, bottom=legend)
+
 ####################################################################
 ####################################################################
 ####################################################################

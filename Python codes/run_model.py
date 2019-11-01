@@ -371,14 +371,14 @@ def sensitivityModelRecovery(gameParameters, modelParameters, badApples):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 45]
+gameParameters = [0.5, 2, 8, 60, 10]
 # WSLS optim
 # modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
 # FRA optim
 # modelParameters = [0.215, 0.134, 10, 31, 0.000000023, 1, 6.23, 1.2]
 
 # Para model recovery WSLS
-modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
+# modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
 # modelParameters = [0.834, 199.999, 10, 31, 0, 0, 0, 0] # full data
 # modelParameters = [0.952, 94.129, 10, 31, 0, 0, 0, 0] # only unicorn absent
 
@@ -386,14 +386,15 @@ modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
 # modelParameters = [0.92, 107, 10, 31, 0, 0, 0, 0] # 0 Bad Apples
 # modelParameters = [0.57, 77, 10, 31, 0, 0, 0, 0] # 2 Bad Apples
 # modelParameters = [0.38, 79, 10, 31, 0, 0, 0, 0] # 4 Bad Apples
+modelParameters = [0.27, 31, 10, 31, 0, 0, 0, 0] # 6 Bad Apples
 
 # Para tofitFRA
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 
-# standard_simulation(gameParameters, modelParameters)
+standard_simulation(gameParameters, modelParameters)
 
-sensitivityModelRecovery(gameParameters, modelParameters, 0)
+# sensitivityModelRecovery(gameParameters, modelParameters, 0)
 
 # # Sweep alpha
 # modelParameters = [0.05, 0, 500, 0.98, 0, 0, 0, 0]
@@ -411,5 +412,5 @@ sensitivityModelRecovery(gameParameters, modelParameters, 0)
 # modelParameters = [0.03, 150, 500, 0.98, 0, 1, 1, 1.2]
 # parameter_sweep_Delta(gameParameters, modelParameters)
 
-# lst = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
+# lst = [10, 50, 100]
 # exploreSampleSizeEffect(gameParameters, modelParameters, lst)
