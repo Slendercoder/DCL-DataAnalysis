@@ -3,19 +3,8 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-#df2 = read.csv("../Python Codes/fileFreqs0.csv", na.strings=c("","NA"))
-df2 = read.csv("../Python Codes/output_Prev.csv", na.strings=c("","NA"))
-args2 <- getArgs(df2)
-args2 <- args2[order(-args2$s, args2$i),] 
-args2 <- args2[c('pair', 'freq', 'sumFreq')]
-head(args2)
-
-#df1 = read.csv("../Python Codes/output_Prev.csv", na.strings=c("","NA"))
-#df1 <- df1[complete.cases(df1), ]
-#df1$Region <- df1$Category1
+df1 = read.csv("../Python Codes/Dyads/output-140-615.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/tofitWSLS.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
@@ -25,10 +14,6 @@ args <- getArgs(df1)
 args <- args[order(-args$s, args$i),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
 head(args)
-head(args2)
-
-sum(unlist(args$sumFreq))
-sum(unlist(args2$sumFreq))
 
 # To search for best parameters WSLS model with mle2
 fitresWSLS <- mle2(minuslogl=WSutil1,
@@ -44,7 +29,7 @@ print(summary(fitresWSLS))
 w1 <- 0.1 # w
 w2 <- 10 # win stay 
 fitresWSLS <- nmkb(par=c(w1, w2),
-               fn = function(theta) WSutil(c(theta, 10, 31, 0, 0, 0, 0), args2, regiones),
+               fn = function(theta) WSutil(c(theta, 10, 31, 0, 0, 0, 0), args, regiones),
                lower=c(0,
                        0),
                upper=c(1.5,

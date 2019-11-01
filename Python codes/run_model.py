@@ -19,10 +19,7 @@ def standard_simulation(gameParameters, modelParameters):
     print('Starting simulation')
     print("****************************")
     print('--- Model parameters ----')
-    print('wALL: ', modelParameters[0])
-    print('wNOTHING: ', modelParameters[0])
-    print('wDOWN: ', modelParameters[0])
-    print('wIN: ', modelParameters[0])
+    print('w: ', modelParameters[0])
     print('alpha: ', modelParameters[1])
     print('beta: ', modelParameters[2])
     print('gamma: ', modelParameters[3])
@@ -321,6 +318,52 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst):
         print('Data saved to', f)
 
 
+def sensitivityModelRecovery(gameParameters, modelParameters, badApples):
+
+    print("****************************")
+    print('Starting simulation')
+    print("****************************")
+    print('--- Model parameters ----')
+    print('w: ', modelParameters[0])
+    print('alpha: ', modelParameters[1])
+    print('beta: ', modelParameters[2])
+    print('gamma: ', modelParameters[3])
+    print('delta: ', modelParameters[4])
+    print('epsilon: ', modelParameters[5])
+    print('zeta: ', modelParameters[6])
+    print('eta: ', modelParameters[7])
+    print("\n")
+    print('--- Game parameters ---')
+    print('Probabilit of a unicorn: ', gameParameters[0])
+    print('Number of players: ', gameParameters[1])
+    print('Grid size: ', str(gameParameters[2]) + ' x ' + str(gameParameters[2]))
+    print('Number of rounds: ', gameParameters[3])
+    print('Number of dyads: ', gameParameters[4])
+    print('Number of bad apples: ', badApples)
+    print("\n")
+
+    E = DL.Experiment(gameParameters, modelParameters)
+    Total_Dyads = gameParameters[4]
+    print("\n")
+    print('Including ' + str(badApples) + ' bad apples...')
+    for j in range(Total_Dyads - badApples):
+        print("****************************")
+        print("Running dyad no. ", j + 1, "--GOOD")
+        print("****************************\n")
+        E.run_dyad()
+
+    for j in range(badApples):
+        print("****************************")
+        print("Running dyad no. ", j + 1 + Total_Dyads - badApples, "--BAD")
+        print("****************************\n")
+        E.run_dyad_with_parameters(0.1, 10)
+
+    E.get_measures()
+    f = 'Sweeps/sensitivity_' + str(badApples) + '.csv'
+    E.df.to_csv(f, index=False)
+    print('Data saved to', f)
+
+
 ##########################################################################
 #
 #  Simulation starts here
@@ -328,24 +371,29 @@ def exploreSampleSizeEffect(gameParameters, modelParameters, lst):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 40, 2]
+gameParameters = [0.5, 2, 8, 60, 45]
 # WSLS optim
-# modelParameters = [0.438, 22.5, 10, 31, 0, 0, 0, 0] # optimos
-# modelParameters = [0.43*0.61, 8.33*95.91, 500, 0.98, 0, 0, 0, 0] # optimos corregidos
+# modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
 # FRA optim
-# modelParameters = [0.022, 13.22, 500, 0.98, 0.00000007, 1, 1.72, 1.2]
-# modelParameters = [0.022*0.19, 13.22*15.75, 500, 0.98, 0.00000007*1.29, 1, 1.72*1.35, 1.2]
+# modelParameters = [0.215, 0.134, 10, 31, 0.000000023, 1, 6.23, 1.2]
 
-# Para tofitWSLS
+# Para model recovery WSLS
 modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
-# modelParameters = [0.8, 130, 10, 31, 0, 0, 0, 0] # full data
-# modelParameters = [0.93, 13, 10, 31, 0, 0, 0, 0] # only unicorn absent
+# modelParameters = [0.834, 199.999, 10, 31, 0, 0, 0, 0] # full data
+# modelParameters = [0.952, 94.129, 10, 31, 0, 0, 0, 0] # only unicorn absent
+
+# Para sensitivityModelRecovery
+# modelParameters = [0.92, 107, 10, 31, 0, 0, 0, 0] # 0 Bad Apples
+# modelParameters = [0.57, 77, 10, 31, 0, 0, 0, 0] # 2 Bad Apples
+# modelParameters = [0.38, 79, 10, 31, 0, 0, 0, 0] # 4 Bad Apples
 
 # Para tofitFRA
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 # modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 
-standard_simulation(gameParameters, modelParameters)
+# standard_simulation(gameParameters, modelParameters)
+
+sensitivityModelRecovery(gameParameters, modelParameters, 0)
 
 # # Sweep alpha
 # modelParameters = [0.05, 0, 500, 0.98, 0, 0, 0, 0]

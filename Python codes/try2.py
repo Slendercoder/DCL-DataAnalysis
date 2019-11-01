@@ -276,9 +276,6 @@ def Insert_row(row_number, df, row_value):
 # data = pd.read_csv('output1.csv')
 data = pd.read_csv('output_Prev.csv')
 # data = data.dropna()
-for key, grp in data.groupby('Player'):
-    print('Datos jujador', key)
-    print(grp[['Round', 'Score', 'Category']])
 
 regions1 = ['RS', \
            'ALL', \
@@ -307,18 +304,22 @@ data['Is_there_LEAD'] = data.groupby(['Dyad', 'Player'])\
 
 # print(data)
 
-# # --------------------------------------------------
-# # Classify region per round, per player
-# # --------------------------------------------------
-# print("Classifying regions...")
-#
-# # Deterimining list of columns
-# cols1 = ['a' + str(i) + str(j) \
-# for i in range(1, Num_Loc + 1) \
-# for j in range(1, Num_Loc + 1) \
-# ]
-#
-# data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1], regions), axis=1)
+# --------------------------------------------------
+# Classify region per round, per player
+# --------------------------------------------------
+print("Classifying regions...")
+
+# Deterimining list of columns
+cols1 = ['a' + str(i) + str(j) \
+for i in range(1, Num_Loc + 1) \
+for j in range(1, Num_Loc + 1) \
+]
+
+data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1], regions), axis=1)
+
+for key, grp in data.groupby('Player'):
+    print('Datos jujador', key)
+    print(grp[['Round', 'Score', 'Category']])
 
 print('Correcting scores...')
 # 1. Create column of indexes

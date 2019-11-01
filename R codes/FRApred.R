@@ -113,7 +113,8 @@ FRApred <- function(i, s, j, w, alpha, beta, gamma, delta, epsilon, zeta, eta, r
 #  print("bias")
 #  imprimir(bias)
   
-  n <- (s + 128) / 160 # Normalizing score
+#  n <- (s + 128) / 160 # Normalizing score
+  n <- s
   
   # Find the attractivenes:
   attractiveness <- bias # Start from bias

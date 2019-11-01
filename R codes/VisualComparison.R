@@ -11,26 +11,16 @@ get_legend<-function(myggplot){
 
 ###############################################
 
-#df1 = read.csv("humans.csv")
-#df1$Exp <- as.character("Observed behavior")
+df1 = read.csv("humans.csv")
+df1$Exp <- as.character("Observed behavior")
 #head(df1)
-#df2 = read.csv("../Python Codes/WSLS.csv")
-#df2$Exp <- as.character("WSLS")
-#head(df2)
-#df3 = read.csv("../Python Codes/FRA.csv")
-#df3$Exp <- as.character("FRA")
-#head(df3)
-
-df1 = read.csv("../Python Codes/tofitWSLS.csv")
-df1$Exp <- as.character("Model")
-head(df1)
-df2 = read.csv("../Python Codes/modelRecoveryFull.csv")
+df2 = read.csv("../Python Codes/WSLS.csv")
 df2$Exp <- as.character("WSLS")
-head(df2)
+#head(df2)
 df3 = read.csv("../Python Codes/FRA.csv")
+df3 = read.csv("../Python Codes/modelRecoveryFull.csv")
 df3$Exp <- as.character("FRA")
-head(df3)
-
+#head(df3)
 
 # Create single data frame with DLIndexes
 df <- rbind(
@@ -39,21 +29,21 @@ df <- rbind(
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-        'Similarity_LAG1',
+#        'Similarity_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)

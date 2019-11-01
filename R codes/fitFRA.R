@@ -3,8 +3,7 @@ source("FRApred.R")
 library(dfoptim)
 library(beepr)
 
-#df1 = read.csv("../Python Codes/humans.csv")
-df1 = read.csv("../Python Codes/tofitFRA.csv")
+df1 = read.csv("../Python Codes/humans.csv")
 head(df1)
 getFreqFromGameFRA(df1)
 
@@ -25,8 +24,8 @@ w4 <- 0.5 # zeta
 fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
                    fn = function(theta) FRAutil(c(theta[1],
                                                  theta[2], 
-                                                 500, 
-                                                 0.98, 
+                                                 10, 
+                                                 31, 
                                                  theta[3], 
                                                  1, 
                                                  theta[4], 

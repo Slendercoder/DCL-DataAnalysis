@@ -11,45 +11,37 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 DEB = False
-IMPR = False
+IMPR = True
 TOLERANCIA = 1
 
-SUM_SCORE = 0
-N_OBS = 0
-AV_SCORE = 0
 CONTINUO = False
-indicesIncluir = []
-indicesAvScore = {}
+CONTADOR = 1
 TOLERANCIA = 1
 
 ############################################################
 # Define function that initializes regions and strategies
 ############################################################
 
-def averageScorePresentBlocks(si, s, ind):
-    global AV_SCORE
-    global CONTINUO
-    global N_OBS
-    global indicesIncluir
-    global indicesAvScore
-    if si == 'Unicorn_Present':
-        if CONTINUO:
-            AV_SCORE += s
-            N_OBS += 1
-        else:
-            AV_SCORE = s
-            N_OBS = 1
-            CONTINUO = True
-            if ind not in indiceJugador:
-                indicesIncluir.append(ind - 1)
-    else:
-        if CONTINUO:
-            indicesAvScore[indicesIncluir[-1]] = float(AV_SCORE)/N_OBS
-            CONTINUO = False
+def obtainPresentBlocks(x):
 
-def nextScore(si, siLead, s, ind):
+    global CONTADOR
+
+    valor = CONTADOR
+
+    if x['Is_there'] == 'Unicorn_Present' and x['Is_there_LEAD'] == 'Unicorn_Absent':
+        CONTADOR += 1
+
+    if pd.isna(x['Is_there_LEAD']):
+        CONTADOR += 1
+
+    if x['Is_there'] == 'Unicorn_Present':
+        return valor
+    else:
+        return 0
+
+def nextScore(si, siLead, s, sLEAD):
     if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s == 32:
-        return indicesAvScore[ind]
+        return sLEAD
     else:
         return s
 
@@ -65,44 +57,6 @@ def calcula_consistencia(x, y):
         return j/t
     else:
         return 1
-
-# Function to insert row in the dataframe
-def Insert_row(row_number, df, row_value):
-    # Starting value of upper half
-    start_upper = 0
-
-    # End value of upper half
-    end_upper = row_number
-
-    # Start value of lower half
-    start_lower = row_number
-
-    # End value of lower half
-    end_lower = df.shape[0]
-
-    # Create a list of upper_half index
-    upper_half = [*range(start_upper, end_upper, 1)]
-
-    # Create a list of lower_half index
-    lower_half = [*range(start_lower, end_lower, 1)]
-
-    # Increment the value of lower half by 1
-    lower_half = [x.__add__(1) for x in lower_half]
-
-    # Combine the two lists
-    index_ = upper_half + lower_half
-
-    # Update the index of the dataframe
-    df.index = index_
-
-    # Insert a row at the end
-    df.loc[row_number] = row_value
-
-    # Sort the index labels
-    df = df.sort_index()
-
-    # return the dataframe
-    return df
 
 def nas(x, y):
 	if x == 'Unicorn_Present':
@@ -754,6 +708,10 @@ class Experiment(object):
 			print("****************************\n")
 			self.run_dyad()
 
+	def run_dyad_with_parameters(self, w, alpha):
+
+            self.modelParameters = [w, alpha] + self.modelParameters[2:]
+            self.run_dyad()
 
 	def get_measures(self):
 
@@ -771,8 +729,8 @@ class Experiment(object):
 
 		print("Sorting by Dyad, Player, Round...")
 		data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True]).reset_index(drop=True)
-        data['Is_there_LEAD'] = data.groupby(['Dyad', 'Player'])\
-                                    ['Is_there'].transform('shift', periods=-1)
+		# data.to_csv('output_Prev.csv', index=False)
+		data['Is_there_LEAD'] = data.groupby(['Dyad', 'Player'])['Is_there'].transform('shift', periods=-1)
 
 		# --------------------------------------------------
 		# Classify region per round, per player
@@ -781,39 +739,49 @@ class Experiment(object):
 
 		# Deterimining list of columns
 		cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-
 		data['Category'] = data.apply(lambda x: self.minDist2Focal(x[cols1], self.regions), axis=1)
 		data['Category1'] = data.apply(lambda x: nameRegion(x['Strategy']), axis=1)
-		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
-		                            ['Category1'].transform('shift', -1)
+		data['RegionGo'] = data.groupby(['Dyad', 'Player'])['Category1'].transform('shift', -1)
+		data.to_csv('output_Prev.csv', index=False)
 
-		# if IMPR:
-		# 	f = './output_Prev.csv'
-		# 	data[['Dyad', 'Player', 'Round', 'Is_there', 'Score', 'Category1', 'RegionGo']].to_csv(f, index=False)
+		if IMPR:
+			f = './output_Prev.csv'
+			data.to_csv(f, index=False)
 
 		# --------------------------------------------------
 		# Correcting scores
 		# --------------------------------------------------
 		print('Correcting scores...')
+		data['Score'] = data['Score'].apply(int)
+		# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
+
 		# 1. Create column of indexes
 		data = data.reset_index()
 		data['indice'] = data.index
-		# Indices de comienzo de jugador
-		indiceJugador = []
-		for key, grp in data.groupby('Player'):
-			indiceJugador.append(list(grp['indice'])[0])
-			# print(grp[['indice', 'Is_there', 'Score', 'Category']])
-			# 2. Obtain indices of blocks of Unicorn_Present
-			grp.apply(lambda x: averageScorePresentBlocks(x['Is_there'], x['Score'], x['Category'], x['indice']), axis=1)
-			# print('List of blocks', indicesIncluir)
-        #
-		# # print('indiceJugador', indiceJugador)
-        # 3. Correct score from last round absent to average score next block present
-        data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['indice']), axis=1)
-		# 4. Keep only rounds with Unicorn_Absent
-		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent')).reset_index()
+
+		# # 2. Indices de comienzo de jugador
+		# indiceJugador = list(data.groupby('Player')['indice'].first())
+		# indiceJugador.sort()
+		# print('indiceJugador', indiceJugador)
+
+		# 2. Obtain indices of blocks of Unicorn_Present
+		data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
+		# print('List of blocks\n', data[['Player', 'Is_there', 'Cambio']][:30])
+
+		# 3. Obtain average score per group of Unicorn_Present
+		data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
+		data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
+		# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][:30])
+
+        # 4. Correct score from last round absent to average score next block present
+		data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
+		# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
+
+		# 5. Keep only rounds with Unicorn_Absent
+		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
+		# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 		print('Done!')
-        #
+
 		# --------------------------------------------------
 		# Obtaining measures from players' performance
 		# --------------------------------------------------
@@ -842,14 +810,14 @@ class Experiment(object):
 		# print("Sorting by Player...")
 		# data = data.sort_values(['Player', 'Round'], \
 		#                 ascending=[True, True])
-        #
+
 		# Find consistency
 		print("Finding consistency...")
 		# # print data[:10]
 		cols2 = ['a' + str(i + 1) + str(j + 1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
 		data['Vector'] = data.apply(lambda x: np.array(x[cols]), axis=1)
 		data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
-		data = data.dropna()
+		# data = data.dropna()
 		data['Consistency'] = data.apply(lambda x: calcula_consistencia(x['Vector'], x['VectorLAG1']), axis=1)
 		del data['VectorLAG1']
 
@@ -894,18 +862,18 @@ class Experiment(object):
 		data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
 		assert(all(data['DLIndex'] >= 0))
 		# #
-		# # # --------------------------------------------------
-		# # # Finding distance to closest focal region per round, per player
-		# # # --------------------------------------------------
-		# # print("Finding distances to focal paths...")
-		# #
-		# # # Deterimining list of columns
-		# # cols1 = ['a' + str(i) + str(j) \
-		# # for i in range(1, Num_Loc + 1) \
-		# # for j in range(1, Num_Loc + 1) \
-		# # ]
-		# #
-		# # data['Similarity'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 1), axis=1)
+		# --------------------------------------------------
+		# Finding distance to closest focal region per round, per player
+		# --------------------------------------------------
+		print("Finding distances to focal paths...")
+
+		# Deterimining list of columns
+		cols1 = ['a' + str(i) + str(j) \
+		for i in range(1, Num_Loc + 1) \
+		for j in range(1, Num_Loc + 1) \
+		]
+
+		data['Similarity'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 1), axis=1)
 		# #
 		# --------------------------------------------------
 		# Finding the lag and lead variables
@@ -923,8 +891,8 @@ class Experiment(object):
 		                            ['Joint'].transform('shift', LAG)
 		data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
 		                            ['Category'].transform('shift', -LAG)
-		# # data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
-	    # #                         ['Similarity'].transform('shift', LAG)
+		data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
+	                            ['Similarity'].transform('shift', LAG)
 
 		self.df = data
 
