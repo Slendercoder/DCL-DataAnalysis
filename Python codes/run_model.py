@@ -371,7 +371,7 @@ def sensitivityModelRecovery(gameParameters, modelParameters, badApples):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 50]
+gameParameters = [0.5, 2, 8, 60, 100]
 # WSLS optim
 # modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
 # FRA optim

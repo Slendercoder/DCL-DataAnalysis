@@ -10,7 +10,7 @@ library(beepr)
 #args2 <- args2[c('pair', 'freq', 'sumFreq')]
 #head(args2)
 
-df1 = read.csv("../Python Codes/Sweeps/sim10_5.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Sweeps/sim1_5.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output0.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/tofitWSLS.csv", na.strings=c("","NA"))
@@ -19,12 +19,12 @@ df1 = read.csv("../Python Codes/Sweeps/sim10_5.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
-head(df1)
+#head(df1)
 
 args <- getArgs(df1)
 args <- args[order(-args$s, args$i),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
-head(args)
+#head(args)
 #head(args2)
 
 #sum(unlist(args$sumFreq))
