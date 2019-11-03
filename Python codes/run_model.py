@@ -371,14 +371,19 @@ def sensitivityModelRecovery(gameParameters, modelParameters, badApples):
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 60, 10]
+gameParameters = [0.5, 2, 8, 60, 200]
 # WSLS optim
-# modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
+modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
 # FRA optim
 # modelParameters = [0.215, 0.134, 10, 31, 0.000000023, 1, 6.23, 1.2]
 
+# WSLS optim Dyad 140-615
+# modelParameters = [0.721196, 200, 10, 31, 0, 0, 0, 0] # optimos
+# FRA optim
+# modelParameters = [0.1146314, 200, 10, 31, 5.8707986, 1, 10, 1.2]
+
 # Para model recovery WSLS
-modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
+# modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
 # modelParameters = [0.834, 199.999, 10, 31, 0, 0, 0, 0] # full data
 # modelParameters = [0.952, 94.129, 10, 31, 0, 0, 0, 0] # only unicorn absent
 

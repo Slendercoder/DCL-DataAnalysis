@@ -168,6 +168,7 @@ grid.arrange(g1, g2, g3, g4, g5,
 # ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)
 
 library(readxl)
+
 dfEst = read_excel("../Python codes/Sweeps/Simulations.xlsx")
 head(dfEst)
 
@@ -180,7 +181,7 @@ gwE <- ggplot(dfc, aes(x = Dyads, y = w_error)) +
   geom_ribbon(aes(ymin = w_error - sd,
                   ymax = w_error + sd), alpha = 0.2) +
   xlab("Dyads") +
-  ylab("w_error") +
+  ylab("w error") +
   theme_bw()
 
 gwE
@@ -194,12 +195,13 @@ gaE <- ggplot(dfc, aes(x = Dyads, y = alpha_error)) +
   geom_ribbon(aes(ymin = alpha_error - sd,
                   ymax = alpha_error + sd), alpha = 0.2) +
   xlab("Dyads") +
-  ylab("alpha_error") +
+  ylab("alpha error") +
   theme_bw()
 
 gaE
 
-grid.arrange(g1, g2,
+grid.arrange(gwE, gaE,
              nrow = 1,
-             top="Size effect in error estimation")
+             top="Effect of number of dyads in error estimation
+             (Model recovery)")
 

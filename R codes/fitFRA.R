@@ -13,9 +13,9 @@ head(data)
 
 args <- getArgs(data, regiones)
 args <- args[order(-args$s, args$i),] 
-beep()
-head(args)
-dim(args)
+#beep()
+#head(args)
+#dim(args)
 
 # To search for best parameters FRA model
 w1 <- 0.1 # bias FOCAL

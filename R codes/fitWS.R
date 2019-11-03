@@ -3,7 +3,7 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-df1 = read.csv("../Python Codes/Dyads/output-140-615.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Dyads/output-216-713.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
