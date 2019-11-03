@@ -171,6 +171,35 @@ library(readxl)
 dfEst = read_excel("../Python codes/Sweeps/Simulations.xlsx")
 head(dfEst)
 
-# Summarize data
+# Summarize w_error
 dfc <- summarySE(dfEst, measurevar="w_error", groupvars=c("Dyads"))
 head(dfc)
+
+gwE <- ggplot(dfc, aes(x = Dyads, y = w_error)) +
+  geom_line(size=0.7) +
+  geom_ribbon(aes(ymin = w_error - sd,
+                  ymax = w_error + sd), alpha = 0.2) +
+  xlab("Dyads") +
+  ylab("w_error") +
+  theme_bw()
+
+gwE
+
+# Summarize alpha_error
+dfc <- summarySE(dfEst, measurevar="alpha_error", groupvars=c("Dyads"))
+head(dfc)
+
+gaE <- ggplot(dfc, aes(x = Dyads, y = alpha_error)) +
+  geom_line(size=0.7) +
+  geom_ribbon(aes(ymin = alpha_error - sd,
+                  ymax = alpha_error + sd), alpha = 0.2) +
+  xlab("Dyads") +
+  ylab("alpha_error") +
+  theme_bw()
+
+gaE
+
+grid.arrange(g1, g2,
+             nrow = 1,
+             top="Size effect in error estimation")
+
