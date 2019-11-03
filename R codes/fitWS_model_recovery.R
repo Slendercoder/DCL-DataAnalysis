@@ -10,7 +10,7 @@ library(beepr)
 #args2 <- args2[c('pair', 'freq', 'sumFreq')]
 #head(args2)
 
-df1 = read.csv("../Python Codes/Sweeps/sim1_5.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Sweeps/sim50_10.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output0.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/tofitWSLS.csv", na.strings=c("","NA"))

@@ -216,11 +216,64 @@ g50 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
 g50
 
 ###############################################
+# 100 dyads simulated
+###############################################
+df1 = read.csv("../Python Codes/Sweeps/sim100_1.csv")
+df1$Exp <- as.character("1")
+head(df1)
+df2 = read.csv("../Python Codes/Sweeps/sim100_2.csv")
+df2$Exp <- as.character("2")
+head(df2)
+df3 = read.csv("../Python Codes/Sweeps/sim100_3.csv")
+df3$Exp <- as.character("3")
+head(df3)
+df4 = read.csv("../Python Codes/Sweeps/sim100_4.csv")
+df4$Exp <- as.character("4")
+head(df4)
+df5 = read.csv("../Python Codes/Sweeps/sim100_5.csv")
+df5$Exp <- as.character("5")
+head(df5)
+
+# Create single data frame with DLIndexes
+df <- rbind(
+  df1[c('Round', 
+        'DLIndex',
+        'Exp')],
+  df2[c('Round', 
+        'DLIndex',
+        'Exp')],
+  df3[c('Round', 
+        'DLIndex',
+        'Exp')],
+  df4[c('Round', 
+        'DLIndex',
+        'Exp')],
+  df5[c('Round', 
+        'DLIndex',
+        'Exp')]
+)
+df$Exp <- as.factor(df$Exp)
+head(df)
+# levels(df$Exp)
+
+# Density plot
+g100 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+  geom_density(size=1) +
+  #  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
+  scale_y_continuous(limits = c(0, 6)) + 
+  labs(color = "Source of data") +
+  theme_bw() +
+  ggtitle('Groups of 100') +
+  theme(legend.position="none")
+
+g100
+
+###############################################
 # Combining plots
 ###############################################
 
-grid.arrange(g1, g5, g10, g50, 
-             nrow = 2,
+grid.arrange(g1, g5, g10, g50, g100, 
+             nrow = 3,
              top='Dispersion of simulated groups')
 
 # ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)

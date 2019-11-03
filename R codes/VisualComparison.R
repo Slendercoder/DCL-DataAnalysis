@@ -50,6 +50,7 @@ df$Exp <- as.factor(df$Exp)
 df$Exp <- factor(df$Exp, levels = c('Observed behavior', 'WSLS', 'FRA'))
 head(df)
 # levels(df$Exp)
+
 # Summarize data
 dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
 head(dfc_DLIndex)

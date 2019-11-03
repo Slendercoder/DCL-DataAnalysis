@@ -167,3 +167,10 @@ grid.arrange(g1, g2, g3, g4, g5,
 
 # ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)
 
+library(readxl)
+dfEst = read_excel("../Python codes/Sweeps/Simulations.xlsx")
+head(dfEst)
+
+# Summarize data
+dfc <- summarySE(dfEst, measurevar="w_error", groupvars=c("Dyads"))
+head(dfc)
