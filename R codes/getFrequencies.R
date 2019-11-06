@@ -12,79 +12,6 @@ letterCode <- function(x, letras) {
   return(code)
 }
 
-#df1 = read.csv("_with_lag.csv")
-#df1 = read.csv("../Python Codes/output.csv")
-#head(df1)
-# df1[df1$Category != df1$Category1]
-
-getFreqFromGameWS <- function(df1) {
-  
-  df1 <- df1[complete.cases(df1), ]
-  
-  # Get visited tiles for each player
-  perDyad <- df1 %>% group_by(Dyad)
-  perPlayer <- perDyad %>% group_by(Player)
-  
-  # Build the frequency table for each (i,s) pair
-  auxDF <- data.frame(c('Dyad', NA), 
-                      c('Player', NA), 
-                      c('Region', NA), 
-                      c('RegionGo', NA), 
-                      c('Score', NA))
-  colnames(auxDF) = as.character(unlist(auxDF[1, ])) # the first row will be the header
-  auxDF = auxDF[-1, ]          # removing the first row.
-  auxDF = auxDF[-1, ]          # removing the first row.
-
-  for (pareja in unique(df1$Dyad)) {
-    # Create the joint region
-    parejaDF <- df1[which(df1$Dyad == pareja), ]
-    parejaDF[order(parejaDF$Round), ]
-    jugador <- unique(parejaDF$Player)
-    n1 <- length(parejaDF$Player[which(parejaDF$Player == jugador[1])])
-    n2 <- length(parejaDF$Player[which(parejaDF$Player == jugador[2])])
-
-    # Create dataframe for first player
-    DF <- data.frame(seq(1, n1, by=1))
-    DF$Dyad <- rep(pareja, n1)
-    DF$Player <- rep(as.character(jugador[1]), n1)
-    DF$Region <- parejaDF$Category[which(parejaDF$Player == jugador[1])]
-    DF$RegionGo <- lead(DF$Region, 1)
-    DF$Score <- parejaDF$Score[which(parejaDF$Player == jugador[1])]
-    DF <- DF[c('Dyad', 'Player', 'Region', 'RegionGo', 'Score')]
-
-    # Add dataframe to big dataframe
-    auxDF <- rbind(auxDF, DF)
-    #  auxDF <- na.omit(auxDF)
-    
-    # Create dataframe for second player
-    DF <- data.frame(seq(1, length(r2), by=1))
-    DF$Dyad <- rep(pareja, length(r2))
-    DF$Player <- rep(as.character(jugador[2]), length(r2))
-    DF$Region <- parejaDF$Category[which(parejaDF$Player == jugador[2])]
-    DF$RegionFULL <- parejaDF$vR[which(parejaDF$Player == jugador[2])]
-    DF$RegionGo <- lead(DF$Region, 1)
-    DF$RJoint <- newDF$rJoint
-    DF$Score <- parejaDF$Score[which(parejaDF$Player == jugador[2])]
-    DF <- DF[c('Dyad', 'Player', 'Region', 'RegionFULL', 'RegionGo', 'RJoint', 'Score')]
-    #  DF <- DF[c('Dyad', 'Player', 'RegionFULL', 'RJoint', 'Score')]
-    
-    # Add dataframe to big dataframe
-    auxDF <- rbind(auxDF, DF)
-    #  auxDF <- na.omit(auxDF)
-  }
-  head(auxDF)
-  dim(auxDF)
-  auxDF$Player <- as.character(auxDF$Player)
-  
-  aux <- auxDF[c('Dyad', 'Player', 'Region', 'RegionGo', 'RJcode', 'Score')]
-  aux$Region <- as.character(aux$Region)
-  aux$RegionGo <- as.character(aux$RegionGo)
-#  aux$Rcode <- as.character(aux$Rcode)
-  aux$RJcode <- as.character(aux$RJcode)
-  head(aux)
-  write.csv(aux, file = "frequencies.csv", row.names = FALSE)
-}
-
 getFreqFromGameFRA <- function(df1) {
   
   df1 <- df1[complete.cases(df1), ]
@@ -198,4 +125,5 @@ getFreqFromGameFRA <- function(df1) {
   aux$RJcode <- as.character(aux$RJcode)
   head(aux)
   write.csv(aux, file = "frequencies.csv", row.names = FALSE)
+  print('Frequencies written in frequencies.csv!')
 }

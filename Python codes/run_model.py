@@ -375,17 +375,33 @@ gameParameters = [0.5, 2, 8, 60, 200]
 # WSLS optim
 # modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
 # FRA optim
-# modelParameters = [0.215, 0.134, 10, 31, 0.000000023, 1, 6.23, 1.2]
+# modelParameters = [0.216, 30.56, 10, 31, 0.00000003, 1, 2.12, 1.2]
 
 # WSLS optim Dyad 140-615
-# modelParameters = [0.721196, 200, 10, 31, 0, 0, 0, 0] # optimos
-# FRA optim
-# modelParameters = [0.1146314, 200, 10, 31, 5.8707986, 1, 10, 1.2]
+# modelParameters = [0.7212, 200, 10, 31, 0, 0, 0, 0] # optimos
+# FRA optim Dyad 140-615
+# modelParameters = [0.1146314, 200, 10, 31, 5.8708, 1, 10, 1.2]
+
+# WSLS optim Dyad 435-261
+# modelParameters = [0.386, 200, 10, 31, 0, 0, 0, 0] # optimos
+# FRA optim Dyad 435-261
+# modelParameters = [0.2399, 200, 10, 31, 15, 1, 0.0001, 1.2]
+
+# WSLS optim Dyad 379-897
+# modelParameters = [0.1079, 0.9683, 10, 31, 0, 0, 0, 0] # optimos
+# FRA optim Dyad 379-897
+# modelParameters = [0.7544, 0.9765, 10, 31, 0, 1, 0, 1.2]
+
+# WSLS optim Dyad 356-137
+# modelParameters = [0.8840, 7.7025, 10, 31, 0, 0, 0, 0] # optimos
+# FRA optim Dyad 356-137
+# modelParameters = [0.6656, 0.0004, 10, 31, 0.0001, 1, 7.1301, 1.2]
 
 # Para model recovery WSLS
-modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
+# modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
 # modelParameters = [0.834, 199.999, 10, 31, 0, 0, 0, 0] # full data
 # modelParameters = [0.952, 94.129, 10, 31, 0, 0, 0, 0] # only unicorn absent
+# modelParameters = [0.934885, 89.287527, 10, 31, 0, 0, 0, 0] # Para ModelRecovered
 
 # Para sensitivityModelRecovery
 # modelParameters = [0.92, 107, 10, 31, 0, 0, 0, 0] # 0 Bad Apples

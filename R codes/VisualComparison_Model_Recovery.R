@@ -21,6 +21,13 @@ df3 = read.csv("../Python Codes/modelRecoveryAbsent.csv")
 df3$Exp <- as.character("Only unicorn absent")
 head(df3)
 
+###############################################
+
+df1 = read.csv("../Python Codes/Model2Recover.csv")
+df1$Exp <- as.character("Initial")
+head(df1)
+df2 = read.csv("../Python Codes/modelRecovered.csv")
+df2$Exp <- as.character("Recovered")
 
 # Create single data frame with DLIndexes
 df <- rbind(
@@ -37,17 +44,10 @@ df <- rbind(
         'Category',
         'Norm_Score_LAG1',
 #        'Similarity_LAG1',
-        'Exp')],
-  df3[c('Round', 
-        'DLIndex',
-        'Consistency',
-        'Category',
-        'Norm_Score_LAG1',
-#        'Similarity_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
-df$Exp <- factor(df$Exp, levels = c('Model', 'Full data', 'Only unicorn absent'))
+df$Exp <- factor(df$Exp, levels = c('Initial', 'Recovered'))
 head(df)
 # levels(df$Exp)
 # Summarize data
@@ -59,7 +59,7 @@ g1 <- ggplot(dfc_DLIndex, aes(x = Round, y = DLIndex, colour=Exp, group=Exp)) +
   geom_line(size=0.7) +
   geom_ribbon(aes(ymin = DLIndex - sd,
                   ymax = DLIndex + sd), alpha = 0.2) +
-  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
+  scale_colour_manual(values = c("Initial" = "#999999", "Recovered" = "#E69F00")) +  
   labs(color = "Source") +
   xlab("Round (unicorn absent)") +
   ylab("Division of labor") +
@@ -70,9 +70,9 @@ g1
 # Density plot
 g2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   geom_density(size=1) +
-  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
+  scale_colour_manual(values = c("Initial" = "#999999", "Recovered" = "#E69F00")) +  
 #  scale_y_continuous(limits = c(0, 5)) + 
-  labs(color = "Source of data") +
+  labs(color = "Model") +
   theme_bw()
 
 g2
@@ -202,6 +202,6 @@ gaE
 
 grid.arrange(gwE, gaE,
              nrow = 1,
-             top="Effect of number of dyads in error estimation
+             top="Effect of number of dyads on estimation error
              (Model recovery)")
 

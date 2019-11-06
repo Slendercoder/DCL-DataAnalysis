@@ -10,7 +10,7 @@ library(beepr)
 #args2 <- args2[c('pair', 'freq', 'sumFreq')]
 #head(args2)
 
-df1 = read.csv("../Python Codes/Sweeps/sim10_10.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/Sweeps/sim100_10.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output0.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/tofitWSLS.csv", na.strings=c("","NA"))
@@ -24,7 +24,7 @@ df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 args <- getArgs(df1)
 args <- args[order(-args$s, args$i),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
-#head(args)
+head(args)
 #head(args2)
 
 #sum(unlist(args$sumFreq))
@@ -44,7 +44,7 @@ print(summary(fitresWSLS))
 w1 <- 0.1 # w
 w2 <- 10 # win stay 
 fitresWSLS <- nmkb(par=c(w1, w2),
-               fn = function(theta) WSutil(c(theta, 10, 31, 0, 0, 0, 0), args2, regiones),
+               fn = function(theta) WSutil(c(theta, 10, 31, 0, 0, 0, 0), args, regiones),
                lower=c(0,
                        0),
                upper=c(1.5,

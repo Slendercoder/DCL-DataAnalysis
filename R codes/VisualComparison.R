@@ -18,20 +18,20 @@ df2 = read.csv("../Python Codes/WSLS.csv")
 df2$Exp <- as.character("WSLS")
 #head(df2)
 df3 = read.csv("../Python Codes/FRA.csv")
-df3 = read.csv("../Python Codes/modelRecoveryFull.csv")
+#df3 = read.csv("../Python Codes/modelRecoveryFull.csv")
 df3$Exp <- as.character("FRA")
 #head(df3)
 
 ###############################################
 
-df1 = read.csv("../Python Codes/Dyads/output-140-615.csv")
-df1$Exp <- as.character("Observed behavior")
+#df1 = read.csv("../Python Codes/Dyads/output-140-615.csv")
+#df1$Exp <- as.character("Observed behavior")
 #head(df1)
-df2 = read.csv("../Python Codes/WSLS-140-615.csv")
-df2$Exp <- as.character("WSLS")
+#df2 = read.csv("../Python Codes/WSLS-140-615.csv")
+#df2$Exp <- as.character("WSLS")
 #head(df2)
-df3 = read.csv("../Python Codes/FRA-140-615.csv")
-df3$Exp <- as.character("FRA")
+#df3 = read.csv("../Python Codes/FRA-140-615.csv")
+#df3$Exp <- as.character("FRA")
 #head(df3)
 
 ###############################################
@@ -43,21 +43,21 @@ df <- rbind(
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-#        'Similarity_LAG1',
+        'Similarity_LAG1',
         'Exp')],
   df2[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-#        'Similarity_LAG1',
+        'Similarity_LAG1',
         'Exp')],
   df3[c('Round', 
         'DLIndex',
         'Consistency',
         'Category',
         'Norm_Score_LAG1',
-#        'Similarity_LAG1',
+        'Similarity_LAG1',
         'Exp')]
 )
 df$Exp <- as.factor(df$Exp)
@@ -174,6 +174,10 @@ g2 <- g2 + theme(legend.position="none")
 g3 <- g3 + theme(legend.position="none")
 g4 <- g4 + theme(legend.position="none")
 g5 <- g5 + theme(legend.position="none")
+
+grid.arrange(g1, g2, 
+             nrow = 1,
+             bottom=legend)
 
 grid.arrange(g1, g2, g3, g4, g5, 
              nrow = 3, 
