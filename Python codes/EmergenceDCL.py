@@ -13,6 +13,7 @@ import matplotlib.patches as patches
 DEB = False
 IMPR = True
 TOLERANCIA = 1
+TO_FILE = True
 
 CONTINUO = False
 CONTADOR = 1
@@ -654,7 +655,13 @@ class Experiment(object):
 				# Add data to dataFrame
 				dfAux = pd.DataFrame.from_dict(row_of_data)
 				# print(dfAux)
-				self.df = self.df.append(dfAux, ignore_index = True)
+
+				if TO_FILE:
+				                with open('temp.csv', 'a') as f:
+				                                dfAux.to_csv(f, header=False)
+				else:
+				                self.df = self.df.append(dfAux, ignore_index = True)
+
 				# print(self.df)
 				# print("Data from player " + str(k) + " has been saved")
 
@@ -715,7 +722,17 @@ class Experiment(object):
 
 	def get_measures(self):
 
-		data = self.df
+        # if TO_FILE:
+        #     data = pd.read_csv("temp.csv")
+        # else:
+        #     data = self.df
+
+		if TO_FILE:
+		          data = pd.read_csv("temp.csv")
+		else:
+		          data = self.df
+
+
 		Num_Loc = self.gameParameters[2]
 		regions = ['RS', \
 		           'ALL', \
