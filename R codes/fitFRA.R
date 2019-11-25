@@ -3,7 +3,9 @@ source("FRApred.R")
 library(dfoptim)
 library(beepr)
 
-df1 = read.csv("../Python Codes/Dyads/output-435-261.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Dyads/output-356-137.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/Dyads/output-379-897.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/Dyads/output-435-261.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/Dyads/output-140-615.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/humans.csv")
 head(df1)
@@ -14,7 +16,7 @@ head(data)
 
 args <- getArgs(data, regiones)
 args <- args[order(-args$s, args$i),] 
-#beep()
+beep()
 #head(args)
 #dim(args)
 

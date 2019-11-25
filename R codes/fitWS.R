@@ -29,6 +29,7 @@ print(summary(fitresWSLS))
 
 
 # To search for best parameters WSLS model with optim
+# Keep constant beta and gamma
 w1 <- 0.1 # w
 w2 <- 10 # win stay 
 fitresWSLS <- nmkb(par=c(w1, w2),
@@ -42,6 +43,29 @@ fitresWSLS <- nmkb(par=c(w1, w2),
 #beep()
 print(fitresWSLS$par) 
 print(fitresWSLS$value) 
+
+# Allow beta and gamma to be free
+w1 <- 0.1 # w
+w2 <- 10 # win stay 
+w3 <- 10 # steepness of sigmoid
+w4 <- 10 # threshold of sigmoid
+fitresWSLS <- nmkb(par=c(w1, w2, w3, w4),
+                   fn = function(theta) WSutil(c(theta, 0, 0, 0, 0), args, regiones),
+                   lower=c(0,
+                           0,
+                           0,
+                           0),
+                   upper=c(1.5,
+                           20,
+                           32,
+                           200),
+                   control=list(trace=0))
+
+#beep()
+print(fitresWSLS$par) 
+print(fitresWSLS$value) 
+
+
 
 dev <-fitresWSLS$value 
 dev # 2289
