@@ -380,7 +380,7 @@ gameParameters = [0.5, 2, 8, 60, 200]
 # modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
 # modelParameters = [0.32030149, 8.30559197, 29.61766480, 0.05846165, 0, 0, 0, 0] # optimos
 # FRA optim
-# modelParameters = [0.216, 30.56, 10, 31, 0.00000003, 1, 2.12, 1.2]
+modelParameters = [0.216, 48, 10, 31, 1.53, 0.94, 3, 1.1]
 
 # WSLS optim Dyad 140-615
 # modelParameters = [0.7212, 200, 10, 31, 0, 0, 0, 0] # optimos
