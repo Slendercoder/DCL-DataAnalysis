@@ -54,7 +54,7 @@ head(df)
 # levels(df$Exp)
 
 # Density plot
-g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+g1D <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   geom_density(size=1) +
   scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
 #  scale_y_continuous(limits = c(0, 5)) + 
@@ -62,7 +62,32 @@ g1 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   theme_bw()  +
   ggtitle("Inside-Outside split (Dyad 140-615)")
 
-g1
+g1D
+
+# Summarize data
+dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
+head(dfc_DLIndex)
+
+# Plot DLIndex with error regions
+g1R <- ggplot(dfc_DLIndex, aes(x = Round, y = DLIndex, colour=Exp, group=Exp)) +
+  geom_line(size=0.7) +
+  geom_ribbon(aes(ymin = DLIndex - sd,
+                  ymax = DLIndex + sd), alpha = 0.2) +
+  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
+  labs(color = "Source") +
+  xlab("Round (unicorn absent)") +
+  ylab("Division of labor") +
+  theme_bw()
+
+g1R
+
+legend <- get_legend(g1D)
+g1D <- g1D + theme(legend.position="none")
+g1DR<- g1R + theme(legend.position="none")
+
+grid.arrange(g1D, g1R, 
+             nrow = 1,
+             bottom=legend)
 
 ###############################################
 # Dyad 435-261
