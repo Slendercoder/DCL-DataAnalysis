@@ -38,8 +38,8 @@ def standard_simulation(gameParameters, modelParameters):
 
     E = DL.Experiment(gameParameters, modelParameters)
     # Inicializa archivo temporal
-    with open('temp.csv', 'w') as data_file:
-        data_file.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy')
+    with open('temp.csv', 'w') as dfile:
+        dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy\n')
     E.run_simulation()
     E.get_measures()
     count = 0
@@ -378,7 +378,7 @@ gameParameters = [0.5, 2, 8, 60, 200]
 
 # WSLS optim
 # modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
-modelParameters = [0.32030149, 8.30559197, 29.61766480, 0.05846165, 0, 0, 0, 0] # optimos
+# modelParameters = [0.32030149, 8.30559197, 29.61766480, 0.05846165, 0, 0, 0, 0] # optimos
 # FRA optim
 # modelParameters = [0.216, 30.56, 10, 31, 0.00000003, 1, 2.12, 1.2]
 
