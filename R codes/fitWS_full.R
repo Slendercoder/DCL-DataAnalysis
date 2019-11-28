@@ -3,6 +3,10 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
+df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
+df1$Region <- df1$Category
+
+
 #df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
@@ -14,6 +18,7 @@ args <- getArgs(df1)
 args <- args[order(-args$s, args$i),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
 head(args)
+args[1:10, ]
 
 # To search for best parameters WSLS model with mle2
 fitresWSLS <- mle2(minuslogl=WSutil1,
@@ -52,6 +57,7 @@ fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                control=list(trace=0))
 
 #beep()
+imprimir(fitresWSLS$par) 
 cat('wALL', fitresWSLS$par[1], 
     'wNOTHING', fitresWSLS$par[2],
     '\nwLEFT', fitresWSLS$par[3],

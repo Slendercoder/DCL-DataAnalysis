@@ -101,8 +101,9 @@ WSprob <- function(i, s, k, theta, regiones){
 # theta <- c(0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.93, 0, 0, 0, 0)
 
 # Estimated from WSLS2BRecovered.csv
-# True values: 0.0125, 0.0125, 0.0125, 0.0125, 150, 405, 0.98, 0, 0, 0, 0
+# TrueVal: 0.0125, 0.0125, 0.0125, 0.0125, 150, 405, 0.98, 0, 0, 0, 0
 theta <- c(0.011, 0.019, 0.011, 0.009, 5.212, 319.841, 0.975, 0, 0, 0, 0)
+#theta <- c(0.011, 0.019, 0.011, 0.009, 150, 319.841, 0.975, 0, 0, 0, 0)
 
 regiones <- c('RS',
               'ALL', 
@@ -148,6 +149,8 @@ df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
 df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
 head(df_RS)
 
+min_score = min(df_RS$Score)
+
 xs <- seq(-128,32,length.out=161)
 fitRS <- sapply(xs, WSprob, i='RS', k='RS', theta=theta, regiones=regiones)
 fitALL <- sapply(xs, WSprob, i='RS', k='ALL', theta=theta, regiones=regiones)
@@ -156,13 +159,14 @@ fitLEFT <- sapply(xs, WSprob, i='RS', k='LEFT', theta=theta, regiones=regiones)
 dfB <- data.frame(xs, fitRS, fitALL, fitNOTHING, fitLEFT)
 
 gRS <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, colour = RegionGo), df_RS) +
+  geom_point(aes(x = Score, y = Freqs, colour = RegionGo), df_RS, alpha = 0.5) +
   scale_colour_manual(values = c("RS" = "#999999", 
                                  "ALL" = "#E69F00", 
                                  "NOTHING" = "#56B4E9",
                                  "LEFT" = "#F0E442")) +  
   geom_line(aes(x = xs, y = fitRS), dfB, color="#999999") + 
   geom_line(aes(x = xs, y = fitALL), dfB, color = "#E69F00") + 
+  scale_x_continuous(limits = c(min_score, 35)) + 
   labs(color = "Jump to") +
   xlab("Score obtained") +
   ylab("Rel. Freq./Probability") +
@@ -182,6 +186,8 @@ df_ALL <- df_ALL[df_ALL$RegionGo != 'IN', ]
 df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
 head(df_ALL)
 
+min_score = min(df_ALL$Score)
+
 xs <- seq(-128,32,length.out=161)
 fitRS <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
 fitALL <- sapply(xs, WSprob, i='ALL', k='ALL', theta=theta, regiones=regiones)
@@ -191,13 +197,14 @@ dfB <- data.frame(xs, fitRS, fitALL, fitNOTHING, fitLEFT)
 head(dfB)
 
 gALL<- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, colour = RegionGo), df_ALL) +
+  geom_point(aes(x = Score, y = Freqs, colour = RegionGo), df_ALL, alpha = 0.5) +
   scale_colour_manual(values = c("RS" = "#999999", 
                                  "ALL" = "#E69F00", 
                                  "NOTHING" = "#56B4E9",
                                  "LEFT" = "#F0E442")) +  
   geom_line(aes(x = xs, y = fitRS), dfB, color="#999999") + 
   geom_line(aes(x = xs, y = fitALL), dfB, color = "#E69F00") + 
+  scale_x_continuous(limits = c(min_score, 35)) + 
   labs(color = "Jump to") +
   xlab("Score obtained") +
   ylab("Rel. Freq./Probability") +
