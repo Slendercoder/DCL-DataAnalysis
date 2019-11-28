@@ -101,10 +101,6 @@ WSprob <- function(i, s, k, theta, regiones){
 # TrueVal: 
 thetaTRUE <- c(0.0125, 0.0125, 0.0125, 0.0125, 150, 405, 0.98, 0, 0, 0, 0)
 
-# Estimated from WSLS2BRecovered.csv
-theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
-theta <- c(0.007, 0.008, 0.007, 0.007, 125.923, 428.197, 0.978, 0, 0, 0, 0) # Estimated full information
-
 regiones <- c('RS',
               'ALL', 
               'NOTHING', 
@@ -120,9 +116,9 @@ regiones <- c('RS',
 # To use for data estimated from only absent
 ###############################################################################
 
-#df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/WSLS.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
+# Estimated from WSLS2BRecovered.csv
+theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
+df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
@@ -134,6 +130,9 @@ head(df1[, 3:5])
 ###############################################################################
 # To use for data estimated from full information
 ###############################################################################
+
+# Estimated from WSLS2BRecovered.csv
+theta <- c(0.007, 0.008, 0.007, 0.007, 125.923, 428.197, 0.978, 0, 0, 0, 0) # Estimated full information
 df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
 df1$Region <- sapply(df1$Strategy, Nombre_Region)
 
@@ -263,7 +262,7 @@ tituloTOP = paste(tituloTOP,
                   ' beta =', as.character(theta[6]),
                   ' gamma =', as.character(theta[7]))
 tituloBOTTOM = "Model recovered from only absent"
-g <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
+gOA <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
 
 ###############################################################################
 # To use for data estimated from full information
@@ -288,8 +287,11 @@ tituloTOP = paste(tituloTOP,
                ' alpha =', as.character(theta[5]),
                ' beta =', as.character(theta[6]),
                ' gamma =', as.character(theta[7]))
-tituloBOTTOM = "Model recovered from full information"
-g <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
+tituloBOTTOM = "Model recovered from full information\n"
+gFULL <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
+
+####
+g <- grid.arrange(gFULL, gOA, nrow = 2)
 
 
 #####################################################
