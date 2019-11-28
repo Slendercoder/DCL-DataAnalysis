@@ -1,13 +1,13 @@
 library(dplyr)
 
+# Trims a number to three decimals
 specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
+
+# Friendly prints a numeric vector
 imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
 
-sigmoid <- function(x, beta, gamma) {
-  # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
-  
-  return(1 / (1 + exp(-beta * (x - gamma))))
-}
+# Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
+sigmoid <- function(x, beta, gamma) {1 / (1 + exp(-beta * (x - gamma)))}
 
 regiones <- c('RS',
               'ALL', 
@@ -23,7 +23,7 @@ lowerEps2=.00001
 highEps2 =.99999
 
 getFreq <- function(i, s, df, regiones) {
-  # Obtains the frequencies vector for each starting region region i and score s 
+  # Obtains the frequencies vector for region region i and score s 
   # Input: i, which is the region the player is in
   #        s, which is the player's score obtained on the previous round
   #        df, the dataframe from which the observations are obtained

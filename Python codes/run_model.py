@@ -40,6 +40,10 @@ def standard_simulation(gameParameters, modelParameters):
     # Inicializa archivo temporal
     with open('temp.csv', 'w') as dfile:
         dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy\n')
+        dfile.close()
+    with open('output_Prev.csv', 'w') as dfile:
+        dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy,Is_there_LEAD,Category,Category1,RegionGo\n')
+        dfile.close()
     E.run_simulation()
     E.get_measures()
     count = 0
@@ -48,7 +52,7 @@ def standard_simulation(gameParameters, modelParameters):
         count += 1
         archivo = './output' + str(count) + '.csv'
     E.df.to_csv(archivo, index=False)
-    print('Data saved to' + archivo + '.csv')
+    print('Data saved to' + archivo)
 
     # print(E.df)
 
@@ -377,66 +381,12 @@ def sensitivityModelRecovery(gameParameters, modelParameters, badApples):
 gameParameters = [0.5, 2, 8, 60, 200]
 
 # WSLS optim
-# modelParameters = [0.45, 32.66, 10, 31, 0, 0, 0, 0] # optimos
-# modelParameters = [0.32030149, 8.30559197, 29.61766480, 0.05846165, 0, 0, 0, 0] # optimos
+# modelParameters = [0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.93, 0, 0, 0, 0] # optimos
 # FRA optim
-modelParameters = [0.216, 48, 10, 31, 1.53, 0.94, 3, 1.1]
+# modelParameters = [0.216, 48, 10, 31, 1.53, 0.94, 3, 1.1]
 
-# WSLS optim Dyad 140-615
-# modelParameters = [0.7212, 200, 10, 31, 0, 0, 0, 0] # optimos
-# FRA optim Dyad 140-615
-# modelParameters = [0.1146314, 200, 10, 31, 5.8708, 1, 10, 1.2]
+# WSLS model2Recover
+modelParameters = [0.0125, 0.0125, 0.0125, 0.0125, 150, 405, 0.98, 0, 0, 0, 0] # optimos
 
-# WSLS optim Dyad 435-261
-# modelParameters = [0.386, 200, 10, 31, 0, 0, 0, 0] # optimos
-# FRA optim Dyad 435-261
-# modelParameters = [0.2399, 200, 10, 31, 15, 1, 0.0001, 1.2]
-
-# WSLS optim Dyad 379-897
-# modelParameters = [0.1079, 0.9683, 10, 31, 0, 0, 0, 0] # optimos
-# FRA optim Dyad 379-897
-# modelParameters = [0.7544, 0.9765, 10, 31, 0, 1, 0, 1.2]
-
-# WSLS optim Dyad 356-137
-# modelParameters = [0.8840, 7.7025, 10, 31, 0, 0, 0, 0] # optimos
-# FRA optim Dyad 356-137
-# modelParameters = [0.6656, 0.0004, 10, 31, 0.0001, 1, 7.1301, 1.2]
-
-# Para model recovery WSLS
-# modelParameters = [1, 150, 10, 31, 0, 0, 0, 0]
-# modelParameters = [0.834, 199.999, 10, 31, 0, 0, 0, 0] # full data
-# modelParameters = [0.952, 94.129, 10, 31, 0, 0, 0, 0] # only unicorn absent
-# modelParameters = [0.934885, 89.287527, 10, 31, 0, 0, 0, 0] # Para ModelRecovered
-
-# Para sensitivityModelRecovery
-# modelParameters = [0.92, 107, 10, 31, 0, 0, 0, 0] # 0 Bad Apples
-# modelParameters = [0.57, 77, 10, 31, 0, 0, 0, 0] # 2 Bad Apples
-# modelParameters = [0.38, 79, 10, 31, 0, 0, 0, 0] # 4 Bad Apples
-# modelParameters = [0.27, 31, 10, 31, 0, 0, 0, 0] # 6 Bad Apples
-
-# Para tofitFRA
-# modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
-# modelParameters = [0.022, 150, 500, 0.98, 10, 1, 1.5, 1.2]
 
 standard_simulation(gameParameters, modelParameters)
-
-# sensitivityModelRecovery(gameParameters, modelParameters, 0)
-
-# # Sweep alpha
-# modelParameters = [0.05, 0, 500, 0.98, 0, 0, 0, 0]
-# parameter_sweep_alpha(gameParameters, modelParameters)
-
-# # Sweep RS
-# modelParameters = [0, 150, 500, 0.98, 0, 0, 0, 0]
-# parameter_sweep_Focal(gameParameters, modelParameters)
-
-# # Sweep Zeta
-# modelParameters = [0.03, 150, 500, 0.98, 0, 1, 0, 1.2]
-# parameter_sweep_Zeta(gameParameters, modelParameters)
-
-# # Sweep Delta
-# modelParameters = [0.03, 150, 500, 0.98, 0, 1, 1, 1.2]
-# parameter_sweep_Delta(gameParameters, modelParameters)
-
-# lst = [10, 50, 100]
-# exploreSampleSizeEffect(gameParameters, modelParameters, lst)

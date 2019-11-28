@@ -83,8 +83,8 @@ WSpred <- function(i, s, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsi
   #  print("bias")
   #  imprimir(bias)
   
-#  n <- (s + 128) / 160 # Normalizing score
-  n <- s
+  n <- (s + 128) / 160 # Normalizing score
+#  n <- s
     
   # Find the attractivenes:
   attractiveness <- bias # Start from bias
