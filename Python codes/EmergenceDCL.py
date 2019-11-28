@@ -261,7 +261,7 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 8), "Model parameters incorrect length!"
+		assert(len(modelParameters) == 11), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 
@@ -370,14 +370,14 @@ class Experiment(object):
 
 	def probabilities(self, i, score, j):
 
-		wALL = 0.1 * float(self.modelParameters[0])
-		wNOTHING = 0.15 * float(self.modelParameters[0])
-		wDOWN = 0.1 * float(self.modelParameters[0])
-		wUP = 0.1 * float(self.modelParameters[0])
-		wLEFT = 0.09 * float(self.modelParameters[0])
-		wRIGHT = 0.09 * float(self.modelParameters[0])
-		wIN = 0.01 * float(self.modelParameters[0])
-		wOUT = 0.01 * float(self.modelParameters[0])
+		wALL = float(self.modelParameters[0])
+		wNOTHING = float(self.modelParameters[1])
+		wDOWN = float(self.modelParameters[2])
+		wUP = float(self.modelParameters[2])
+		wLEFT = float(self.modelParameters[2])
+		wRIGHT = float(self.modelParameters[2])
+		wIN = float(self.modelParameters[3])
+		wOUT = float(self.modelParameters[3])
 		bias = [0, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
 		# print('biases:', bias)
 		# print('sum', np.sum(bias))
@@ -387,13 +387,13 @@ class Experiment(object):
 		bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
 		# biasPrint = ["%.2f" % v for v in bias]
 		# print('bias: ', biasPrint)
-		alpha = self.modelParameters[1] # for how much the focal region augments attractiveness
-		beta = self.modelParameters[2] # amplitude of the sigmoid function
-		gamma = self.modelParameters[3] # position of the sigmoid function
-		delta = self.modelParameters[4] # for how much the similarity to complement augments attractiveness
-		epsilon = self.modelParameters[5] # for similarity to complementary focal region
-		zeta = self.modelParameters[6] # for the steepness of the similarity to focal region
-		eta = self.modelParameters[7] # for the steepness of the similarity to complementary focal region
+		alpha = self.modelParameters[4] # for how much the focal region augments attractiveness
+		beta = self.modelParameters[5] # amplitude of the sigmoid function
+		gamma = self.modelParameters[6] # position of the sigmoid function
+		delta = self.modelParameters[7] # for how much the similarity to complement augments attractiveness
+		epsilon = self.modelParameters[8] # for similarity to complementary focal region
+		zeta = self.modelParameters[9] # for the steepness of the similarity to focal region
+		eta = self.modelParameters[10] # for the steepness of the similarity to complementary focal region
 
 		regionsCoded = self.regions
 		strategies = self.strategies
@@ -406,8 +406,8 @@ class Experiment(object):
 			attactPrint = ["%.2f" % v for v in attractiveness]
 			print('attractiveness before WS and FRA\n', attactPrint)
 
-		# n = (score + 128) / 160 # normalizing score
-		n = score
+		n = (score + 128) / 160 # normalizing score
+		# n = score
 
 		# Adding 'Win Stay'
 		attractiveness[i] += alpha * self.sigmoid(n, beta, gamma)
