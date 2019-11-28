@@ -195,3 +195,25 @@ WSutil1 <- function(a, b){
   return(WSutil(theta, args, regiones))
 
 }
+
+Nombre_Region <- function(x) {
+  if (x == '0' || x== '9') {
+    return('RS')
+  } else if (x == '1') {
+    return('ALL')
+  } else if (x == '2') {
+      return('NOTHING')
+  } else if (x == '3') {
+    return('DOWN')
+  } else if (x == '4') {
+    return('UP')
+  } else if (x == '5') {
+    return('LEFT')
+  } else if (x == '6') {
+    return('RIGHT')
+  } else if (x == '7') {
+    return('IN')
+  } else if (x == '8') {
+    return('OUT')
+  }
+}

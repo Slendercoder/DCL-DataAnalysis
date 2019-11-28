@@ -3,12 +3,12 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-#df2 = read.csv("../Python Codes/output_Prev.csv", na.strings=c("","NA"))
-#df2$Region <- df2$Category1
-#args2 <- getArgs(df2)
-#args2 <- args2[order(-args2$s, args2$i),] 
-#args2 <- args2[c('pair', 'freq', 'sumFreq')]
-#head(args2)
+df2 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
+df2$Region <- df2$Category1
+args2 <- getArgs(df2)
+args2 <- args2[order(-args2$s, args2$i),] 
+args2 <- args2[c('pair', 'freq', 'sumFreq')]
+head(args2)
 
 #df1 = read.csv("../Python Codes/Sweeps/sim100_10.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output0.csv", na.strings=c("","NA"))
