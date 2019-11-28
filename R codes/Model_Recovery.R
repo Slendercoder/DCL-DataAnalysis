@@ -2,6 +2,7 @@ library(stats4)
 library(bbmle)
 library(dplyr)
 library(ggplot2)
+library(gridExtra)
 
 #####################################################
 # Definitions
@@ -97,13 +98,12 @@ WSprob <- function(i, s, k, theta, regiones){
 # Instructions
 #####################################################
 
-# theta <- c(0.32, 8.3, 29.6, 0.05, 0, 0, 0, 0)
-# theta <- c(0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.93, 0, 0, 0, 0)
+# TrueVal: 
+thetaTRUE <- c(0.0125, 0.0125, 0.0125, 0.0125, 150, 405, 0.98, 0, 0, 0, 0)
 
 # Estimated from WSLS2BRecovered.csv
-# TrueVal: 0.0125, 0.0125, 0.0125, 0.0125, 150, 405, 0.98, 0, 0, 0, 0
-theta <- c(0.011, 0.019, 0.011, 0.009, 5.212, 319.841, 0.975, 0, 0, 0, 0)
-#theta <- c(0.011, 0.019, 0.011, 0.009, 150, 319.841, 0.975, 0, 0, 0, 0)
+theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
+theta <- c(0.007, 0.008, 0.007, 0.007, 125.923, 428.197, 0.978, 0, 0, 0, 0) # Estimated full information
 
 regiones <- c('RS',
               'ALL', 
@@ -115,9 +115,14 @@ regiones <- c('RS',
               'IN', 
               'OUT')
 
+
+###############################################################################
+# To use for data estimated from only absent
+###############################################################################
+
 #df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/WSLS.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
@@ -126,6 +131,25 @@ df1$RegionGo <- factor(df1$RegionGo, levels = regiones, ordered = TRUE)
 df1 <- df1[order(df1$Region, df1$Score), ] 
 head(df1[, 3:5])
 
+###############################################################################
+# To use for data estimated from full information
+###############################################################################
+df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
+df1$Region <- sapply(df1$Strategy, Nombre_Region)
+
+df1 <- df1 %>% 
+  group_by(Player) %>%
+  mutate(RegionGo = lead(Region)) %>%
+  as.data.frame()
+
+df1 <- df1[complete.cases(df1), ]
+df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
+head(df1[, 3:5])
+
+
+###############################################################################
+# Graph model recovery...
+###############################################################################
 dfA <- df1[, 3:5]
 dfA$Freqs <- apply(dfA, 1, function(x) {
   i <- as.character(x[[1]][1])
@@ -150,6 +174,7 @@ df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
 head(df_RS)
 
 min_score = min(df_RS$Score)
+min_score
 
 xs <- seq(-128,32,length.out=161)
 fitRS <- sapply(xs, WSprob, i='RS', k='RS', theta=theta, regiones=regiones)
@@ -187,6 +212,7 @@ df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
 head(df_ALL)
 
 min_score = min(df_ALL$Score)
+min_score
 
 xs <- seq(-128,32,length.out=161)
 fitRS <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
@@ -213,6 +239,57 @@ gALL<- ggplot() +
 
 gALL
 
+###############################################################################
+# To use for data estimated from only absent
+###############################################################################
+
+tituloTOP = "True params:"
+tituloTOP = paste(tituloTOP,
+                  ' wALL =', as.character(thetaTRUE[1]),
+                  ' wNOTHING =', as.character(thetaTRUE[2]),
+                  ' wLEFT =', as.character(thetaTRUE[3]),
+                  ' wIN =', as.character(thetaTRUE[4]),
+                  ' alpha =', as.character(thetaTRUE[5]),
+                  ' beta =', as.character(thetaTRUE[6]),
+                  ' gamma =', as.character(thetaTRUE[7]))
+
+tituloTOP = paste(tituloTOP, "\nEstimated:")
+tituloTOP = paste(tituloTOP,
+                  ' wALL =', as.character(theta[1]),
+                  ' wNOTHING =', as.character(theta[2]),
+                  ' wLEFT =', as.character(theta[3]),
+                  ' wIN =', as.character(theta[4]),
+                  ' alpha =', as.character(theta[5]),
+                  ' beta =', as.character(theta[6]),
+                  ' gamma =', as.character(theta[7]))
+tituloBOTTOM = "Model recovered from only absent"
+g <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
+
+###############################################################################
+# To use for data estimated from full information
+###############################################################################
+
+tituloTOP = "True params:"
+tituloTOP = paste(tituloTOP,
+                  ' wALL =', as.character(thetaTRUE[1]),
+                  ' wNOTHING =', as.character(thetaTRUE[2]),
+                  ' wLEFT =', as.character(thetaTRUE[3]),
+                  ' wIN =', as.character(thetaTRUE[4]),
+                  ' alpha =', as.character(thetaTRUE[5]),
+                  ' beta =', as.character(thetaTRUE[6]),
+                  ' gamma =', as.character(thetaTRUE[7]))
+
+tituloTOP = paste(tituloTOP, "\nEstimated:")
+tituloTOP = paste(tituloTOP,
+               ' wALL =', as.character(theta[1]),
+               ' wNOTHING =', as.character(theta[2]),
+               ' wLEFT =', as.character(theta[3]),
+               ' wIN =', as.character(theta[4]),
+               ' alpha =', as.character(theta[5]),
+               ' beta =', as.character(theta[6]),
+               ' gamma =', as.character(theta[7]))
+tituloBOTTOM = "Model recovered from full information"
+g <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
 
 
 #####################################################
