@@ -4,7 +4,6 @@ library(bbmle)
 library(beepr)
 library(dplyr)
 
-
 ################################################################
 # To use with data estimated from only absent
 ################################################################
@@ -25,6 +24,7 @@ args <- args[order(-args$s, args$i),]
 args <- args[c('pair', 'freq', 'sumFreq')]
 head(args)
 
+args[1:9, ]
 
 ################################################################
 # To use with data estimated from full information

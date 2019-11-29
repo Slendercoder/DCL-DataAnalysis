@@ -238,6 +238,43 @@ gALL<- ggplot() +
 
 gALL
 
+df_NOTHING <- dfA[dfA$Region == 'NOTHING', ]
+df_NOTHING <- df_NOTHING[c('Score', 'RegionGo', 'Freqs')]
+df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'ALL', ]
+df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'DOWN', ]
+df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'UP', ]
+df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'LEFT', ]
+df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'RIGHT', ]
+df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'IN', ]
+df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'OUT', ]
+head(df_NOTHING)
+
+min_score = min(df_NOTHING$Score)
+min_score
+
+xs <- seq(-128,32,length.out=161)
+fitRS <- sapply(xs, WSprob, i='NOTHING', k='RS', theta=theta, regiones=regiones)
+fitNOTHING <- sapply(xs, WSprob, i='NOTHING', k='NOTHING', theta=theta, regiones=regiones)
+dfB <- data.frame(xs, fitRS, fitNOTHING)
+head(dfB)
+
+gNOTHING <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs, colour = RegionGo), df_NOTHING, alpha = 0.5) +
+  scale_colour_manual(values = c("RS" = "#999999", 
+                                 "ALL" = "#E69F00", 
+                                 "NOTHING" = "#56B4E9",
+                                 "LEFT" = "#F0E442")) +  
+  geom_line(aes(x = xs, y = fitRS), dfB, color="#999999") + 
+  geom_line(aes(x = xs, y = fitNOTHING), dfB, color = "#E69F00") + 
+  scale_x_continuous(limits = c(min_score, 35)) + 
+  labs(color = "Jump to") +
+  xlab("Score obtained") +
+  ylab("Rel. Freq./Probability") +
+  ggtitle("NOTHING") +
+  theme_bw()
+
+gNOTHING
+
 ###############################################################################
 # To use for data estimated from only absent
 ###############################################################################
@@ -262,7 +299,8 @@ tituloTOP = paste(tituloTOP,
                   ' beta =', as.character(theta[6]),
                   ' gamma =', as.character(theta[7]))
 tituloBOTTOM = "Model recovered from only absent"
-gOA <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
+
+gOA <- grid.arrange(gRS, gALL, gNOTHING, ncol = 3, top=tituloTOP, bottom=tituloBOTTOM)
 
 ###############################################################################
 # To use for data estimated from full information
@@ -288,7 +326,7 @@ tituloTOP = paste(tituloTOP,
                ' beta =', as.character(theta[6]),
                ' gamma =', as.character(theta[7]))
 tituloBOTTOM = "Model recovered from full information\n"
-gFULL <- grid.arrange(gRS, gALL, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
+gFULL <- grid.arrange(gRS, gALL, gNOTHING, ncol = 3, top=tituloTOP, bottom=tituloBOTTOM)
 
 ####
 g <- grid.arrange(gFULL, gOA, nrow = 2)
