@@ -386,7 +386,7 @@ gameParameters = [0.5, 2, 8, 60, 200]
 # modelParameters = [0.216, 48, 10, 31, 1.53, 0.94, 3, 1.1]
 
 # WSLS model2Recover
-modelParameters = [0.0125, 0.0125, 0.0125, 0.0125, 150, 405, 0.98, 0, 0, 0, 0] # optimos
+modelParameters = [0.0125, 0.0125, 0.0125, 0.0125, 150, 400, 0.98, 0, 0, 0, 0] # optimos
 
 
 standard_simulation(gameParameters, modelParameters)

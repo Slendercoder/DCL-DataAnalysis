@@ -3,9 +3,8 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
-df1$Region <- df1$Category
-
+#df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
+#df1$Region <- df1$Category
 
 #df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
@@ -20,15 +19,14 @@ args <- args[c('pair', 'freq', 'sumFreq')]
 head(args)
 args[1:10, ]
 
-# To search for best parameters WSLS model with mle2
-fitresWSLS <- mle2(minuslogl=WSutil1,
-                   start=list(a=0.1,b=1),
-                   lower=c(a=0,b=.01),
-                   upper=c(a=1.5,b=200),
-                   method="L-BFGS-B")
-
-print(summary(fitresWSLS))
-
+## To search for best parameters WSLS model with mle2
+#fitresWSLS <- mle2(minuslogl=WSutil1,
+#                   start=list(a=0.1,b=1),
+#                   lower=c(a=0,b=.01),
+#                   upper=c(a=1.5,b=200),
+#                   method="L-BFGS-B")
+#
+#print(summary(fitresWSLS))
 
 # To search for best parameters WSLS model with optim
 wAll <- 0.01 # w
@@ -56,7 +54,7 @@ fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                        1),
                control=list(trace=0))
 
-#beep()
+beep()
 imprimir(fitresWSLS$par) 
 cat('wALL', fitresWSLS$par[1], 
     'wNOTHING', fitresWSLS$par[2],

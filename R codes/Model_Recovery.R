@@ -17,6 +17,28 @@ imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
 # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
 sigmoid <- function(x, beta, gamma) {1 / (1 + exp(-beta * (x - gamma)))}
 
+Nombre_Region <- function(x) {
+  if (x == '0' || x== '9') {
+    return('RS')
+  } else if (x == '1') {
+    return('ALL')
+  } else if (x == '2') {
+    return('NOTHING')
+  } else if (x == '3') {
+    return('DOWN')
+  } else if (x == '4') {
+    return('UP')
+  } else if (x == '5') {
+    return('LEFT')
+  } else if (x == '6') {
+    return('RIGHT')
+  } else if (x == '7') {
+    return('IN')
+  } else if (x == '8') {
+    return('OUT')
+  }
+}
+
 getRelFreq <- function(i, s, k, df) {
   # Obtains the relative frequencies for transition from region i and score s to region k
   # Input: i, which is the region the player is currently in
@@ -111,29 +133,13 @@ regiones <- c('RS',
               'IN', 
               'OUT')
 
-
-###############################################################################
-# To use for data estimated from only absent
-###############################################################################
-
-# Estimated from WSLS2BRecovered.csv
-theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
-df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
-df1 <- df1[complete.cases(df1), ]
-df1$Region <- df1$Category
-df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
-df1$Region <- factor(df1$Region, levels = regiones, ordered = TRUE)
-df1$RegionGo <- factor(df1$RegionGo, levels = regiones, ordered = TRUE)
-df1 <- df1[order(df1$Region, df1$Score), ] 
-head(df1[, 3:5])
-
 ###############################################################################
 # To use for data estimated from full information
 ###############################################################################
 
 # Estimated from WSLS2BRecovered.csv
 theta <- c(0.007, 0.008, 0.007, 0.007, 125.923, 428.197, 0.978, 0, 0, 0, 0) # Estimated full information
-df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 df1$Region <- sapply(df1$Strategy, Nombre_Region)
 
 df1 <- df1 %>% 
@@ -145,10 +151,27 @@ df1 <- df1[complete.cases(df1), ]
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df1[, 3:5])
 
+###############################################################################
+# To use for data estimated from only absent
+###############################################################################
+
+# Estimated from WSLS2BRecovered.csv
+theta <- c(0.009, 0.020, 0.009, 0.010, 15.159, 139.544, 0.995, 0, 0, 0, 0) # Estimated only absent
+df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
+#theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
+#df1 = read.csv("../Python Codes/WSLS2BRecovered_32.csv", na.strings=c("","NA"))
+df1 <- df1[complete.cases(df1), ]
+df1$Region <- df1$Category
+df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
+df1$Region <- factor(df1$Region, levels = regiones, ordered = TRUE)
+df1$RegionGo <- factor(df1$RegionGo, levels = regiones, ordered = TRUE)
+df1 <- df1[order(df1$Region, df1$Score), ] 
+head(df1[, 3:5])
 
 ###############################################################################
 # Graph model recovery...
 ###############################################################################
+
 dfA <- df1[, 3:5]
 dfA$Freqs <- apply(dfA, 1, function(x) {
   i <- as.character(x[[1]][1])
@@ -192,7 +215,7 @@ gRS <- ggplot() +
   geom_line(aes(x = xs, y = fitALL), dfB, color = "#E69F00") + 
   scale_x_continuous(limits = c(min_score, 35)) + 
   labs(color = "Jump to") +
-  xlab("Score obtained") +
+  xlab("Score") +
   ylab("Rel. Freq./Probability") +
   ggtitle("RS") +
   theme_bw()
@@ -231,8 +254,9 @@ gALL<- ggplot() +
   geom_line(aes(x = xs, y = fitALL), dfB, color = "#E69F00") + 
   scale_x_continuous(limits = c(min_score, 35)) + 
   labs(color = "Jump to") +
-  xlab("Score obtained") +
-  ylab("Rel. Freq./Probability") +
+  xlab("Score") +
+  ylab("") +
+#  ylab("Rel. Freq./Probability") +
   ggtitle("ALL") +
   theme_bw()
 
@@ -265,15 +289,19 @@ gNOTHING <- ggplot() +
                                  "NOTHING" = "#56B4E9",
                                  "LEFT" = "#F0E442")) +  
   geom_line(aes(x = xs, y = fitRS), dfB, color="#999999") + 
-  geom_line(aes(x = xs, y = fitNOTHING), dfB, color = "#E69F00") + 
+  geom_line(aes(x = xs, y = fitNOTHING), dfB, color = "#56B4E9") + 
   scale_x_continuous(limits = c(min_score, 35)) + 
   labs(color = "Jump to") +
-  xlab("Score obtained") +
-  ylab("Rel. Freq./Probability") +
+  xlab("Score") +
+  ylab("") +
+#  ylab("Rel. Freq./Probability") +
   ggtitle("NOTHING") +
   theme_bw()
 
 gNOTHING
+
+gRS <- gRS + theme(legend.position="none")
+gALL <- gALL + theme(legend.position="none")
 
 ###############################################################################
 # To use for data estimated from only absent

@@ -41,7 +41,7 @@ def obtainPresentBlocks(x):
         return 0
 
 def nextScore(si, siLead, s, sLEAD):
-    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s == 32:
+    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s > 30:
         return sLEAD
     else:
         return s
@@ -156,6 +156,9 @@ def create_regions_and_strategies(Num_Loc):
 	strategies = {}
 
 	strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+	while len(strategies[0]) < 2 or len(strategies[0]) > 62:
+	       strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+
 	strategies[1] = ALL
 	strategies[2] = NOTHING
 	strategies[3] = DOWN
@@ -165,6 +168,8 @@ def create_regions_and_strategies(Num_Loc):
 	strategies[7] = IN
 	strategies[8] = OUT
 	strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+	while len(strategies[9]) < 2 or len(strategies[9]) > 62:
+	       strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
 
 	return [all, nothing, down, up, left, right, In, out], strategies
 
@@ -517,7 +522,7 @@ class Experiment(object):
 			# print "Player " + str(k) + " chose strategy " + strat
 
 		# Create dyad name
-		dyad = str(Players[0].name)[:4] + str(Players[1].name)[:4]
+		dyad = str(Players[0].name)[:5] + str(Players[1].name)[:5]
 
 		# Start the rounds
 		for i in range(0, N):
@@ -678,6 +683,9 @@ class Experiment(object):
 			# print('newStrategy:', newStrategy)
 			if not sameRS:
 				self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+				while len(self.strategies[0]) < 2 or len(self.strategies[0]) > 62:
+				                self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+
 			# else:
 			# 	print('Do not randomize for player 0')
 
@@ -690,6 +698,8 @@ class Experiment(object):
 			Players[1].strategy = newStrategy
 			if not sameRS:
 				self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+				while len(self.strategies[9]) < 2 or len(self.strategies[9]) > 62:
+				                self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
 			# else:
 			# 	print('Do not randomize for player 1')
 

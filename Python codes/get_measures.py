@@ -73,7 +73,7 @@ def obtainPresentBlocks(x):
         return 0
 
 def nextScore(si, siLead, s, sLEAD):
-    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s == 32:
+    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s > 30:
         return sLEAD
     else:
         return s
@@ -258,6 +258,7 @@ data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1]), axis=1)
 # Correcting scores
 # --------------------------------------------------
 print('Correcting scores...')
+# 0. Making sure Score is an integer
 data['Score'] = data['Score'].apply(int)
 # print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
 
