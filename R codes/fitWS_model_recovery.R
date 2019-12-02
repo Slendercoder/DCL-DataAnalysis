@@ -24,13 +24,16 @@ args <- args[order(-args$s, args$i),]
 args <- args[c('pair', 'freq', 'sumFreq')]
 head(args)
 
-args[1:9, ]
+args <- args[args$sumFreq > 5, ]
+
+#args1 <- args
+#args1[10:19, ]
 
 ################################################################
 # To use with data estimated from full information
 ################################################################
 
-df2 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 df2$Region <- sapply(df2$Strategy, Nombre_Region)
 
 df2 <- df2 %>% 
@@ -38,12 +41,15 @@ df2 <- df2 %>%
   mutate(RegionGo = lead(Region)) %>%
   as.data.frame()
 
+df2 <- df2[complete.cases(df2), ]
 df2 <- df2[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df2)
 args <- getArgs(df2)
 args <- args[order(-args$s, args$i),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
 head(args)
+
+#args[10:19, ]
 
 ################################################################
 # To search for best parameters WSLS model with optim
@@ -69,7 +75,7 @@ fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                            0.15,
                            0.15,
                            0.15,
-                           200,
+                           500,
                            500,
                            1),
                    control=list(trace=0))

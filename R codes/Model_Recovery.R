@@ -137,8 +137,8 @@ regiones <- c('RS',
 # To use for data estimated from full information
 ###############################################################################
 
-# Estimated from WSLS2BRecovered.csv
-theta <- c(0.007, 0.008, 0.007, 0.007, 125.923, 428.197, 0.978, 0, 0, 0, 0) # Estimated full information
+# Estimated from fullWSLS2BRecovered.csv
+theta <- c(0.009, 0.009, 0.008, 0.007, 126.462, 444.185, 0.978, 0, 0, 0, 0) # Estimated full information
 df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 df1$Region <- sapply(df1$Strategy, Nombre_Region)
 
@@ -147,7 +147,7 @@ df1 <- df1 %>%
   mutate(RegionGo = lead(Region)) %>%
   as.data.frame()
 
-df1 <- df1[complete.cases(df1), ]
+#df1 <- df1[complete.cases(df1), ]
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df1[, 3:5])
 
@@ -156,7 +156,8 @@ head(df1[, 3:5])
 ###############################################################################
 
 # Estimated from WSLS2BRecovered.csv
-theta <- c(0.009, 0.020, 0.009, 0.010, 15.159, 139.544, 0.995, 0, 0, 0, 0) # Estimated only absent
+theta <- c(0.012, 0.010, 0.010, 0.009, 184.559, 187.651, 0.999, 0, 0, 0, 0) # Estimated only absent
+#theta <- c(0.012, 0.010, 0.011, 0.009, 177.922, 190.004, 1, 0, 0, 0, 0) # Estimated only absent
 df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
 #theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
 #df1 = read.csv("../Python Codes/WSLS2BRecovered_32.csv", na.strings=c("","NA"))
@@ -195,8 +196,9 @@ df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
 df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
 head(df_RS)
 
-min_score = min(df_RS$Score)
-min_score
+#min_score = min(df_RS$Score)
+#min_score
+min_score = 0
 
 xs <- seq(-128,32,length.out=161)
 fitRS <- sapply(xs, WSprob, i='RS', k='RS', theta=theta, regiones=regiones)
@@ -233,14 +235,15 @@ df_ALL <- df_ALL[df_ALL$RegionGo != 'IN', ]
 df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
 head(df_ALL)
 
-min_score = min(df_ALL$Score)
-min_score
+#min_score = min(df_ALL$Score)
+#min_score
+min_score = 0
 
 xs <- seq(-128,32,length.out=161)
 fitRS <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
 fitALL <- sapply(xs, WSprob, i='ALL', k='ALL', theta=theta, regiones=regiones)
-fitNOTHING <- sapply(xs, WSprob, i='ALL', k='NOTHING', theta=theta, regiones=regiones)
-fitLEFT <- sapply(xs, WSprob, i='ALL', k='LEFT', theta=theta, regiones=regiones)
+#fitNOTHING <- sapply(xs, WSprob, i='ALL', k='NOTHING', theta=theta, regiones=regiones)
+#fitLEFT <- sapply(xs, WSprob, i='ALL', k='LEFT', theta=theta, regiones=regiones)
 dfB <- data.frame(xs, fitRS, fitALL, fitNOTHING, fitLEFT)
 head(dfB)
 
@@ -252,6 +255,8 @@ gALL<- ggplot() +
                                  "LEFT" = "#F0E442")) +  
   geom_line(aes(x = xs, y = fitRS), dfB, color="#999999") + 
   geom_line(aes(x = xs, y = fitALL), dfB, color = "#E69F00") + 
+#  geom_line(aes(x = xs, y = fitNOTHING), dfB, color = "#56B4E9") + 
+#  geom_line(aes(x = xs, y = fitLEFT), dfB, color = "#F0E442") + 
   scale_x_continuous(limits = c(min_score, 35)) + 
   labs(color = "Jump to") +
   xlab("Score") +
@@ -273,8 +278,10 @@ df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'IN', ]
 df_NOTHING <- df_NOTHING[df_NOTHING$RegionGo != 'OUT', ]
 head(df_NOTHING)
 
-min_score = min(df_NOTHING$Score)
-min_score
+#min_score = min(df_NOTHING$Score)
+#min_score
+min_score = 0
+
 
 xs <- seq(-128,32,length.out=161)
 fitRS <- sapply(xs, WSprob, i='NOTHING', k='RS', theta=theta, regiones=regiones)
@@ -299,9 +306,6 @@ gNOTHING <- ggplot() +
   theme_bw()
 
 gNOTHING
-
-gRS <- gRS + theme(legend.position="none")
-gALL <- gALL + theme(legend.position="none")
 
 ###############################################################################
 # To use for data estimated from only absent
@@ -329,6 +333,7 @@ tituloTOP = paste(tituloTOP,
 tituloBOTTOM = "Model recovered from only absent"
 
 gOA <- grid.arrange(gRS, gALL, gNOTHING, ncol = 3, top=tituloTOP, bottom=tituloBOTTOM)
+#gOA <- grid.arrange(gRS, gALL, gNOTHING, gLEFT, ncol = 2, top=tituloTOP, bottom=tituloBOTTOM)
 
 ###############################################################################
 # To use for data estimated from full information

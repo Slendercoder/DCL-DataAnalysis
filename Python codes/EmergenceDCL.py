@@ -41,7 +41,7 @@ def obtainPresentBlocks(x):
         return 0
 
 def nextScore(si, siLead, s, sLEAD):
-    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s > 30:
+    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s > 29 and s > sLEAD:
         return sLEAD
     else:
         return s
@@ -762,7 +762,7 @@ class Experiment(object):
 		# --------------------------------------------------
 		# Classify region per round, per player
 		# --------------------------------------------------
-		print("Classifying regions...")
+		print("Classifying regions (please be patient)...")
 
 		# Deterimining list of columns
 		cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
@@ -892,7 +892,7 @@ class Experiment(object):
 		# --------------------------------------------------
 		# Finding distance to closest focal region per round, per player
 		# --------------------------------------------------
-		print("Finding distances to focal paths...")
+		print("Finding distances to focal paths (please be patient)...")
 
 		# Deterimining list of columns
 		cols1 = ['a' + str(i) + str(j) \
