@@ -1,16 +1,9 @@
-# Simulation of probabilistic heuristic for WSLS and FRA solving "Seeking the unicorn" task
-# Edgar Andrade-Lotero 2019
-# Run with Python 3
-
-print('Importing packages...')
+import EmergenceDCL as DL
 import numpy as np
 import pandas as pd
-import EmergenceDCL as DL
-import os
-print('Done!')
 
 ##########################################################################
-# DEFINE FUNCTIONS
+# DEFINE FUNCTIONS RUN MODEL
 ##########################################################################
 
 def standard_simulation(gameParameters, modelParameters):
@@ -369,24 +362,3 @@ def sensitivityModelRecovery(gameParameters, modelParameters, badApples):
     f = 'Sweeps/sensitivity_' + str(badApples) + '.csv'
     E.df.to_csv(f, index=False)
     print('Data saved to', f)
-
-
-##########################################################################
-#
-#  Simulation starts here
-#
-##########################################################################
-
-# Create experiment
-gameParameters = [0.5, 2, 8, 60, 200]
-
-# WSLS optim
-# modelParameters = [0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.93, 0, 0, 0, 0] # optimos
-# FRA optim
-# modelParameters = [0.216, 48, 10, 31, 1.53, 0.94, 3, 1.1]
-
-# WSLS model2Recover
-modelParameters = [0.0125, 0.0125, 0.0125, 0.0125, 150, 400, 0.98, 0, 0, 0, 0] # optimos
-
-
-standard_simulation(gameParameters, modelParameters)

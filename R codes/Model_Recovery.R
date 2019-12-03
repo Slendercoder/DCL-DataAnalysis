@@ -3,6 +3,7 @@ library(bbmle)
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
+library(beepr)
 
 #####################################################
 # Definitions
@@ -117,7 +118,7 @@ WSprob <- function(i, s, k, theta, regiones){
 }
 
 #####################################################
-# Instructions
+# Global variables
 #####################################################
 
 # TrueVal: 
@@ -138,7 +139,7 @@ regiones <- c('RS',
 ###############################################################################
 
 # Estimated from fullWSLS2BRecovered.csv
-theta <- c(0.009, 0.009, 0.008, 0.007, 126.462, 444.185, 0.978, 0, 0, 0, 0) # Estimated full information
+theta <- c(0.009, 0.009, 0.008, 0.007, 112.654, 450.929, 0.977, 0, 0, 0, 0) # Estimated full information
 df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 df1$Region <- sapply(df1$Strategy, Nombre_Region)
 
@@ -156,7 +157,7 @@ head(df1[, 3:5])
 ###############################################################################
 
 # Estimated from WSLS2BRecovered.csv
-theta <- c(0.012, 0.010, 0.010, 0.009, 184.559, 187.651, 0.999, 0, 0, 0, 0) # Estimated only absent
+theta <- c(0.010, 0.009, 0.009, 0.010, 197.225, 216.609, 0.996, 0, 0, 0, 0) # Estimated only absent
 #theta <- c(0.012, 0.010, 0.011, 0.009, 177.922, 190.004, 1, 0, 0, 0, 0) # Estimated only absent
 df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
 #theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
@@ -170,7 +171,7 @@ df1 <- df1[order(df1$Region, df1$Score), ]
 head(df1[, 3:5])
 
 ###############################################################################
-# Graph model recovery...
+# Obtaining frequencies...
 ###############################################################################
 
 dfA <- df1[, 3:5]
@@ -183,6 +184,11 @@ dfA$Freqs <- apply(dfA, 1, function(x) {
 })
 dfA <- unique(dfA)
 head(dfA)
+beep()
+
+###############################################################################
+# Graph model recovery...
+###############################################################################
 
 df_RS <- dfA[dfA$Region == 'RS', ]
 df_RS <- df_RS[c('Score', 'RegionGo', 'Freqs')]
@@ -364,6 +370,57 @@ gFULL <- grid.arrange(gRS, gALL, gNOTHING, ncol = 3, top=tituloTOP, bottom=titul
 ####
 g <- grid.arrange(gFULL, gOA, nrow = 2)
 
+
+###############################################################################
+# Drawing both models on the same plot
+###############################################################################
+
+df_ALL2 <- dfA[dfA$Region == 'ALL', ]
+df_ALL2 <- df_ALL2[c('Score', 'RegionGo', 'Freqs')]
+df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'NOTHING', ]
+df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'DOWN', ]
+df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'UP', ]
+df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'LEFT', ]
+df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'RIGHT', ]
+df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'IN', ]
+df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'OUT', ]
+head(df_ALL2)
+
+#min_score = min(df_ALL$Score)
+#min_score
+min_score = 0
+
+xs <- seq(-128,32,length.out=161)
+# Model
+theta <- c(0.0125, 0.0125, 0.0125, 0.0125, 150, 10, 31, 0, 0, 0, 0) # Model
+fitRS1 <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
+fitALL1 <- sapply(xs, WSprob, i='ALL', k='ALL', theta=theta, regiones=regiones)
+# Model fitted from only absent
+theta <- c(0.012, 0.011, 0.012, 0.013, 137.788, 258.525, 30.878, 0, 0, 0, 0) # Estimated only absent
+fitRS2 <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
+fitALL2 <- sapply(xs, WSprob, i='ALL', k='ALL', theta=theta, regiones=regiones)
+dfB <- data.frame(xs, fitRS1, fitALL1, fitRS2, fitALL2)
+head(dfB)
+
+gALL2<- ggplot() +
+  geom_point(aes(x = Score, y = Freqs, colour = RegionGo), df_ALL2, alpha = 0.5) +
+  scale_colour_manual(values = c("RS" = "#999999", 
+                                 "ALL" = "#E69F00", 
+                                 "NOTHING" = "#56B4E9",
+                                 "LEFT" = "#F0E442")) +  
+  geom_line(aes(x = xs, y = fitRS1), dfB, color="#999999") + 
+  geom_line(aes(x = xs, y = fitALL1), dfB, color = "#E69F00") + 
+  geom_line(aes(x = xs, y = fitRS2), dfB, color = "#56B4E9") + 
+  geom_line(aes(x = xs, y = fitALL2), dfB, color = "#F0E442") + 
+  scale_x_continuous(limits = c(min_score, 35)) + 
+  labs(color = "Jump to") +
+  xlab("Score") +
+  ylab("") +
+  #  ylab("Rel. Freq./Probability") +
+  ggtitle("ALL") +
+  theme_bw()
+
+gALL2
 
 #####################################################
 #####################################################

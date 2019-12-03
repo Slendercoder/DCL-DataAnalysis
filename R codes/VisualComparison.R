@@ -22,6 +22,16 @@ df3 = read.csv("../Python Codes/FRA.csv")
 df3$Exp <- as.character("FRA")
 #head(df3)
 
+df1 = read.csv("../Python Codes/tofitWSLS.csv")
+df1$Exp <- as.character("Observed behavior")
+head(df1)
+df2 = read.csv("../Python Codes/modelRecoveryFull.csv")
+df2$Exp <- as.character("WSLS")
+head(df2)
+df3 = read.csv("../Python Codes/modelRecoveryAbsent.csv")
+df3$Exp <- as.character("FRA")
+head(df3)
+
 ###############################################
 
 # Create single data frame with DLIndexes

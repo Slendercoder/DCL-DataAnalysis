@@ -11,19 +11,7 @@ get_legend<-function(myggplot){
 
 ###############################################
 
-df1 = read.csv("../Python Codes/tofitWSLS.csv")
-df1$Exp <- as.character("Model")
-head(df1)
-df2 = read.csv("../Python Codes/modelRecoveryFull.csv")
-df2$Exp <- as.character("Full data")
-head(df2)
-df3 = read.csv("../Python Codes/modelRecoveryAbsent.csv")
-df3$Exp <- as.character("Only unicorn absent")
-head(df3)
-
-###############################################
-
-df1 = read.csv("../Python Codes/Model2Recover.csv")
+df1 = read.csv("../Python Codes/WSLS2BRecovered.csv")
 df1$Exp <- as.character("Initial")
 head(df1)
 df2 = read.csv("../Python Codes/modelRecovered.csv")
@@ -50,6 +38,9 @@ df$Exp <- as.factor(df$Exp)
 df$Exp <- factor(df$Exp, levels = c('Initial', 'Recovered'))
 head(df)
 # levels(df$Exp)
+
+###############################################
+
 # Summarize data
 dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
 head(dfc_DLIndex)

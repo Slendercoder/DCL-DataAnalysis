@@ -411,8 +411,8 @@ class Experiment(object):
 			attactPrint = ["%.2f" % v for v in attractiveness]
 			print('attractiveness before WS and FRA\n', attactPrint)
 
-		n = (score + 128) / 160 # normalizing score
-		# n = score
+		# n = (score + 128) / 160 # normalizing score
+		n = score
 
 		# Adding 'Win Stay'
 		attractiveness[i] += alpha * self.sigmoid(n, beta, gamma)
