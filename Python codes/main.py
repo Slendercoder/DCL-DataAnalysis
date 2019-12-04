@@ -4,7 +4,6 @@
 
 print('Importing packages...')
 import run_model as RM
-import os
 print('Done!')
 
 
@@ -18,9 +17,9 @@ print('Done!')
 gameParameters = [0.5, 2, 8, 60, 200]
 
 # WSLS model2Recover
-modelParameters = [0.0125, 0.0125, 0.0125, 0.0125, 150, 10, 31, 0, 0, 0, 0]
+modelParameters = [0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0]
 # # WSLS model recovered only absent
-# modelParameters = [0.012, 0.011, 0.012, 0.013, 137.788, 258.525, 30.878, 0, 0, 0, 0]
+# modelParameters = [0.089, 0.099, 0.044, 0.042, 122.228, 160.825, 31.060, 0, 0, 0, 0]
 
 # WSLS optim
 # modelParameters = [0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.93, 0, 0, 0, 0] # optimos

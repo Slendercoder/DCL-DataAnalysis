@@ -58,7 +58,7 @@ wLef <- 0.01 # w
 wIn <- 0.01 # w
 alpha <- 10 # win stay 
 beta <- 100 # steepness 
-gamma <- 0.9 # threshold 
+gamma <- 20 # threshold 
 fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                    fn = function(theta) WSutil(c(theta, 0, 0, 0, 0), args, regiones),
                    lower=c(0,

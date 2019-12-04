@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 DEB = False
-IMPR = True
+IMPR = False
 TOLERANCIA = 1
 TO_FILE = True
 
@@ -778,31 +778,31 @@ class Experiment(object):
 		# --------------------------------------------------
 		# Correcting scores
 		# --------------------------------------------------
-		print('Correcting scores...')
-		data['Score'] = data['Score'].apply(int)
-		# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
-
-		# 1. Create column of indexes
-		data = data.reset_index()
-		data['indice'] = data.index
-
-		# # 2. Indices de comienzo de jugador
-		# indiceJugador = list(data.groupby('Player')['indice'].first())
-		# indiceJugador.sort()
-		# print('indiceJugador', indiceJugador)
-
-		# 2. Obtain indices of blocks of Unicorn_Present
-		data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
-		# print('List of blocks\n', data[['Player', 'Is_there', 'Cambio']][:30])
-
-		# 3. Obtain average score per group of Unicorn_Present
-		data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
-		data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
-		# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][:30])
-
-        # 4. Correct score from last round absent to average score next block present
-		data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
-		# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
+		# print('Correcting scores...')
+		# data['Score'] = data['Score'].apply(int)
+		# # print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
+        #
+		# # 1. Create column of indexes
+		# data = data.reset_index()
+		# data['indice'] = data.index
+        #
+		# # # 2. Indices de comienzo de jugador
+		# # indiceJugador = list(data.groupby('Player')['indice'].first())
+		# # indiceJugador.sort()
+		# # print('indiceJugador', indiceJugador)
+        #
+		# # 2. Obtain indices of blocks of Unicorn_Present
+		# data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
+		# # print('List of blocks\n', data[['Player', 'Is_there', 'Cambio']][:30])
+        #
+		# # 3. Obtain average score per group of Unicorn_Present
+		# data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
+		# data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
+		# # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][:30])
+        #
+        # # 4. Correct score from last round absent to average score next block present
+		# data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
+		# # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 
 		# 5. Keep only rounds with Unicorn_Absent
 		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()

@@ -64,135 +64,17 @@ g2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
   scale_colour_manual(values = c("Initial" = "#999999", "Recovered" = "#E69F00")) +  
 #  scale_y_continuous(limits = c(0, 5)) + 
   labs(color = "Model") +
-  theme_bw()
-
-g2
-
-levels(df$Category)
-#df$Category <- lapply(df$Category, function(x) {
-#  if(x=='NOTHING') {
-#    return('NOT')
-#  } else if(x=='DOWN') {
-#    return('DOW')
-#  } else if(x=='LEFT') {
-#    return('LEF')
-#  } else if(x=='RIGHT') {
-#    return('RIG')
-#  } else {
-#    #    print(x)
-#    return(as.character(x))
-#  }
-#})
-df$Category <- unlist(df$Category)
-df$Category <- as.factor(df$Category)
-#df$Category <- factor(df$Category, levels = c('RS',
-#                                              'ALL', 
-#                                              'NOT', 
-#                                              'DOW', 
-#                                              'UP', 
-#                                              'LEF', 
-#                                              'RIG', 
-#                                              'IN', 
-#                                              'OUT'))
-df$Category <- factor(df$Category, levels = c('RS',
-                                              'ALL', 
-                                              'NOTHING', 
-                                              'DOWN', 
-                                              'UP', 
-                                              'LEFT', 
-                                              'RIGHT', 
-                                              'IN', 
-                                              'OUT'))
-
-
-g3 <- ggplot(df, aes(x=Category,  group=Exp, fill=Exp)) + 
-  geom_bar(aes(y = ..prop..), stat="count", position="dodge") +
-  #  geom_text(aes(label = scales::percent(..prop..),
-  #                 y= ..prop.. ), stat= "count", vjust = -.5) +
-  #  labs(y = "Percent", fill="Region") +
-  scale_fill_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
-  xlab("Region") +
-  ylab("Instances (%)") +
-#  labs(fill = TeX('bias$_{focal}$')) +
-  #  facet_grid(~Condition) +
-  #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
+  xlab("Division of labor") +
   theme_bw() +
   theme(legend.position="top")
 
-g3
+g2
 
-g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency, color=Exp)) +
-  geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
-  scale_y_continuous(limits = c(0, 1)) + 
-  xlab("Score prev. round") +
-  ylab("Consistency") +
-  geom_smooth(method = lm)
-
-g4 <- g4 + theme_sjplot()
-
-g4
-
-g5 <- ggplot(df, aes(log(Similarity_LAG1), Consistency, color=Exp)) +
-  geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("Model" = "#999999", "Full data" = "#E69F00", "Only unicorn absent" = "#56B4E9")) +  
-  xlab("Log of max similarity w.r.t.\nfocal regions prev. round") +
-  ylab("Consistency") +
-  geom_smooth(method = lm)
-
-g5 <- g5 + theme_sjplot()
-
-g5
-
-legend <- get_legend(g3)
+legend <- get_legend(g2)
 g1 <- g1 + theme(legend.position="none")
 g2 <- g2 + theme(legend.position="none")
-g3 <- g3 + theme(legend.position="none")
-g4 <- g4 + theme(legend.position="none")
-g5 <- g5 + theme(legend.position="none")
 
-grid.arrange(g1, g2, g3, g4, g5, 
-             nrow = 3, 
-             layout_matrix = rbind(c(1, 2), c(4, 5), c(3)),
-             bottom=legend)
-
-# ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)
-
-library(readxl)
-
-dfEst = read_excel("../Python codes/Sweeps/Simulations.xlsx")
-head(dfEst)
-
-# Summarize w_error
-dfc <- summarySE(dfEst, measurevar="w_error", groupvars=c("Dyads"))
-head(dfc)
-
-gwE <- ggplot(dfc, aes(x = Dyads, y = w_error)) +
-  geom_line(size=0.7) +
-  geom_ribbon(aes(ymin = w_error - sd,
-                  ymax = w_error + sd), alpha = 0.2) +
-  xlab("Dyads") +
-  ylab("w error") +
-  theme_bw()
-
-gwE
-
-# Summarize alpha_error
-dfc <- summarySE(dfEst, measurevar="alpha_error", groupvars=c("Dyads"))
-head(dfc)
-
-gaE <- ggplot(dfc, aes(x = Dyads, y = alpha_error)) +
-  geom_line(size=0.7) +
-  geom_ribbon(aes(ymin = alpha_error - sd,
-                  ymax = alpha_error + sd), alpha = 0.2) +
-  xlab("Dyads") +
-  ylab("alpha error") +
-  theme_bw()
-
-gaE
-
-grid.arrange(gwE, gaE,
+grid.arrange(g1, g2, 
              nrow = 1,
-             top="Effect of number of dyads on estimation error
-             (Model recovery)")
+             bottom=legend, top="Model recovery - DLindex")
 
