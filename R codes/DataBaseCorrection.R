@@ -79,13 +79,13 @@ regiones <- c('RS',
 #df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
 df1$Region <- sapply(df1$Strategy, Nombre_Region)
-
+df1 <- df1[order(df1$Player), ]
 df1 <- df1 %>% 
   group_by(Player) %>%
   mutate(RegionGo = lead(Region)) %>%
   as.data.frame()
 
-#df1 <- df1[complete.cases(df1), ]
+df1 <- df1[complete.cases(df1), ]
 df1 <- df1[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
 head(df1[, 3:6])
 
@@ -93,8 +93,8 @@ head(df1[, 3:6])
 # Loading database with only absent
 ###############################################################################
 
-#df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
-df2 = read.csv("../Python Codes/output0.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
+#df2 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
 df2 <- df2[complete.cases(df2), ]
 df2$Region <- df2$Category
 df2 <- df2[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
@@ -133,6 +133,7 @@ dfA$Exp <- "Full"
 dfB$Exp <- "Only absent"
 
 df <- rbind(dfA, dfB)
+#df <- dfA
 
 beep()
 
@@ -188,7 +189,8 @@ gALL <- ggplot() +
 #  scale_shape_manual(values = c("RS" = 1, 
 #                                "ALL" = 2),
 #                     name="Jumps to") +  
-  scale_x_continuous(limits = c(min_score, 35)) + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
   labs(color = "Source of data") +
   xlab("Score") +
   ylab("") +
