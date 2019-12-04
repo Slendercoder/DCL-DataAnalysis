@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-DEB = False
+DEB = True
 IMPR = False
 TOLERANCIA = 1
 TO_FILE = True
