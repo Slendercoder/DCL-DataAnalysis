@@ -236,6 +236,14 @@ print("Reading data...")
 
 script, data_archivo = argv
 
+print('Please input the measures to be obtained:')
+print('1: Classify regions')
+print('2: Correct scores')
+print('3: Keep only absent')
+print('4: Find max similarity')
+lista = input('Input as list, e.g. 1, 2, 3, 4: ')
+
+print('Opening database...')
 data = pd.read_csv(data_archivo, index_col=False)
 print("Done!")
 # print(data)
@@ -245,48 +253,52 @@ data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True
 # data.to_csv('output_Prev.csv', index=False)
 data['Is_there_LEAD'] = data.groupby(['Dyad', 'Player'])['Is_there'].transform('shift', periods=-1)
 
-# --------------------------------------------------
-# Classify region per round, per player
-# --------------------------------------------------
-print("Classifying regions (please be patient)...")
+if '1' in lista:
+    # --------------------------------------------------
+    # Classify region per round, per player
+    # --------------------------------------------------
+    print("Classifying regions (please be patient)...")
 
-# Deterimining list of columns
-cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1]), axis=1)
+    # Deterimining list of columns
+    cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
+    data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1]), axis=1)
 
-# --------------------------------------------------
-# Correcting scores
-# --------------------------------------------------
-print('Correcting scores...')
-# 0. Making sure Score is an integer
-data['Score'] = data['Score'].apply(int)
-# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
+if '2' in lista:
+    # --------------------------------------------------
+    # Correcting scores
+    # --------------------------------------------------
+    print('Correcting scores...')
+    # 0. Making sure Score is an integer
+    data['Score'] = data['Score'].apply(int)
+    # print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
 
-# 1. Create column of indexes
-data = data.reset_index()
-data['indice'] = data.index
+    # 1. Create column of indexes
+    data = data.reset_index()
+    data['indice'] = data.index
 
-# # 2. Indices de comienzo de jugador
-# indiceJugador = list(data.groupby('Player')['indice'].first())
-# indiceJugador.sort()
-# print('indiceJugador', indiceJugador)
+    # # 2. Indices de comienzo de jugador
+    # indiceJugador = list(data.groupby('Player')['indice'].first())
+    # indiceJugador.sort()
+    # print('indiceJugador', indiceJugador)
 
-# 2. Obtain indices of blocks of Unicorn_Present
-data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
-# print('List of blocks\n', data[['Player', 'Is_there', 'Cambio']][:30])
+    # 2. Obtain indices of blocks of Unicorn_Present
+    data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
+    # print('List of blocks\n', data[['Player', 'Is_there', 'Cambio']][:30])
 
-# 3. Obtain average score per group of Unicorn_Present
-data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
-data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
-# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][:30])
+    # 3. Obtain average score per group of Unicorn_Present
+    data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
+    data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
+    # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][:30])
 
-# 4. Correct score from last round absent to average score next block present
-data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
-# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
+    # 4. Correct score from last round absent to average score next block present
+    data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
+    # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 
-# 5. Keep only rounds with Unicorn_Absent
-data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
-# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
+if '3' in lista:
+    # 5. Keep only rounds with Unicorn_Absent
+    print('Keeping only rounds with Unicorn Absent')
+    data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
+    # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 print('Done!')
 
 # --------------------------------------------------
@@ -369,18 +381,19 @@ del data['Pair']
 data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
 assert(all(data['DLIndex'] >= 0))
 
-# --------------------------------------------------
-# Finding distance to closest focal region per round, per player
-# --------------------------------------------------
-print("Finding distances to focal paths (please be patient)...")
+if '4' in lista:
+    # --------------------------------------------------
+    # Finding distance to closest focal region per round, per player
+    # --------------------------------------------------
+    print("Finding distances to focal paths (please be patient)...")
 
-# Deterimining list of columns
-cols1 = ['a' + str(i) + str(j) \
-for i in range(1, Num_Loc + 1) \
-for j in range(1, Num_Loc + 1) \
-]
+    # Deterimining list of columns
+    cols1 = ['a' + str(i) + str(j) \
+    for i in range(1, Num_Loc + 1) \
+    for j in range(1, Num_Loc + 1) \
+    ]
 
-data['Similarity'] = data.apply(lambda x: maxSim2Focal(x[cols1]), axis=1)
+    data['Similarity'] = data.apply(lambda x: maxSim2Focal(x[cols1]), axis=1)
 
 # --------------------------------------------------
 # Finding the lag and lead variables
@@ -398,8 +411,9 @@ data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Joint'].transform('shift', LAG)
 data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
                             ['Category'].transform('shift', -LAG)
-data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
-                        ['Similarity'].transform('shift', LAG)
+if '4' in lista:
+    data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
+                            ['Similarity'].transform('shift', LAG)
 
 outputFile = 'output.csv'
 data.to_csv(outputFile, index=False)

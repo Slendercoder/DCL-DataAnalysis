@@ -77,14 +77,13 @@ regiones <- c('RS',
 ###############################################################################
 
 #df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
-df1$Region <- sapply(df1$Strategy, Nombre_Region)
-df1 <- df1[order(df1$Player), ]
-df1 <- df1 %>% 
-  group_by(Player) %>%
-  mutate(RegionGo = lead(Region)) %>%
-  as.data.frame()
-
+df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
+df1$Region <- df1$Category
+#df1$Region <- sapply(df1$Strategy, Nombre_Region)
+#df1 <- df1 %>% 
+#  group_by(Player) %>%
+#  mutate(RegionGo = lead(Region)) %>%
+#  as.data.frame()
 df1 <- df1[complete.cases(df1), ]
 df1 <- df1[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
 head(df1[, 3:6])
@@ -93,8 +92,8 @@ head(df1[, 3:6])
 # Loading database with only absent
 ###############################################################################
 
-df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
-#df2 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
+#df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
 df2 <- df2[complete.cases(df2), ]
 df2$Region <- df2$Category
 df2 <- df2[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
@@ -154,14 +153,44 @@ df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
 df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
 head(df_RS)
 
-gRS <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_RS, alpha = 0.8) +
+gRS2RS <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_RS, alpha = 0.8, size=2) +
   #  scale_colour_manual(values = c("RS" = "#999999", 
   #                                 "ALL" = "#E69F00")) +  
   #  scale_shape_manual(values = c("RS" = 1, 
   #                                "ALL" = 2),
   #                     name="Jumps to") +  
   scale_x_continuous(limits = c(min_score, 35)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  labs(color = "Source of data") +
+  xlab("Score") +
+  ylab("") +
+  #  ylab("Rel. Freq./Probability") +
+  ggtitle("Transition from RS to RS") +
+  theme_bw()
+
+gRS2RS
+
+df_RS <- df[df$Region == 'RS', ]
+df_RS <- df_RS[df_RS$RegionGo != 'RS', ]
+df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
+df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
+df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
+df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+head(df_RS)
+
+gRS2ALL <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_RS, alpha = 0.8, size=2) +
+  #  scale_colour_manual(values = c("RS" = "#999999", 
+  #                                 "ALL" = "#E69F00")) +  
+  #  scale_shape_manual(values = c("RS" = 1, 
+  #                                "ALL" = 2),
+  #                     name="Jumps to") +  
+  scale_x_continuous(limits = c(min_score, 35)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
   labs(color = "Source of data") +
   xlab("Score") +
   ylab("") +
@@ -169,7 +198,36 @@ gRS <- ggplot() +
   ggtitle("Transition from RS to ALL") +
   theme_bw()
 
-gRS
+gRS2ALL
+
+df_ALL <- df[df$Region == 'ALL', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'ALL', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'NOTHING', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'DOWN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'UP', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'LEFT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'RIGHT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'IN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
+head(df_ALL)
+
+gALL2RS <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_ALL, alpha = 0.8, size=2) +
+  #  scale_colour_manual(values = c("RS" = "#999999", 
+  #                                 "ALL" = "#E69F00")) +  
+  #  scale_shape_manual(values = c("RS" = 1, 
+  #                                "ALL" = 2),
+  #                     name="Jumps to") +  
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  labs(color = "Source of data") +
+  xlab("Score") +
+  ylab("") +
+  #  ylab("Rel. Freq./Probability") +
+  ggtitle("Transition from ALL to RS") +
+  theme_bw()
+
+gALL2RS
 
 df_ALL <- df[df$Region == 'ALL', ]
 df_ALL <- df_ALL[df_ALL$RegionGo != 'RS', ]
@@ -182,8 +240,8 @@ df_ALL <- df_ALL[df_ALL$RegionGo != 'IN', ]
 df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
 head(df_ALL)
 
-gALL <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_ALL, alpha = 0.8) +
+gALL2ALL <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_ALL, alpha = 0.8, size=2) +
 #  scale_colour_manual(values = c("RS" = "#999999", 
 #                                 "ALL" = "#E69F00")) +  
 #  scale_shape_manual(values = c("RS" = 1, 
@@ -198,16 +256,19 @@ gALL <- ggplot() +
   ggtitle("Transition from ALL to ALL") +
   theme_bw()
 
-gALL
+gALL2ALL
 
 
-legend <- get_legend(gRS2)
-gRS2 <- gRS2 + theme(legend.position="none")
-gALL2 <- gALL2 + theme(legend.position="none")
+legend <- get_legend(gRS2RS)
+gRS2RS <- gRS2RS + theme(legend.position="none")
+gALL2RS <- gALL2RS + theme(legend.position="none")
+gRS2ALL <- gRS2ALL + theme(legend.position="none")
+gALL2ALL <- gALL2ALL + theme(legend.position="none")
 
-grid.arrange(gRS2, gALL2,
-             nrow = 1,
-             right=legend, top="Model recovery - transitions")
+grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
+             nrow = 2, 
+             right=legend, 
+             top="Model recovery - transitions")
 
 
 ######################################
