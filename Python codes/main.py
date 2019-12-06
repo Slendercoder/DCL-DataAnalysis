@@ -14,7 +14,7 @@ print('Done!')
 ##########################################################################
 
 # Create experiment
-gameParameters = [0.5, 2, 8, 2, 1]
+gameParameters = [0.5, 2, 8, 60, 500]
 
 # WSLS model2Recover
 modelParameters = [0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0]
