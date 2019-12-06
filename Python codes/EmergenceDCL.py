@@ -775,9 +775,9 @@ class Experiment(object):
 			f = './output_Prev.csv'
 			data.to_csv(f, index=False)
 
-		--------------------------------------------------
-		Correcting scores
-		--------------------------------------------------
+		# --------------------------------------------------
+		# Correcting scores
+		# --------------------------------------------------
 		print('Correcting scores...')
 		data['Score'] = data['Score'].apply(int)
 		# print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
