@@ -659,7 +659,7 @@ class Experiment(object):
 
 				# Add data to dataFrame
 				dfAux = pd.DataFrame.from_dict(row_of_data)
-				print(dfAux)
+				print(dfAux.columns)
 
 				if TO_FILE:
 				                with open('temp.csv', 'a') as f:
