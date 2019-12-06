@@ -809,8 +809,8 @@ class Experiment(object):
 		# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 
 		# 5. Keep only rounds with Unicorn_Absent
-		situations = data.Is_there.unique()
-		print(situations)
+		# situations = data.Is_there.unique()
+		# print(situations)
 		data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
 		# print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 		print('Done!')

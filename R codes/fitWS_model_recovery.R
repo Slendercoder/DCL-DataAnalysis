@@ -29,8 +29,8 @@ head(args)
 # To use with data estimated from full information
 ################################################################
 
-#df1 = read.csv("../Python Codes/Sweeps/Full/sim200_10.csv", na.strings=c("","NA"))
-df2 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
+#df2 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 #df2$Region <- sapply(df2$Strategy, Nombre_Region)
 df2$Region <- df2$Category
 df2 <- df2 %>% 

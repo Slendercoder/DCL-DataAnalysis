@@ -304,10 +304,9 @@ if '2' in lista:
 
 if '3' in lista:
     # 5. Keep only rounds with Unicorn_Absent
-    print('Keeping only rounds with Unicorn Absent')
+    print('Keeping only rounds with Unicorn Absent...')
     data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
     # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
-    print('Done!')
 
 # --------------------------------------------------
 # Obtaining measures from players' performance

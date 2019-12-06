@@ -61,7 +61,8 @@ getRelFreq <- function(i, s, k, df) {
 # True parameters: 
 thetaTRUE <- c(0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0)
 # Estimated parameters:
-theta <- c(0.090, 0.091, 0.046, 0.046, 7.372,311.871, 31.209, 0, 0, 0, 0) # Estimated only absent
+#theta <- c(0.090, 0.091, 0.046, 0.046, 7.372,311.871, 31.209, 0, 0, 0, 0) # Estimated only absent
+theta <- c(0.096, 0.059, 0.013, 0.001, 8.988, 26.281, 19.121, 0, 0, 0, 0)
 
 regiones <- c('RS',
               'ALL', 
@@ -77,7 +78,8 @@ regiones <- c('RS',
 # Loading database with full information
 ###############################################################################
 
-df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Sweeps/Full/sim500_1.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
 #df1$Region <- sapply(df1$Strategy, Nombre_Region)
@@ -93,8 +95,9 @@ head(df1[, 3:6])
 # Loading database with only absent
 ###############################################################################
 
+df2 = read.csv("../Python Codes/Sweeps/Only_Absent/sim500_1.csv", na.strings=c("","NA"))
 #df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
-df2 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
+#df2 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 df2 <- df2[complete.cases(df2), ]
 df2$Region <- df2$Category
 df2 <- df2[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
@@ -133,7 +136,7 @@ dfA$Exp <- "Full"
 dfB$Exp <- "Only absent"
 
 df <- rbind(dfA, dfB)
-#df <- dfA
+df <- dfB
 
 beep()
 
@@ -277,9 +280,10 @@ grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
 # Including models on top of data plots
 #################################################
 
-# Transition from RS to RS
 #xs <- seq(-128,32,length.out=161)
-xs <- seq(min_score,32,length.out=(32-min_score + 1))
+xs <- seq(min_score,32,length.out=(32-min_score + 1)*100)
+
+# Transition from RS to RS
 # Model
 fitTRUE <- sapply(xs, WSprob, i='RS', k='RS', theta=thetaTRUE, regiones=regiones)
 # Model fitted from only absent
@@ -312,8 +316,6 @@ gRS2RS <- gRS2RS +
 gRS2RS
 
 # Transition from RS to ALL
-#xs <- seq(-128,32,length.out=161)
-xs <- seq(min_score,32,length.out=(32-min_score + 1))
 # Model
 fitTRUE <- sapply(xs, WSprob, i='RS', k='ALL', theta=thetaTRUE, regiones=regiones)
 # Model fitted from only absent
@@ -332,8 +334,6 @@ gRS2ALL <- gRS2ALL +
 gRS2ALL
 
 # Transition from ALL to RS
-#xs <- seq(-128,32,length.out=161)
-xs <- seq(min_score,32,length.out=(32-min_score + 1))
 # Model
 fitTRUE <- sapply(xs, WSprob, i='ALL', k='RS', theta=thetaTRUE, regiones=regiones)
 # Model fitted from only absent
@@ -352,8 +352,6 @@ gALL2RS <- gALL2RS +
 gALL2RS
 
 # Transition from ALL to ALL
-#xs <- seq(-128,32,length.out=161)
-xs <- seq(min_score,32,length.out=(32-min_score + 1))
 # Model
 fitTRUE <- sapply(xs, WSprob, i='ALL', k='ALL', theta=thetaTRUE, regiones=regiones)
 # Model fitted from only absent
