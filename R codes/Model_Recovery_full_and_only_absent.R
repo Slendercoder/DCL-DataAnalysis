@@ -140,16 +140,15 @@ regiones <- c('RS',
 
 # Estimated from fullWSLS2BRecovered.csv
 theta <- c(0.009, 0.009, 0.008, 0.007, 112.654, 450.929, 0.977, 0, 0, 0, 0) # Estimated full information
-df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/temp.csv", na.strings=c("","NA"))
-df1$Region <- sapply(df1$Strategy, Nombre_Region)
-
-df1 <- df1 %>% 
-  group_by(Player) %>%
-  mutate(RegionGo = lead(Region)) %>%
-  as.data.frame()
-
-#df1 <- df1[complete.cases(df1), ]
+#df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
+df1$Region <- df1$Category
+#df1$Region <- sapply(df1$Strategy, Nombre_Region)
+#df1 <- df1 %>% 
+#  group_by(Player) %>%
+#  mutate(RegionGo = lead(Region)) %>%
+#  as.data.frame()
+df1 <- df1[complete.cases(df1), ]
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df1[, 3:5])
 
@@ -160,7 +159,7 @@ head(df1[, 3:5])
 # Estimated from WSLS2BRecovered.csv
 theta <- c(0.010, 0.009, 0.009, 0.010, 197.225, 216.609, 0.996, 0, 0, 0, 0) # Estimated only absent
 #theta <- c(0.012, 0.010, 0.011, 0.009, 177.922, 190.004, 1, 0, 0, 0, 0) # Estimated only absent
-df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
 df2 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
 #theta <- c(0.010, 0.019, 0.009, 0.010, 18.962, 124.242, 1.000, 0, 0, 0, 0) # Estimated only absent
 #df1 = read.csv("../Python Codes/WSLS2BRecovered_32.csv", na.strings=c("","NA"))

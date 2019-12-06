@@ -263,6 +263,14 @@ if '1' in lista:
     cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
     data['Category'] = data.apply(lambda x: minDist2Focal(x[cols1]), axis=1)
 
+else:
+    print("Trying to obtain classification from simulation...")
+    try:
+        data['Category'] = data.apply(lambda x: nameRegion(x['Strategy']), axis=1)
+        print('Done!')
+    except:
+        print('Data does not seem to come from simulation!')
+
 if '2' in lista:
     # --------------------------------------------------
     # Correcting scores
@@ -299,7 +307,7 @@ if '3' in lista:
     print('Keeping only rounds with Unicorn Absent')
     data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
     # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
-print('Done!')
+    print('Done!')
 
 # --------------------------------------------------
 # Obtaining measures from players' performance

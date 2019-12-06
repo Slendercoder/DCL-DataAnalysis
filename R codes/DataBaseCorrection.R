@@ -58,9 +58,10 @@ getRelFreq <- function(i, s, k, df) {
 # Global variables
 #####################################################
 
-# TrueVal: 
+# True parameters: 
 thetaTRUE <- c(0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0)
-theta <- c(0.089, 0.099, 0.044, 0.042, 122.228, 160.825, 31.060, 0, 0, 0, 0) # Estimated only absent
+# Estimated parameters:
+theta <- c(0.090, 0.091, 0.046, 0.046, 7.372,311.871, 31.209, 0, 0, 0, 0) # Estimated only absent
 
 regiones <- c('RS',
               'ALL', 
@@ -76,8 +77,8 @@ regiones <- c('RS',
 # Loading database with full information
 ###############################################################################
 
-#df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
 #df1$Region <- sapply(df1$Strategy, Nombre_Region)
 #df1 <- df1 %>% 
@@ -93,7 +94,7 @@ head(df1[, 3:6])
 ###############################################################################
 
 #df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
-df2 = read.csv("../Python Codes/output1.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 df2 <- df2[complete.cases(df2), ]
 df2$Region <- df2$Category
 df2 <- df2[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
@@ -140,7 +141,8 @@ beep()
 # Graph effect of keeping only absent...
 ###############################################################################
 
-min_score = -50
+#min_score = -50
+min_score = 0
 
 df_RS <- df[df$Region == 'RS', ]
 df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
@@ -268,38 +270,110 @@ gALL2ALL <- gALL2ALL + theme(legend.position="none")
 grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
              nrow = 2, 
              right=legend, 
-             top="Model recovery - transitions")
+             top="Transitions - Only data")
 
 
-######################################
-levels(df2$Region)
-#df$Category <- lapply(df$Category, function(x) {
-#  if(x=='NOTHING') {
-#    return('NOT')
-#  } else if(x=='DOWN') {
-#    return('DOW')
-#  } else if(x=='LEFT') {
-#    return('LEF')
-#  } else if(x=='RIGHT') {
-#    return('RIG')
-#  } else {
-#    #    print(x)
-#    return(as.character(x))
-#  }
-#})
+#################################################
+# Including models on top of data plots
+#################################################
 
-g3 <- ggplot(df2, aes(x=Region)) + 
-  geom_bar(aes(y = ..prop..), stat="count", position="dodge") +
-  geom_text(aes(label = scales::percent(..prop..),
-                 y= ..prop.. ), stat= "count", vjust = -.5) +
-  labs(y = "Percent", fill="Region") +
-  # scale_fill_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
-  xlab("Region") +
-  ylab("Instances (%)") +
-  #  labs(fill = TeX('bias$_{focal}$')) +
-  #  facet_grid(~Condition) +
-  #  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
+# Transition from RS to RS
+#xs <- seq(-128,32,length.out=161)
+xs <- seq(min_score,32,length.out=(32-min_score + 1))
+# Model
+fitTRUE <- sapply(xs, WSprob, i='RS', k='RS', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='RS', k='RS', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+# Dummy plot to get legend
+dummyplot <- ggplot() +
+  geom_line(aes(x = xs, y = fitTRUE, color="Original"), dfmodels, size = tamanho) + 
+  geom_line(aes(x = xs, y = fitEST, color = "Recovered"), dfmodels, size = tamanho) + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  scale_color_manual(values=c("Original"="#F0E442",
+                                "Recovered"="#009E73"),
+                       name="Transition")  +
   theme_bw() +
-  theme(legend.position="top")
+  theme(legend.position="bottom")
 
-g3
+legend2 <- get_legend(dummyplot)
+
+gRS2RS <- gRS2RS +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gRS2RS
+
+# Transition from RS to ALL
+#xs <- seq(-128,32,length.out=161)
+xs <- seq(min_score,32,length.out=(32-min_score + 1))
+# Model
+fitTRUE <- sapply(xs, WSprob, i='RS', k='ALL', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='RS', k='ALL', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+gRS2ALL <- gRS2ALL +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gRS2ALL
+
+# Transition from ALL to RS
+#xs <- seq(-128,32,length.out=161)
+xs <- seq(min_score,32,length.out=(32-min_score + 1))
+# Model
+fitTRUE <- sapply(xs, WSprob, i='ALL', k='RS', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+gALL2RS <- gALL2RS +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gALL2RS
+
+# Transition from ALL to ALL
+#xs <- seq(-128,32,length.out=161)
+xs <- seq(min_score,32,length.out=(32-min_score + 1))
+# Model
+fitTRUE <- sapply(xs, WSprob, i='ALL', k='ALL', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='ALL', k='ALL', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+gALL2ALL <- gALL2ALL +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gALL2ALL
+
+grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
+             nrow = 2, 
+             right=legend, 
+             bottom=legend2,
+             top="Transitions - Model recovery")
+ 
