@@ -67,7 +67,8 @@ getArgs <- function(data) {
     return(sum(x))
   })
   
-  args <- args[args$sumFreq > 0, ]
+#  args <- args[args$sumFreq > 0, ]
+  args <- args[args$sumFreq > 5, ]
   
   return(args)
 }

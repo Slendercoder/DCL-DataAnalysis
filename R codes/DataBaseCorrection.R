@@ -9,6 +9,13 @@ library(beepr)
 # Definitions
 #####################################################
 
+get_legend<-function(myggplot){
+  tmp <- ggplot_gtable(ggplot_build(myggplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+
 Nombre_Region <- function(x) {
   if (x == '0' || x== '9') {
     return('RS')
@@ -42,9 +49,18 @@ getRelFreq <- function(i, s, k, df) {
   regs <- df[df$Region == i, ]
   regs <- regs[regs$Score == s, ]
   n <- dim(regs)[1]
-  regs <- regs[regs$RegionGo == k, ]
-  f <- dim(regs)[1]
-  return(f/n)
+  if (n > 5) {
+    regs <- regs[regs$RegionGo == k, ]
+    f <- dim(regs)[1]
+    return(f/n)
+  } else {
+    return(NA)
+  }
+  
+  
+#  regs <- regs[regs$RegionGo == k, ]
+#  f <- dim(regs)[1]
+#  return(f/n)
 
   # auxDF <- t(as.data.frame(table(regsGo)))
   #  print(auxDF)
@@ -54,6 +70,60 @@ getRelFreq <- function(i, s, k, df) {
   # return(as.numeric(auxDF[1:9]))
 }
 
+WSprob <- function(i, s, k, theta, regiones){
+  
+  #  w <- theta[1]
+  #  alpha <- theta[2]
+  #  beta <- theta[3]
+  #  gamma <- theta[4]
+  #  delta <- theta[5]
+  #  epsilon <- theta[6]
+  #  zeta <- theta[7]
+  #  eta <- theta[8]
+  #  aux <- c(0.1, 0.15, 0.1, 0.1, 0.09, 0.09, 0.01, 0.01)*w
+  
+  wALL <- theta[1]
+  wNOTHING <- theta[2]
+  wLEFT <- theta[3]
+  wIN <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
+  eta <- theta[11]
+  aux <- c(wALL, wNOTHING, wLEFT, wLEFT, wLEFT, wLEFT, wIN, wIN)
+  
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  print("bias")
+  #  imprimir(bias)
+  
+  #  n <- (s + 128) / 160 # Normalizing score
+  n <- s
+  
+  # Find the attractivenes:
+  attractiveness <- bias # Start from bias
+  
+  # Add attractiveness to current region according to score
+  #  if (i != 'RS') {
+  index <- which(regiones == i)
+  attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
+  #  }
+  
+  probs <- attractiveness / sum(attractiveness)
+  #  probs <- replace(probs,probs<lowerEps2,lowerEps2)
+  #  probs <- replace(probs,probs>highEps2,highEps2)
+  
+  probab <- probs[which(regiones == k)]
+  
+  return(probab)
+}
+
 #####################################################
 # Global variables
 #####################################################
@@ -61,8 +131,8 @@ getRelFreq <- function(i, s, k, df) {
 # True parameters: 
 thetaTRUE <- c(0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0)
 # Estimated parameters:
-#theta <- c(0.090, 0.091, 0.046, 0.046, 7.372,311.871, 31.209, 0, 0, 0, 0) # Estimated only absent
-theta <- c(0.096, 0.059, 0.013, 0.001, 8.988, 26.281, 19.121, 0, 0, 0, 0)
+theta <- c(0.105, 0.105, 0.05, 0.052, 122.629, 454.531, 30.763, 0, 0, 0, 0) # Estimated only absent
+#theta <- c(0.099, 0.1, 0.049, 0.053, 144.424, 431.692, 30.51, 0, 0, 0, 0) # Estimated full
 
 regiones <- c('RS',
               'ALL', 
@@ -78,8 +148,8 @@ regiones <- c('RS',
 # Loading database with full information
 ###############################################################################
 
-df1 = read.csv("../Python Codes/Sweeps/Full/sim500_1.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/Sweeps/Full/sim500_1.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
 #df1$Region <- sapply(df1$Strategy, Nombre_Region)
@@ -88,6 +158,8 @@ df1$Region <- df1$Category
 #  mutate(RegionGo = lead(Region)) %>%
 #  as.data.frame()
 df1 <- df1[complete.cases(df1), ]
+df1$Region <- factor(df1$Region, levels = regiones, ordered = TRUE)
+df1$RegionGo <- factor(df1$RegionGo, levels = regiones, ordered = TRUE)
 df1 <- df1[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
 head(df1[, 3:6])
 
@@ -95,8 +167,8 @@ head(df1[, 3:6])
 # Loading database with only absent
 ###############################################################################
 
-df2 = read.csv("../Python Codes/Sweeps/Only_Absent/sim500_1.csv", na.strings=c("","NA"))
-#df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
+#df2 = read.csv("../Python Codes/Sweeps/Only_Absent/sim500_1.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
 #df2 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 df2 <- df2[complete.cases(df2), ]
 df2$Region <- df2$Category
@@ -136,7 +208,7 @@ dfA$Exp <- "Full"
 dfB$Exp <- "Only absent"
 
 df <- rbind(dfA, dfB)
-df <- dfB
+#df <- dfB
 
 beep()
 
@@ -159,7 +231,7 @@ df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
 head(df_RS)
 
 gRS2RS <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_RS, alpha = 0.8, size=2) +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_RS, alpha = 0.5, size=2) +
   #  scale_colour_manual(values = c("RS" = "#999999", 
   #                                 "ALL" = "#E69F00")) +  
   #  scale_shape_manual(values = c("RS" = 1, 
@@ -188,7 +260,7 @@ df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
 head(df_RS)
 
 gRS2ALL <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_RS, alpha = 0.8, size=2) +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_RS, alpha = 0.5, size=2) +
   #  scale_colour_manual(values = c("RS" = "#999999", 
   #                                 "ALL" = "#E69F00")) +  
   #  scale_shape_manual(values = c("RS" = 1, 
@@ -217,7 +289,7 @@ df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
 head(df_ALL)
 
 gALL2RS <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_ALL, alpha = 0.8, size=2) +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_ALL, alpha = 0.5, size=2) +
   #  scale_colour_manual(values = c("RS" = "#999999", 
   #                                 "ALL" = "#E69F00")) +  
   #  scale_shape_manual(values = c("RS" = 1, 
@@ -246,7 +318,7 @@ df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
 head(df_ALL)
 
 gALL2ALL <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_ALL, alpha = 0.8, size=2) +
+  geom_point(aes(x = Score, y = Freqs, color=Exp, shape=Is_there), df_ALL, alpha = 0.5, size=2) +
 #  scale_colour_manual(values = c("RS" = "#999999", 
 #                                 "ALL" = "#E69F00")) +  
 #  scale_shape_manual(values = c("RS" = 1, 
@@ -281,7 +353,7 @@ grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
 #################################################
 
 #xs <- seq(-128,32,length.out=161)
-xs <- seq(min_score,32,length.out=(32-min_score + 1)*100)
+xs <- seq(min_score,32,length.out=(32-min_score + 1)*1000)
 
 # Transition from RS to RS
 # Model
@@ -290,6 +362,9 @@ fitTRUE <- sapply(xs, WSprob, i='RS', k='RS', theta=thetaTRUE, regiones=regiones
 fitEST <- sapply(xs, WSprob, i='RS', k='RS', theta=theta, regiones=regiones)
 dfmodels <- data.frame(xs, fitTRUE, fitEST)
 head(dfmodels)
+
+# Size of models' lines
+tamanho <- 0.5
 
 # Dummy plot to get legend
 dummyplot <- ggplot() +

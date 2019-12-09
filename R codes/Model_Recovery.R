@@ -300,7 +300,7 @@ grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
 #################################################
 
 #xs <- seq(-128,32,length.out=161)
-xs <- seq(min_score,32,length.out=(32-min_score + 1)*100)
+xs <- seq(min_score,32,length.out=(32-min_score + 1)*1000)
 
 # Transition from RS to RS
 # Model

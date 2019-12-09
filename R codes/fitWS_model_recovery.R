@@ -8,9 +8,10 @@ library(dplyr)
 # To use with data estimated from only absent
 ################################################################
 
-#df1 = read.csv("../Python Codes/Sweeps/Only_Absent/sim200_10.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
@@ -19,7 +20,6 @@ df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 args <- getArgs(df1)
 args <- args[order(-args$s, args$i),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
-args <- args[args$sumFreq > 5, ]
 head(args)
 
 #args1 <- args
