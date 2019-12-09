@@ -29,14 +29,14 @@ head(args)
 # To use with data estimated from full information
 ################################################################
 
-df2 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
-#df2 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
+#df2 = read.csv("../Python Codes/Finite_Size_Analysis/Full/output.csv", na.strings=c("","NA"))
+df2 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
 #df2$Region <- sapply(df2$Strategy, Nombre_Region)
 df2$Region <- df2$Category
-df2 <- df2 %>% 
-  group_by(Player) %>%
-  mutate(RegionGo = lead(Region)) %>%
-  as.data.frame()
+#df2 <- df2 %>% 
+#  group_by(Player) %>%
+#  mutate(RegionGo = lead(Region)) %>%
+#  as.data.frame()
 
 df2 <- df2[complete.cases(df2), ]
 df2 <- df2[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
@@ -53,13 +53,13 @@ head(args)
 # To search for best parameters WSLS model with optim
 ################################################################
 
-wAll <- 0.01 # w
-wNoth <- 0.01 # w
-wLef <- 0.01 # w
-wIn <- 0.01 # w
-alpha <- 10 # win stay 
-beta <- 20 # steepness 
-gamma <- 20 # threshold 
+wAll <- 0.09 # w
+wNoth <- 0.09 # w
+wLef <- 0.04 # w
+wIn <- 0.04 # w
+alpha <- 120 # win stay 
+beta <- 400 # steepness 
+gamma <- 30.5 # threshold 
 fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                    fn = function(theta) WSutil(c(theta, 0, 0, 0, 0), args, regiones),
                    lower=c(0,
@@ -79,6 +79,7 @@ fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                    control=list(trace=0))
 
 beep()
+print(fitresWSLS$value) 
 imprimir(fitresWSLS$par) 
 cat('wALL', fitresWSLS$par[1], 
     'wNOTHING', fitresWSLS$par[2],
@@ -87,5 +88,6 @@ cat('wALL', fitresWSLS$par[1],
     '\nalpha', fitresWSLS$par[5],
     '\nbeta', fitresWSLS$par[6],
     'gamma', fitresWSLS$par[7], '\n') 
-print(fitresWSLS$value) 
 
+#theta <- c(wAll, wNoth, wLef, wIn, alpha, beta, gamma)
+#WSutil(c(theta, 0, 0, 0, 0), args, regiones)

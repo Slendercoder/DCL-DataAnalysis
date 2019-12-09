@@ -9,14 +9,12 @@ library(beepr)
 # Definitions
 #####################################################
 
-# Trims a number to three decimals
-specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
-
-# Friendly prints a numeric vector
-imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
-
-# Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
-sigmoid <- function(x, beta, gamma) {1 / (1 + exp(-beta * (x - gamma)))}
+get_legend<-function(myggplot){
+  tmp <- ggplot_gtable(ggplot_build(myggplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
 
 Nombre_Region <- function(x) {
   if (x == '0' || x== '9') {
@@ -65,16 +63,16 @@ getRelFreq <- function(i, s, k, df) {
 
 WSprob <- function(i, s, k, theta, regiones){
   
-#  w <- theta[1]
-#  alpha <- theta[2]
-#  beta <- theta[3]
-#  gamma <- theta[4]
-#  delta <- theta[5]
-#  epsilon <- theta[6]
-#  zeta <- theta[7]
-#  eta <- theta[8]
-#  aux <- c(0.1, 0.15, 0.1, 0.1, 0.09, 0.09, 0.01, 0.01)*w
-
+  #  w <- theta[1]
+  #  alpha <- theta[2]
+  #  beta <- theta[3]
+  #  gamma <- theta[4]
+  #  delta <- theta[5]
+  #  epsilon <- theta[6]
+  #  zeta <- theta[7]
+  #  eta <- theta[8]
+  #  aux <- c(0.1, 0.15, 0.1, 0.1, 0.09, 0.09, 0.01, 0.01)*w
+  
   wALL <- theta[1]
   wNOTHING <- theta[2]
   wLEFT <- theta[3]
@@ -96,21 +94,21 @@ WSprob <- function(i, s, k, theta, regiones){
   #  print("bias")
   #  imprimir(bias)
   
-#  n <- (s + 128) / 160 # Normalizing score
+  #  n <- (s + 128) / 160 # Normalizing score
   n <- s
   
   # Find the attractivenes:
   attractiveness <- bias # Start from bias
   
   # Add attractiveness to current region according to score
-  if (i != 'RS') {
+#  if (i != 'RS') {
     index <- which(regiones == i)
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
-  }
+#  }
   
   probs <- attractiveness / sum(attractiveness)
-#  probs <- replace(probs,probs<lowerEps2,lowerEps2)
-#  probs <- replace(probs,probs>highEps2,highEps2)
+  #  probs <- replace(probs,probs<lowerEps2,lowerEps2)
+  #  probs <- replace(probs,probs>highEps2,highEps2)
   
   probab <- probs[which(regiones == k)]
   
@@ -121,9 +119,10 @@ WSprob <- function(i, s, k, theta, regiones){
 # Global variables
 #####################################################
 
-# TrueVal: 
+# True parameters: 
 thetaTRUE <- c(0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0)
-theta <- c(0.089, 0.099, 0.044, 0.042, 122.228, 160.825, 31.060, 0, 0, 0, 0) # Estimated only absent
+# Estimated parameters:
+theta <- c(0.099, 0.1, 0.049, 0.05, 144.424, 431.692, 30.51, 0, 0, 0, 0)
 
 regiones <- c('RS',
               'ALL', 
@@ -136,149 +135,270 @@ regiones <- c('RS',
               'OUT')
 
 ###############################################################################
-# Loading simulation
+# Loading database with full information
 ###############################################################################
 
-df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
-df1 <- df1[complete.cases(df1), ]
+#df1 = read.csv("../Python Codes/Sweeps/Full/sim500_1.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/fullWSLS2BRecovered.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
-df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
-df1$Region <- factor(df1$Region, levels = regiones, ordered = TRUE)
-df1$RegionGo <- factor(df1$RegionGo, levels = regiones, ordered = TRUE)
-df1 <- df1[order(df1$Region, df1$Score), ] 
-head(df1[, 3:5])
+#df1$Region <- sapply(df1$Strategy, Nombre_Region)
+#df1 <- df1 %>% 
+#  group_by(Player) %>%
+#  mutate(RegionGo = lead(Region)) %>%
+#  as.data.frame()
+df1 <- df1[complete.cases(df1), ]
+df1 <- df1[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
+head(df1[, 3:6])
 
 ###############################################################################
 # Obtaining frequencies...
 ###############################################################################
 
-dfA <- df1[, 3:5]
+dfA <- df1[, 3:6]
 dfA$Freqs <- apply(dfA, 1, function(x) {
-  i <- as.character(x[[1]][1])
-  s <- as.numeric(x[[2]][1])
-  k <- as.character(x[[3]][1])
+  i <- as.character(x[[2]][1])
+  s <- as.numeric(x[[3]][1])
+  k <- as.character(x[[4]][1])
   #cat('\ni', i, 's', s, 'k', k)
   return(getRelFreq(i, s, k, df1))
 })
 dfA <- unique(dfA)
 head(dfA)
+df <- dfA
 beep()
 
 ###############################################################################
-# Graph model recovery...
+# Plot simulated data...
 ###############################################################################
 
-df_RS2 <- dfA[dfA$Region == 'RS', ]
-df_RS2 <- df_RS2[c('Score', 'RegionGo', 'Freqs')]
-df_RS2 <- df_RS2[df_RS2$RegionGo != 'NOTHING', ]
-df_RS2 <- df_RS2[df_RS2$RegionGo != 'DOWN', ]
-df_RS2 <- df_RS2[df_RS2$RegionGo != 'UP', ]
-df_RS2 <- df_RS2[df_RS2$RegionGo != 'LEFT', ]
-df_RS2 <- df_RS2[df_RS2$RegionGo != 'RIGHT', ]
-df_RS2 <- df_RS2[df_RS2$RegionGo != 'IN', ]
-df_RS2 <- df_RS2[df_RS2$RegionGo != 'OUT', ]
-head(df_RS2)
-
-#min_score = min(df_ALL$Score)
-#min_score
+#min_score = -50
 min_score = 0
 
-xs <- seq(-128,32,length.out=161)
-# Model
-fitRS1 <- sapply(xs, WSprob, i='RS', k='RS', theta=thetaTRUE, regiones=regiones)
-fitALL1 <- sapply(xs, WSprob, i='RS', k='ALL', theta=thetaTRUE, regiones=regiones)
-# Model fitted from only absent
-fitRS2 <- sapply(xs, WSprob, i='RS', k='RS', theta=theta, regiones=regiones)
-fitALL2 <- sapply(xs, WSprob, i='RS', k='ALL', theta=theta, regiones=regiones)
-dfB <- data.frame(xs, fitRS1, fitALL1, fitRS2, fitALL2)
-head(dfB)
+df_RS <- df[df$Region == 'RS', ]
+df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
+df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
+df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
+df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
+df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+head(df_RS)
 
-gRS2 <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, shape = RegionGo), df_RS2, alpha = 1) +
-  scale_shape_manual(values = c("RS" = 1, 
-                                "ALL" = 2),
-                     name="Jumps to") +  
+gRS2RS <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs), df_RS, alpha = 0.4, size=1.5) +
+  #  scale_colour_manual(values = c("RS" = "#999999", 
+  #                                 "ALL" = "#E69F00")) +  
+  #  scale_shape_manual(values = c("RS" = 1, 
+  #                                "ALL" = 2),
+  #                     name="Jumps to") +  
   scale_x_continuous(limits = c(min_score, 35)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  labs(color = "Source of data") +
+  xlab("Score") +
+#  ylab("") +
+  ylab("Rel. Freq./Probability") +
+  ggtitle("Transition from RS to RS") +
+  theme_bw()
+
+gRS2RS
+
+df_RS <- df[df$Region == 'RS', ]
+df_RS <- df_RS[df_RS$RegionGo != 'RS', ]
+df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
+df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
+df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
+df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+head(df_RS)
+
+gRS2ALL <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs), df_RS, alpha = 0.4, size=1.5) +
+  #  scale_colour_manual(values = c("RS" = "#999999", 
+  #                                 "ALL" = "#E69F00")) +  
+  #  scale_shape_manual(values = c("RS" = 1, 
+  #                                "ALL" = 2),
+  #                     name="Jumps to") +  
+  scale_x_continuous(limits = c(min_score, 35)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  labs(color = "Source of data") +
   xlab("Score") +
   ylab("") +
   #  ylab("Rel. Freq./Probability") +
-  ggtitle("RS") +
+  ggtitle("Transition from RS to ALL") +
   theme_bw()
 
-tamanho <- 0.9
+gRS2ALL
 
-gRS2 <- gRS2 +
-  geom_line(aes(x = xs, y = fitRS1, color="Original transition to RS"), dfB, size = tamanho) + 
-  geom_line(aes(x = xs, y = fitALL1, color = "Original transition to ALL"), dfB, size = tamanho) + 
-  geom_line(aes(x = xs, y = fitRS2, color = "Recovered transition to RS"), dfB, size = tamanho) + 
-  geom_line(aes(x = xs, y = fitALL2, color = "Recovered transition to ALL"), dfB, size = tamanho) + 
-  scale_color_manual(values=c("Original transition to ALL"="#E69F00",
-                              "Recovered transition to ALL"="#F0E442",
-                              "Original transition to RS"="#009E73",
-                              "Recovered transition to RS"="#0072B2"),
-                     name="Models")  +
+df_ALL <- df[df$Region == 'ALL', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'ALL', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'NOTHING', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'DOWN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'UP', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'LEFT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'RIGHT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'IN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
+head(df_ALL)
+
+gALL2RS <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs), df_ALL, alpha = 0.4, size=1.5) +
+  #  scale_colour_manual(values = c("RS" = "#999999", 
+  #                                 "ALL" = "#E69F00")) +  
+  #  scale_shape_manual(values = c("RS" = 1, 
+  #                                "ALL" = 2),
+  #                     name="Jumps to") +  
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  labs(color = "Source of data") +
+  xlab("Score") +
+#  ylab("") +
+  ylab("Rel. Freq./Probability") +
+  ggtitle("Transition from ALL to RS") +
   theme_bw()
 
-gRS2
+gALL2RS
 
+df_ALL <- df[df$Region == 'ALL', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'RS', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'NOTHING', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'DOWN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'UP', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'LEFT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'RIGHT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'IN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
+head(df_ALL)
 
-df_ALL2 <- dfA[dfA$Region == 'ALL', ]
-df_ALL2 <- df_ALL2[c('Score', 'RegionGo', 'Freqs')]
-df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'NOTHING', ]
-df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'DOWN', ]
-df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'UP', ]
-df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'LEFT', ]
-df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'RIGHT', ]
-df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'IN', ]
-df_ALL2 <- df_ALL2[df_ALL2$RegionGo != 'OUT', ]
-head(df_ALL2)
-
-#min_score = min(df_ALL$Score)
-#min_score
-min_score = 0
-
-xs <- seq(-128,32,length.out=161)
-# Model
-fitRS1 <- sapply(xs, WSprob, i='ALL', k='RS', theta=thetaTRUE, regiones=regiones)
-fitALL1 <- sapply(xs, WSprob, i='ALL', k='ALL', theta=thetaTRUE, regiones=regiones)
-# Model fitted from only absent
-fitRS2 <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
-fitALL2 <- sapply(xs, WSprob, i='ALL', k='ALL', theta=theta, regiones=regiones)
-dfB <- data.frame(xs, fitRS1, fitALL1, fitRS2, fitALL2)
-head(dfB)
-
-gALL2 <- ggplot() +
-  geom_point(aes(x = Score, y = Freqs, shape = RegionGo), df_ALL2, alpha = 1) +
-  scale_shape_manual(values = c("RS" = 1, 
-                                "ALL" = 2),
-                     name="Jumps to") +  
-  scale_x_continuous(limits = c(min_score, 35)) + 
+gALL2ALL <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs), df_ALL, alpha = 0.4, size=1.5) +
+#  scale_colour_manual(values = c("RS" = "#999999", 
+#                                 "ALL" = "#E69F00")) +  
+#  scale_shape_manual(values = c("RS" = 1, 
+#                                "ALL" = 2),
+#                     name="Jumps to") +  
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  labs(color = "Source of data") +
   xlab("Score") +
   ylab("") +
   #  ylab("Rel. Freq./Probability") +
-  ggtitle("ALL") +
+  ggtitle("Transition from ALL to ALL") +
   theme_bw()
 
-tamanho <- 0.9
+gALL2ALL
 
-gALL2 <- gALL2 +
-  geom_line(aes(x = xs, y = fitALL1, color = "Original transition to ALL"), dfB, size = tamanho) + 
-  geom_line(aes(x = xs, y = fitRS1, color="Original transition to RS"), dfB, size = tamanho) + 
-  geom_line(aes(x = xs, y = fitRS2, color = "Recovered transition to RS"), dfB, size = tamanho) + 
-  geom_line(aes(x = xs, y = fitALL2, color = "Recovered transition to ALL"), dfB, size = tamanho) + 
-  scale_color_manual(values=c("Original transition to ALL"="#E69F00",
-                              "Recovered transition to ALL"="#F0E442",
-                              "Original transition to RS"="#009E73",
-                              "Recovered transition to RS"="#0072B2"),
-                     name="Models")  +
-  theme_bw()
+grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
+             nrow = 2, 
+             top="Model Recovery")
 
-gALL2
+#################################################
+# Including models on top of data plots
+#################################################
 
-legend <- get_legend(gRS2)
-gRS2 <- gRS2 + theme(legend.position="none")
-gALL2 <- gALL2 + theme(legend.position="none")
+#xs <- seq(-128,32,length.out=161)
+xs <- seq(min_score,32,length.out=(32-min_score + 1)*100)
 
-grid.arrange(gRS2, gALL2,
-             nrow = 1,
-             right=legend, top="Model recovery - transitions")
+# Transition from RS to RS
+# Model
+fitTRUE <- sapply(xs, WSprob, i='RS', k='RS', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='RS', k='RS', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+# Size of models' lines
+tamanho <- 0.5
+
+# Dummy plot to get legend
+dummyplot <- ggplot() +
+  geom_line(aes(x = xs, y = fitTRUE, color="Original"), dfmodels, size = tamanho) + 
+  geom_line(aes(x = xs, y = fitEST, color = "Recovered"), dfmodels, size = tamanho) + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  scale_color_manual(values=c("Original"="#F0E442",
+                                "Recovered"="#009E73"),
+                       name="Transition")  +
+  theme_bw() +
+  theme(legend.position="bottom")
+
+legend2 <- get_legend(dummyplot)
+
+gRS2RS <- gRS2RS +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gRS2RS
+
+# Transition from RS to ALL
+# Model
+fitTRUE <- sapply(xs, WSprob, i='RS', k='ALL', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='RS', k='ALL', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+gRS2ALL <- gRS2ALL +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gRS2ALL
+
+# Transition from ALL to RS
+# Model
+fitTRUE <- sapply(xs, WSprob, i='ALL', k='RS', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='ALL', k='RS', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+gALL2RS <- gALL2RS +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gALL2RS
+
+# Transition from ALL to ALL
+# Model
+fitTRUE <- sapply(xs, WSprob, i='ALL', k='ALL', theta=thetaTRUE, regiones=regiones)
+# Model fitted from only absent
+fitEST <- sapply(xs, WSprob, i='ALL', k='ALL', theta=theta, regiones=regiones)
+dfmodels <- data.frame(xs, fitTRUE, fitEST)
+head(dfmodels)
+
+gALL2ALL <- gALL2ALL +
+  geom_line(aes(x = xs, y = fitTRUE), dfmodels, size = tamanho, color="#F0E442") + 
+  geom_line(aes(x = xs, y = fitEST), dfmodels, size = tamanho, color="#009E73") + 
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+gALL2ALL
+
+grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
+             nrow = 2, 
+             right=legend, 
+             bottom=legend2,
+             top="Transitions - Model recovery")
+ 
+#################################################
+# Plotting DLindex
+#################################################
+
+
