@@ -17,13 +17,13 @@ print('Done!')
 gameParameters = [0.5, 2, 8, 60, 500]
 
 # WSLS model2Recover
-modelParameters = [0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0]
+# modelParameters = [0.1, 0.1, 0.05, 0.05, 150, 10, 31, 0, 0, 0, 0]
 # # WSLS model recovered only absent
 # modelParameters = [0.089, 0.099, 0.044, 0.042, 122.228, 160.825, 31.060, 0, 0, 0, 0]
 
 # WSLS optim
-# modelParameters = [0.14, 0.0674, 0.0123, 0.0009, 39, 405, 0.93, 0, 0, 0, 0] # optimos
-modelParameters = [0.094, 0.078, 0.017, 0.005, 10.619, 495.681, 29.002, 0, 0, 0, 0] # optimos
+modelParameters = [0.042, 0.037, 0.015, 0.001, 30.000, 0.032, 32.000, 0, 0, 0, 0] # optimos
+# modelParameters = [0.14, 0.0674, 0.0123, 0.0009, 39, 405, 20, 0, 0, 0, 0] # optimos
 # FRA optim
 # modelParameters = [0.216, 48, 10, 31, 1.53, 0.94, 3, 1.1]
 

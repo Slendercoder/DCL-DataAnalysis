@@ -8,10 +8,9 @@ library(dplyr)
 # To use with data estimated from only absent
 ################################################################
 
-#df1 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Only_Absent.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/WSLS2BRecovered.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
@@ -53,12 +52,12 @@ head(args)
 # To search for best parameters WSLS model with optim
 ################################################################
 
-wAll <- 0.09 # w
-wNoth <- 0.09 # w
-wLef <- 0.04 # w
-wIn <- 0.04 # w
-alpha <- 120 # win stay 
-beta <- 400 # steepness 
+wAll <- 0.1 # w
+wNoth <- 0.1 # w
+wLef <- 0.05 # w
+wIn <- 0.05 # w
+alpha <- 150 # win stay 
+beta <- 405 # steepness 
 gamma <- 30.5 # threshold 
 fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                    fn = function(theta) WSutil(c(theta, 0, 0, 0, 0), args, regiones),
@@ -78,7 +77,7 @@ fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
                            32),
                    control=list(trace=0))
 
-beep()
+#beep()
 print(fitresWSLS$value) 
 imprimir(fitresWSLS$par) 
 cat('wALL', fitresWSLS$par[1], 
@@ -89,5 +88,5 @@ cat('wALL', fitresWSLS$par[1],
     '\nbeta', fitresWSLS$par[6],
     'gamma', fitresWSLS$par[7], '\n') 
 
-#theta <- c(wAll, wNoth, wLef, wIn, alpha, beta, gamma)
-#WSutil(c(theta, 0, 0, 0, 0), args, regiones)
+theta <- c(wAll, wNoth, wLef, wIn, alpha, beta, gamma)
+WSutil(c(theta, 0, 0, 0, 0), args, regiones)

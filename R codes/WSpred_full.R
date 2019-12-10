@@ -68,7 +68,7 @@ getArgs <- function(data) {
   })
   
 #  args <- args[args$sumFreq > 0, ]
-  args <- args[args$sumFreq > 5, ]
+  args <- args[args$sumFreq > 4, ]
   
   return(args)
 }
@@ -91,10 +91,10 @@ WSpred <- function(i, s, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsi
   attractiveness <- bias # Start from bias
   
   # Add attractiveness to current region according to score
-#  if (i != 'RS') {
+  if (i != 'RS') {
     index <- which(regiones == i)
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
-#  }
+  }
   
   probs <- attractiveness / sum(attractiveness)
   probs <- replace(probs,probs<lowerEps2,lowerEps2)

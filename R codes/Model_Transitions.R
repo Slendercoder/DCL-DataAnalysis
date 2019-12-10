@@ -112,10 +112,10 @@ WSprob <- function(i, s, k, theta, regiones){
   attractiveness <- bias # Start from bias
   
   # Add attractiveness to current region according to score
-#  if (i != 'RS') {
+  if (i != 'RS') {
     index <- which(regiones == i)
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
-#  }
+  }
   
   probs <- attractiveness / sum(attractiveness)
   #  probs <- replace(probs,probs<lowerEps2,lowerEps2)
@@ -131,7 +131,10 @@ WSprob <- function(i, s, k, theta, regiones){
 #####################################################
 
 # Estimated parameters:
-theta <- c(0.094, 0.078, 0.017, 0.005, 10.619, 495.681, 29.002, 0, 0, 0, 0)
+#theta <- c(0.094, 0.078, 0.017, 0.005, 10.619, 495.681, 29.002, 0, 0, 0, 0)
+#theta <- c(0.093, 0.062, 0.015, 0.000, 17.845, 255.959, 19.014, 0, 0, 0, 0)
+theta <- c(0.042, 0.037, 0.015, 0.001, 30.000, 0.032, 32.000, 0, 0, 0, 0)
+theta <- c(0.14, 0.0674, 0.0123, 0.0009, 39, 405, 20, 0, 0, 0, 0)
 
 regiones <- c('RS',
               'ALL', 
@@ -177,6 +180,21 @@ beep()
 
 #min_score = -50
 min_score = 0
+
+df_RS <- df[df$Region == 'RS', ]
+head(df_RS)
+
+gRS <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs, color=RegionGo), df_RS, alpha = 0.4, size=1.5) +
+  scale_x_continuous(limits = c(min_score, 35)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  xlab("Score") +
+  #  ylab("") +
+  ylab("Rel. Freq./Probability") +
+  ggtitle("Transitions from RS") +
+  theme_bw()
+
+gRS
 
 df_RS <- df[df$Region == 'RS', ]
 df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
@@ -273,6 +291,30 @@ gALL2ALL
 grid.arrange(gRS2RS, gRS2ALL, gALL2RS, gALL2ALL,
              nrow = 2, 
              top="Human data")
+
+
+df_ALL <- df[df$Region == 'ALL', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'RS', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'NOTHING', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'DOWN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'UP', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'LEFT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'RIGHT', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'IN', ]
+df_ALL <- df_ALL[df_ALL$RegionGo != 'OUT', ]
+head(df_ALL)
+
+gNOTHING2NOTHING <- ggplot() +
+  geom_point(aes(x = Score, y = Freqs), df_ALL, alpha = 0.4, size=1.5) +
+  scale_x_continuous(limits = c(min_score, 33)) + 
+  scale_y_continuous(limits = c(0, 1.01)) + 
+  xlab("Score") +
+  ylab("") +
+  #  ylab("Rel. Freq./Probability") +
+  ggtitle("Transition from ALL to ALL") +
+  theme_bw()
+
+gNOTHING2NOTHING
 
 #################################################
 # Including models on top of data plots

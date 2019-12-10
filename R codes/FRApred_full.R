@@ -71,7 +71,7 @@ getArgs <- function(data, regiones) {
     return(sum(x))
   })
   
-  args <- args[args$sumFreq > 0, ]
+  args <- args[args$sumFreq > 4, ]
 
   print('Done!')
   return(args)

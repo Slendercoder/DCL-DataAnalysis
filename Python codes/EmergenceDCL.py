@@ -1,7 +1,7 @@
 # Class definition for solving "Seeking the unicorn" task
 # Edgar Andrade-Lotero 2019
 # Run with Python 3
-# Run from run_model.py
+# Run from main.py
 
 from random import choice, uniform, random, sample, randint
 from math import floor
@@ -415,7 +415,8 @@ class Experiment(object):
 		n = score
 
 		# Adding 'Win Stay'
-		attractiveness[i] += alpha * self.sigmoid(n, beta, gamma)
+		if i != 0:
+		          attractiveness[i] += alpha * self.sigmoid(n, beta, gamma)
 
 		if DEB:
 			attactPrint = ["%.3f" % v for v in attractiveness]
@@ -491,21 +492,23 @@ class Experiment(object):
 				data_file.write(str(nameRegion(newStrategy)) + '\n')
 			data_file.close()
 
-		# Determines if should not randomize RS
-		if newStrategy == 0:
-			# print('Determines if should randomize RS')
-			n = (s + 128) / 160 # normalizing score
-			beta = self.modelParameters[2] # amplitude of the sigmoid function
-			gamma = self.modelParameters[3] # position of the sigmoid function
-			if uniform(0,1) > self.sigmoid(n, beta, gamma):
-				# print('It should')
-				return newStrategy, False
-			else:
-				# print('It should not')
-				return newStrategy, True
-		else:
-			return newStrategy, False
-		# return newStrategy, False
+		return newStrategy
+
+		# # Determines if should not randomize RS
+		# if newStrategy == 0:
+		# 	# print('Determines if should randomize RS')
+		# 	n = (s + 128) / 160 # normalizing score
+		# 	beta = self.modelParameters[2] # amplitude of the sigmoid function
+		# 	gamma = self.modelParameters[3] # position of the sigmoid function
+		# 	if uniform(0,1) > self.sigmoid(n, beta, gamma):
+		# 		# print('It should')
+		# 		return newStrategy, False
+		# 	else:
+		# 		# print('It should not')
+		# 		return newStrategy, True
+		# else:
+		# 	return newStrategy, False
+		# # return newStrategy, False
 
 	def run_dyad(self):
 
@@ -682,28 +685,37 @@ class Experiment(object):
 			sc = []
 			a.append(Players[0].strategy)
 			sc.append(Players[0].score)
-			newStrategy, sameRS = self.chooseStrategy(Players[0].strategy, Players[0].score, both)
+			# newStrategy, sameRS = self.chooseStrategy(Players[0].strategy, Players[0].score, both)
+			newStrategy = self.chooseStrategy(Players[0].strategy, Players[0].score, both)
 			Players[0].strategy = newStrategy
 			# print('newStrategy:', newStrategy)
-			if not sameRS:
-				self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-				while len(self.strategies[0]) < 2 or len(self.strategies[0]) > 62:
-				                self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			while len(self.strategies[0]) < 2 or len(self.strategies[0]) > 62:
+                            self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
 
+			# if not sameRS:
+			# 	self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			# 	while len(self.strategies[0]) < 2 or len(self.strategies[0]) > 62:
+			# 	                self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
 			# else:
 			# 	print('Do not randomize for player 0')
 
 			a.append(Players[1].strategy)
 			sc.append(Players[1].score)
-			newStrategy, sameRS = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
+			# newStrategy, sameRS = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
+			newStrategy = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
 			# print('newStrategy:', newStrategy)
 			if newStrategy == 0:
 				newStrategy = 9
 			Players[1].strategy = newStrategy
-			if not sameRS:
-				self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-				while len(self.strategies[9]) < 2 or len(self.strategies[9]) > 62:
-				                self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			while len(self.strategies[9]) < 2 or len(self.strategies[9]) > 62:
+                            self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+
+			# if not sameRS:
+			# 	self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			# 	while len(self.strategies[9]) < 2 or len(self.strategies[9]) > 62:
+			# 	                self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
 			# else:
 			# 	print('Do not randomize for player 1')
 
