@@ -409,18 +409,20 @@ LAG = 1
 
 print("Finding the lag variables...")
 data['Norm_Score_LAG1'] = data.groupby(['Dyad', 'Player'])\
-                            ['Norm_Score'].transform('shift', LAG)
+                            ['Norm_Score'].transform('shift', 1)
 data['Consistency_LAG1'] = data.groupby(['Dyad', 'Player'])\
-                            ['Consistency'].transform('shift', LAG)
+                            ['Consistency'].transform('shift', 1)
 data['Dif_consist_LAG1'] = data.groupby(['Dyad', 'Player'])\
-                            ['Dif_consist'].transform('shift', LAG)
+                            ['Dif_consist'].transform('shift', 1)
 data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
-                            ['Joint'].transform('shift', LAG)
+                            ['Joint'].transform('shift', 1)
 data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
-                            ['Category'].transform('shift', -LAG)
+                            ['Category'].transform('shift', -1)
+data['RegionGo2'] = data.groupby(['Dyad', 'Player'])\
+                            ['Category'].transform('shift', -2)
 if '4' in lista:
     data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
-                            ['Similarity'].transform('shift', LAG)
+                            ['Similarity'].transform('shift', 1)
 
 outputFile = 'output.csv'
 data.to_csv(outputFile, index=False)

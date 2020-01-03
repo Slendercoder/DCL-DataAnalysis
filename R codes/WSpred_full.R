@@ -47,28 +47,26 @@ getArgs <- function(data) {
   # Prepare dataFrame with frequencies
 #  regions <- unique(data$Region)
   scores <- unique(data$Score)
+  # print(scores)
   
   # Create all combinations of regions, scores and joints
   args <- as.data.frame(expand.grid(i = regiones, s = scores))
-  head(args)
   args$pair <- apply(args, 1, function(x) list(as.character(x[1]), as.numeric(x[2])))
-  #length(args$pair)
-  #  of the fifth row, args$pair[5][[1]][1] is the region, args$pair[5][[1]][2] is the score
-  
+  #print(head(args))
+
   # Get the frequencies for each pair
   args$freq <- lapply(args$pair, function(x) {
     i <- as.character(x[[1]][1])
     s <- as.numeric(x[[2]][1])
     return(getFreq(i,s,data, regiones))
   })
+  # print(head(args))
+  args$sumFreq <- sapply(args$freq, sum)
   
-  # Get the sum of frequencies for each pair
-  args$sumFreq <- lapply(args$freq, function(x) {
-    return(sum(x))
-  })
-  
-#  args <- args[args$sumFreq > 0, ]
-  args <- args[args$sumFreq > 4, ]
+  args <- args[args$sumFreq > 0, ]
+  # print(head(args))
+
+  #  args <- args[args$sumFreq > 4, ]
   
   return(args)
 }

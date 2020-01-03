@@ -335,8 +335,8 @@ if Vid == 1:
                 # print "Trabajando con el jugador " + str(key)
                 tangulos = []
                 for j in range(0, Num_Loc * Num_Loc):
-                    x = int(j) % Num_Loc
-                    y = (int(j) - x) / Num_Loc
+                    x = int(int(j) % Num_Loc)
+                    y = int((int(j) - x) / Num_Loc)
                     # print "x: " + str(x + 1)
                     # print "y: " + str(y + 1)
                     colA = "a" + str(x + 1) + str(y + 1)

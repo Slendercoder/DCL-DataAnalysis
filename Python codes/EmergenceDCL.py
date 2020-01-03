@@ -23,6 +23,19 @@ TOLERANCIA = 1
 # Define function that initializes regions and strategies
 ############################################################
 
+def new_random_strategy(Num_Loc):
+    # Creates a new random strategy to explore grid
+    # The size of this new strategy is determined by
+    # a normal distribution with mean = 48 and s.d. = 4
+
+    m = 48
+    sd = 4
+    n = int(np.random.normal(48, 4))
+    while n < 2 or n > 62:
+        n = int(np.random.normal(48, 4))
+
+    return list(np.random.choice(Num_Loc * Num_Loc, n))
+
 def obtainPresentBlocks(x):
 
     global CONTADOR
@@ -155,10 +168,7 @@ def create_regions_and_strategies(Num_Loc):
 
 	strategies = {}
 
-	strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-	while len(strategies[0]) < 2 or len(strategies[0]) > 62:
-	       strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-
+	strategies[0] = new_random_strategy(Num_Loc)
 	strategies[1] = ALL
 	strategies[2] = NOTHING
 	strategies[3] = DOWN
@@ -167,9 +177,7 @@ def create_regions_and_strategies(Num_Loc):
 	strategies[6] = RIGHT
 	strategies[7] = IN
 	strategies[8] = OUT
-	strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-	while len(strategies[9]) < 2 or len(strategies[9]) > 62:
-	       strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+	strategies[9] = new_random_strategy(Num_Loc)
 
 	return [all, nothing, down, up, left, right, In, out], strategies
 
@@ -266,7 +274,7 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 11), "Model parameters incorrect length!"
+		assert(len(modelParameters) == 22), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 
@@ -373,16 +381,41 @@ class Experiment(object):
 	    # valor = np.min(np.array(distances))
 	    # return(valor)
 
-	def probabilities(self, i, score, j):
+	def probabilities(self, i, score, j, pl):
 
-		wALL = float(self.modelParameters[0])
-		wNOTHING = float(self.modelParameters[1])
-		wDOWN = float(self.modelParameters[2])
-		wUP = float(self.modelParameters[2])
-		wLEFT = float(self.modelParameters[2])
-		wRIGHT = float(self.modelParameters[2])
-		wIN = float(self.modelParameters[3])
-		wOUT = float(self.modelParameters[3])
+		if pl == 0:
+			wALL = float(self.modelParameters[0])
+			wNOTHING = float(self.modelParameters[1])
+			wDOWN = float(self.modelParameters[2])
+			wUP = float(self.modelParameters[2])
+			wLEFT = float(self.modelParameters[2])
+			wRIGHT = float(self.modelParameters[2])
+			wIN = float(self.modelParameters[3])
+			wOUT = float(self.modelParameters[3])
+			alpha = self.modelParameters[4] # for how much the focal region augments attractiveness
+			beta = self.modelParameters[5] # amplitude of the sigmoid function
+			gamma = self.modelParameters[6] # position of the sigmoid function
+			delta = self.modelParameters[7] # for how much the similarity to complement augments attractiveness
+			epsilon = self.modelParameters[8] # for similarity to complementary focal region
+			zeta = self.modelParameters[9] # for the steepness of the similarity to focal region
+			eta = self.modelParameters[10] # for the steepness of the similarity to complementary focal region
+		else:
+			wALL = float(self.modelParameters[11])
+			wNOTHING = float(self.modelParameters[12])
+			wDOWN = float(self.modelParameters[13])
+			wUP = float(self.modelParameters[13])
+			wLEFT = float(self.modelParameters[13])
+			wRIGHT = float(self.modelParameters[13])
+			wIN = float(self.modelParameters[14])
+			wOUT = float(self.modelParameters[14])
+			alpha = self.modelParameters[15] # for how much the focal region augments attractiveness
+			beta = self.modelParameters[16] # amplitude of the sigmoid function
+			gamma = self.modelParameters[17] # position of the sigmoid function
+			delta = self.modelParameters[18] # for how much the similarity to complement augments attractiveness
+			epsilon = self.modelParameters[19] # for similarity to complementary focal region
+			zeta = self.modelParameters[20] # for the steepness of the similarity to focal region
+			eta = self.modelParameters[21] # for the steepness of the similarity to complementary focal region
+
 		bias = [0, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
 		# print('biases:', bias)
 		# print('sum', np.sum(bias))
@@ -392,13 +425,6 @@ class Experiment(object):
 		bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
 		# biasPrint = ["%.2f" % v for v in bias]
 		# print('bias: ', biasPrint)
-		alpha = self.modelParameters[4] # for how much the focal region augments attractiveness
-		beta = self.modelParameters[5] # amplitude of the sigmoid function
-		gamma = self.modelParameters[6] # position of the sigmoid function
-		delta = self.modelParameters[7] # for how much the similarity to complement augments attractiveness
-		epsilon = self.modelParameters[8] # for similarity to complementary focal region
-		zeta = self.modelParameters[9] # for the steepness of the similarity to focal region
-		eta = self.modelParameters[10] # for the steepness of the similarity to complementary focal region
 
 		regionsCoded = self.regions
 		strategies = self.strategies
@@ -463,14 +489,14 @@ class Experiment(object):
 
 		return probs
 
-	def chooseStrategy(self, i, s, j):
+	def chooseStrategy(self, i, s, j, pl):
 		# Returns the next region according to biases
 		# Input: i, which is the region that the player is in
 		#		 s, which is the player's score
 		#		 j, which is the overlapping region with the other player
 
 		# get the probability vector
-		probs = self.probabilities(i, s, j)
+		probs = self.probabilities(i, s, j, pl)
 
 		if DEB:
 			probsPrint = ["%.3f" % v for v in probs]
@@ -686,12 +712,10 @@ class Experiment(object):
 			a.append(Players[0].strategy)
 			sc.append(Players[0].score)
 			# newStrategy, sameRS = self.chooseStrategy(Players[0].strategy, Players[0].score, both)
-			newStrategy = self.chooseStrategy(Players[0].strategy, Players[0].score, both)
+			newStrategy = self.chooseStrategy(Players[0].strategy, Players[0].score, both, 0)
 			Players[0].strategy = newStrategy
 			# print('newStrategy:', newStrategy)
-			self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-			while len(self.strategies[0]) < 2 or len(self.strategies[0]) > 62:
-                            self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			self.strategies[0] = new_random_strategy(Num_Loc)
 
 			# if not sameRS:
 			# 	self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
@@ -703,14 +727,12 @@ class Experiment(object):
 			a.append(Players[1].strategy)
 			sc.append(Players[1].score)
 			# newStrategy, sameRS = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
-			newStrategy = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
+			newStrategy = self.chooseStrategy(Players[1].strategy, Players[1].score, both, 1)
 			# print('newStrategy:', newStrategy)
 			if newStrategy == 0:
 				newStrategy = 9
 			Players[1].strategy = newStrategy
-			self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-			while len(self.strategies[9]) < 2 or len(self.strategies[9]) > 62:
-                            self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
+			self.strategies[9] = new_random_strategy(Num_Loc)
 
 			# if not sameRS:
 			# 	self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))

@@ -3,7 +3,10 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/Dyads/output-356-137.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Dyads/output-356-137PL2.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/Dyads/output-356-137PL1.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
@@ -51,7 +54,7 @@ fitresWSLS <- nmkb(par=c(wAll, wNoth, wLef, wIn, alpha, beta, gamma),
 
 beep()
 print(fitresWSLS$value) 
-imprimir(fitresWSLS$par) 
+imprimir(fitresWSLS$par)
 cat('wALL', fitresWSLS$par[1], 
     'wNOTHING', fitresWSLS$par[2],
     '\nwLEFT', fitresWSLS$par[3],
@@ -61,7 +64,7 @@ cat('wALL', fitresWSLS$par[1],
     'gamma', fitresWSLS$par[7]) 
 
 dev <-fitresWSLS$value 
-dev # 2289
+dev
 
 aic <- 2*4 + dev
 aic # 2297
