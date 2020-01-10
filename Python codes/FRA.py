@@ -1,4 +1,3 @@
-print('Importing packages...')
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -234,11 +233,8 @@ def dibuja_regiones(reg1, reg2, Num_Loc, titulo):
 def sigmoid(x, beta, gamma):
 	return 1. / (1 + np.exp(-beta * (x - gamma)))
 
-def code2Vector(strategy):
+def code2Vector(strategy, Num_Loc):
 
-    global gameParameters
-
-    Num_Loc = gameParameters[2]
     size = int(Num_Loc * Num_Loc)
     v = [0] * size
 
@@ -284,20 +280,6 @@ def dist(k, i):
     dif = np.subtract(k, i)
     squares = np.multiply(dif, dif)
     return(np.sqrt(np.sum(squares)))
-
-def sim_consist(v1, v2):
-	# Returns the similarity based on consistency
-	# v1 and v2 are two 64-bit coded regions
-
-	assert(len(v1) == 64), 'v1 must be a 64-bit coded region!'
-	assert(len(v2) == 64), 'v2 must be a 64-bit coded region!'
-
-	joint = [v1[x] * v2[x] for x in range(len(v1))]
-	union = [v1[x] + v2[x] for x in range(len(v1))]
-	union = [x/x for x in union if x != 0]
-	j = np.sum(np.array(joint))
-	u = np.sum(np.array(union))
-	return float(j)/u
 
 def maxSim2Focal(r, regionsCoded, eta):
     # Returns closest distance to focal region
@@ -420,8 +402,7 @@ def probabilities(iV, i, score, j, pl):
 	simils = [0] * 9
 	for k in range(1,9): # do not consider 'rs'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
-		# similarity = simil(iV, kCoded, eta)
-		similarity = sim_consist(iV, kCoded)
+		similarity = simil(iV, kCoded, eta)
 		# print('Similarity to', nameRegion(k), similarity)
 		simils[k] = similarity
 	#
@@ -443,8 +424,7 @@ def probabilities(iV, i, score, j, pl):
 	for k in range(2,9): # do not consider 'rs' or 'all'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 		kComp = [1 - x for x in kCoded]
-		# similarity = simil(jV, kComp, epsilon)
-		similarity = sim_consist(jV, kComp)
+		similarity = simil(jV, kComp, epsilon)
 		# print('Similarity to complement of', nameRegion(k), similarity)
 		simils[k] = similarity
 	#
@@ -504,54 +484,3 @@ def list_from_row(r, cols):
         lista.append(list(r[c])[0])
 
     return lista
-
-#########################################################################
-# INSTRUCTIONS
-#########################################################################
-
-# modelParameters = [400, 1, 1, 20, 1, 200, 500, 32, 1000, 0.2, 100, 0.2, 100] #PL1
-modelParameters = [100, 1, 1, 20, 1, 200, 500, 32, 100, 0.2, 100, 0.2, 100] #PL2
-
-data = pd.read_csv('humans.csv')
-print('Data loaded!')
-# print(data[['Dyad', 'Player', 'Score']][:3])
-
-dyad = '435-261'
-
-data = pd.DataFrame(data.groupby('Dyad').get_group(dyad))
-
-# print(data[:10])
-
-regionsCoded, strategies = create_regions_and_strategies(Num_Loc)
-
-# for i in range(len(regionsCoded)):
-# 	print(nameRegion(i + 1))
-# 	imprime_region(regionsCoded[i])
-
-# player = dyad + 'PL1'
-player = dyad + 'PL2'
-dataPL1 = pd.DataFrame(data.groupby('Player').get_group(player))
-dataPL1 = dataPL1[1:6]
-
-# player = dyad + 'PL2'
-player = dyad + 'PL1'
-dataPL2 = pd.DataFrame(data.groupby('Player').get_group(player))
-dataPL2 = dataPL2[1:6]
-
-cols = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-
-for key, grp in dataPL1.groupby('Round'):
-    print('\nThis is the end of round', key)
-    region = list(grp['Category'])[0]
-    categoria = numberRegion(region)
-    print('The visited region was', str(region), '(Category', str(categoria) + ')')
-    grp_otro = dataPL2.groupby('Round').get_group(key)
-    regionPL1 = list_from_row(grp, cols)
-    regionPL2 = list_from_row(grp_otro, cols)
-    joint = [regionPL1[i] * regionPL2[i] for i in range(len(regionPL1))]
-    # print(joint)
-    # imprime_region(regionPL1)
-    score = list(grp['Score'])[0]
-    print('The score was', score)
-    n = chooseStrategy(regionPL1, categoria, score, joint, 0)
-    print('The new strategy is', str(n), '(' + str(nameRegion(n)) + ')')

@@ -285,20 +285,6 @@ def dist(k, i):
     squares = np.multiply(dif, dif)
     return(np.sqrt(np.sum(squares)))
 
-def sim_consist(v1, v2):
-	# Returns the similarity based on consistency
-	# v1 and v2 are two 64-bit coded regions
-
-	assert(len(v1) == 64), 'v1 must be a 64-bit coded region!'
-	assert(len(v2) == 64), 'v2 must be a 64-bit coded region!'
-
-	joint = [v1[x] * v2[x] for x in range(len(v1))]
-	union = [v1[x] + v2[x] for x in range(len(v1))]
-	union = [x/x for x in union if x != 0]
-	j = np.sum(np.array(joint))
-	u = np.sum(np.array(union))
-	return float(j)/u
-
 def maxSim2Focal(r, regionsCoded, eta):
     # Returns closest distance to focal region
     # Input: r, which is a region coded as a vector of 0s and 1s of length 64
@@ -420,8 +406,7 @@ def probabilities(iV, i, score, j, pl):
 	simils = [0] * 9
 	for k in range(1,9): # do not consider 'rs'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
-		# similarity = simil(iV, kCoded, eta)
-		similarity = sim_consist(iV, kCoded)
+		similarity = simil(iV, kCoded, eta)
 		# print('Similarity to', nameRegion(k), similarity)
 		simils[k] = similarity
 	#
@@ -443,8 +428,7 @@ def probabilities(iV, i, score, j, pl):
 	for k in range(2,9): # do not consider 'rs' or 'all'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 		kComp = [1 - x for x in kCoded]
-		# similarity = simil(jV, kComp, epsilon)
-		similarity = sim_consist(jV, kComp)
+		similarity = simil(jV, kComp, epsilon)
 		# print('Similarity to complement of', nameRegion(k), similarity)
 		simils[k] = similarity
 	#

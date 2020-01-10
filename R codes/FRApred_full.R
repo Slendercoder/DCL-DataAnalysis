@@ -2,10 +2,8 @@ source('ClassifyRegions.R')
 
 specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
 imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
-
 sigmoid <- function(x, beta, gamma) {
   # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
-  
   return(1 / (1 + exp(-beta * (x - gamma))))
 }
 
@@ -18,29 +16,6 @@ regiones <- c('RS',
               'RIGHT', 
               'IN', 
               'OUT')
-
-# USING scoreLevel
-getFreq <- function(i, s, j, df) {
-  # Obtains the requencies vector for each score s and overlapping region j
-  # Input: i, which is the region the player is in
-  #        s, which is the player's scoreLevel on the round
-  #        j, the overlapping region from players' strategies
-  #        df, the dataframe from which the observations are obtained
-  # Output: Frequency vector of length 9
-  
-  #  print(regiones)
-  df$RegionGo <- factor(df$RegionGo, levels = regiones, ordered = TRUE)
-  #  print(levels(df$RegionGo))
-  
-  regs <- df[which(df$Region == i), ]
-  scores <- regs[which(regs$Score == s), ]
-  regsGo <- scores$RegionGo[which(scores$RJcode == j)]
-  auxDF <- t(as.data.frame(table(regsGo)))
-  colnames(auxDF) <- as.character(unlist(auxDF[1, ])) # the first row will be the header
-  auxDF <- auxDF[-1, ]          # removing the first row.
-  auxDF <- auxDF[regiones]
-  return(as.numeric(auxDF[1:9]))
-}
 
 getArgs <- function(data, regiones) {
   # Prepare dataFrame with frequencies
@@ -78,7 +53,7 @@ getArgs <- function(data, regiones) {
   
 }
 
-FRApred <- function(i, s, j, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones){
+FRApred <- function(i, s, j, wRS, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones){
   # Returns the transition probability vector
   # Each position in the vector represents a region
   # and the value represents the probability of going to that region
@@ -100,59 +75,27 @@ FRApred <- function(i, s, j, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, 
 #  }
 
   # First we calculate the prior probabilities
-  # w[1] is the probability of region 'ALL' and 'NOTHING'
-  # w[2] is the probability of regions 'DOWN', 'UP', 'LEFT', 'RIGHT'
-  # w[3] is the probability of regions 'IN', 'OUT'
+  # w[1] is the probability of 'RS'
+  # w[2] is the probability of region 'ALL'
+  # w[3] is the probability of region 'NOTHING'
+  # w[4] is the probability of regions 'DOWN', 'UP', 'LEFT', 'RIGHT'
+  # w[5] is the probability of regions 'IN', 'OUT'
 #  aux <- rep(w, 8)
-  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
-  # The probability of region 'RS' is 1 - the sum of the other probabilities
-  if (sum(aux) > 1) {
-    aux <- aux/sum(aux)
-  }
-  bias <- c(1 - sum(aux), aux)
+  aux <- c(wRS, wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
 #  print("bias")
 #  imprimir(bias)
-  
-#  n <- (s + 128) / 160 # Normalizing score
-  n <- s
   
   # Find the attractivenes:
   attractiveness <- bias # Start from bias
 
-  # Add attractiveness to current region according to score
+  # Add win stay only to focal regions
   index <- which(regiones == i)
 #  print('i')
 #  print(regionsCoded[index - 1])
-  # adding win stay only to focal regions
   if (i != 'RS') {
-    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
   }
 #  print('Attractiveness with WS:')
-#  imprimir(attractiveness)
-  
-#  print(attractiveness)
-  
-  # Consider distance from j to complementary k and augment attractiveness
-  jV <- code2Vector(j)
-#  print("jV")
-#  print(jV)
-  kVcompVector <- lapply(regiones[3:9], function(k) {
-    index <- which(regiones == k)
-    kCoded <- regionsCoded[index - 1] # regionsCoded does not have 'RS'
-#    print('kCoded')
-#    print(kCoded)
-    kVComp <- 1 - code2Vector(kCoded)
-  })
-  similarity2Complement <- lapply(kVcompVector, function(x) {
-    simil(jV, x, eta) 
-  })
-  similarity2Complement <- as.numeric(unlist(similarity2Complement))
-  similarity2Complement <- c(0, 0, similarity2Complement)
-#  print('Similarity to complement:')
-#  imprimir(similarity2Complement)
-  
-  attractiveness <- attractiveness + delta * similarity2Complement
-#  print('Attractiveness to complement:')
 #  imprimir(attractiveness)
 
   # Consider distance from i to each focal region k and augment attractiveness
@@ -176,19 +119,32 @@ FRApred <- function(i, s, j, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, 
   }
 #  print('Similarity to region:')
 #  imprimir(similarities)
-#  print('Final attractiveness:')
+#  print('Attractiveness to focal regions:')
 #  imprimir(attractiveness)
+
+  # Consider distance from j to complementary k and augment attractiveness
+  jV <- code2Vector(j)
+  #  print("jV")
+  #  print(jV)
+  kVcompVector <- lapply(regiones[3:9], function(k) {
+    index <- which(regiones == k)
+    kCoded <- regionsCoded[index - 1] # regionsCoded does not have 'RS'
+    #    print('kCoded')
+    #    print(kCoded)
+    kVComp <- 1 - code2Vector(kCoded)
+  })
+  similarity2Complement <- lapply(kVcompVector, function(x) {
+    simil(jV, x, eta) 
+  })
+  similarity2Complement <- as.numeric(unlist(similarity2Complement))
+  similarity2Complement <- c(0, 0, similarity2Complement)
+  #  print('Similarity to complement:')
+  #  imprimir(similarity2Complement)
   
-  
-#  negative <- which(attractiveness < 0)
-#  if (length(negative) > 0) {
-#    print('Error: attractiveness negative')
-#    print(attractiveness)
-#    for (k in negative) {
-#      attractiveness[k] <- 0.00001
-#    }
-#  }
-  
+  attractiveness <- attractiveness + delta * similarity2Complement
+  #  print('Attractiveness to complement:')
+  #  imprimir(attractiveness)
+
   probs <- attractiveness / sum(attractiveness)
   return(probs)
 }
