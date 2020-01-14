@@ -105,7 +105,7 @@ dataPL1 = pd.DataFrame(data.groupby('Player').get_group(player))
 dataPL1['FRASim'] = dataPL1.apply(lambda x: find_FRAsim(x), axis=1)
 # print(dataPL1[['index', 'SimFocalGO']])
 
-data = dataPL1[['Round', 'Category', 'RegionGo', 'FRASim']]
+data = dataPL1[['Round', 'Category', 'RegionGo', 'Score', 'FRASim']]
 print(data)
 
 # print(dataPL1.columns)
