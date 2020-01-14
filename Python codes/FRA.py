@@ -16,6 +16,16 @@ Num_Loc = 8
 DEB = True
 IMPR = False
 
+regionsCoded = ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:', # ALL
+                  '', # NOTHING
+                  'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # DOWN
+                  'abcdefghijklmnopqrstuvwxyzABCDEF', # UP
+                  'abcdijklqrstyzABGHIJOPQRWXYZ4567', # LEFT
+                  'efghmnopuvwxCDEFKLMNSTUV012389;:', # RIGHT
+                  'jklmnorstuvwzABCDEHIJKLMPQRSTUXYZ012', # IN
+                  'abcdefghipqxyFGNOVW3456789;:' # OUT
+                  ]
+
 ###########################################################
 # FUNCTIONS
 ###########################################################
@@ -233,6 +243,16 @@ def dibuja_regiones(reg1, reg2, Num_Loc, titulo):
 def sigmoid(x, beta, gamma):
 	return 1. / (1 + np.exp(-beta * (x - gamma)))
 
+def lettercode2Strategy(coded, Num_Loc):
+
+	letras = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:')
+
+	v = []
+	for c in coded:
+		v.append(letras.index(c))
+
+	return v
+
 def code2Vector(strategy, Num_Loc):
 
     size = int(Num_Loc * Num_Loc)
@@ -268,6 +288,23 @@ def simil(k, i, o):
 
     return(np.exp(- o * distance))
 
+def sim_consist(v1, v2):
+	# Returns the similarity based on consistency
+	# v1 and v2 are two 64-bit coded regions
+
+	assert(len(v1) == 64), 'v1 must be a 64-bit coded region!'
+	assert(len(v2) == 64), 'v2 must be a 64-bit coded region!'
+
+	joint = [v1[x] * v2[x] for x in range(len(v1))]
+	union = [v1[x] + v2[x] for x in range(len(v1))]
+	union = [x/x for x in union if x != 0]
+	j = np.sum(np.array(joint))
+	u = np.sum(np.array(union))
+	if u != 0:
+		return float(j)/u
+	else:
+		return 1
+
 def dist(k, i):
     # Returns similarity between regions k and i
     # Input: k, which is a region coded as a vector of 0s and 1s of length 64
@@ -281,20 +318,33 @@ def dist(k, i):
     squares = np.multiply(dif, dif)
     return(np.sqrt(np.sum(squares)))
 
-def maxSim2Focal(r, regionsCoded, eta):
-    # Returns closest distance to focal region
+def maxSim2Focal(r):
+    # Returns maximum similarity (BASED ON CONSISTNECY) to focal region
     # Input: r, which is a region coded as a vector of 0s and 1s of length 64
-    # Output: number representing the closest distance
+    # Output: number representing the highest similarity
 
-    distances = [0] * 8
+    global Num_Loc
+
+    # imprime_region(r)
+    # print('\n')
+
+    similarities = [0] * 8
     contador = 0
 
     for k in regionsCoded:
-        # kV = self.code2Vector(k)
-        distances[contador] = self.simil(r, k, eta)
+        reg = lettercode2Strategy(k, Num_Loc)
+        kV = code2Vector(reg, Num_Loc)
+        # imprime_region(kV)
+        # finding similarity to COMPLEMENT
+        kComp = [1 - x for x in kV]
+        sss = sim_consist(r, kComp)
+        # print('Similarity to Comp Region', contador, ' is:', sss)
+        similarities[contador] = sss
         contador = contador + 1
 
-    valor = np.max(np.array(distances))
+    # simPrint = ["%.3f" % v for v in similarities]
+    # print('maxSim2Focal', simPrint)
+    valor = np.max(np.array(similarities))
     return(valor)
 
 def minDist2Focal(r, regionsCoded):
@@ -328,7 +378,242 @@ def minDist2Focal(r, regionsCoded):
     # valor = np.min(np.array(distances))
     # return(valor)
 
+def FRASim(r, joint, focal):
+    # Returns FRA similarity
+    # Input: r, which is a region coded as a vector of 0s and 1s of length 64
+    #        joint, which is a region coded as a vector of 0s and 1s of length 64
+    #        focal, which is a focal region coded as a vector of 0s and 1s of length 64
+    # Output: number representing FRA similarity
+
+    global Num_Loc
+
+    # print('Region')
+    # imprime_region(r)
+    # print('Joint')
+    # imprime_region(joint)
+    # print('Focal region')
+    # imprime_region(focal)
+
+    # finding similarity between r and focal
+    sss1 = sim_consist(r, focal)
+    # print('Similarity to Focal Region is:', sss1)
+
+    # finding similarity between Joint and Complement to focal
+	# first check whether focal is ALL (should not add similarity to complement here)
+    aux = [x for x in focal if x == 0]
+    if len(aux) == 0:
+    	# print('Ignore focal region ALL for similarity to complement')
+    	sss2 = 0
+    else:
+    	kComp = [1 - x for x in focal]
+    	sss2 = sim_consist(joint, kComp)
+    	# print('Similarity to Comp Focal Region is:', sss2)
+
+    return sss1 + sss2
+
+def maxFRASim(r, joint):
+    # Returns maximum FRA similarity
+    # Input: r, which is a region coded as a vector of 0s and 1s of length 64
+    #        joint, which is a region coded as a vector of 0s and 1s of length 64
+    # Output: number representing maximum FRA similarity
+
+    global Num_Loc
+
+    # print('Region')
+    # imprime_region(r)
+    # print('Joint')
+    # imprime_region(joint)
+
+    similarities = [0] * 8
+    contador = 0
+
+    for k in regionsCoded:
+        reg = lettercode2Strategy(k, Num_Loc)
+        kV = code2Vector(reg, Num_Loc)
+        similarities[contador] = FRASim(r, joint, kV)
+        contador = contador + 1
+
+    # simPrint = ["%.3f" % v for v in similarities]
+    # print('maxSim2Focal', simPrint)
+    valor = np.max(np.array(similarities))
+    return(valor)
+
 def probabilities(iV, i, score, j, pl):
+
+	global modelParameters
+
+	if pl == 0:
+		wALL = float(modelParameters[0])
+		wNOTHING = float(modelParameters[1])
+		wDOWN = float(modelParameters[2])
+		wUP = float(modelParameters[2])
+		wLEFT = float(modelParameters[2])
+		wRIGHT = float(modelParameters[2])
+		wIN = float(modelParameters[3])
+		wOUT = float(modelParameters[3])
+		alpha = float(modelParameters[4]) # for how much the focal region augments attractiveness
+		beta = float(modelParameters[5]) # amplitude of the WSLS sigmoid function
+		gamma = float(modelParameters[6]) # position of the WSLS sigmoid function
+		delta = float(modelParameters[7]) # for how much the added FRA similarities augments attractiveness
+		epsilon = float(modelParameters[8]) # amplitude of the FRA sigmoid function
+		zeta = float(modelParameters[9]) # position of the FRA sigmoid function
+	else:
+		wALL = float(modelParameters[10])
+		wNOTHING = float(modelParameters[11])
+		wDOWN = float(modelParameters[12])
+		wUP = float(modelParameters[12])
+		wLEFT = float(modelParameters[12])
+		wRIGHT = float(modelParameters[12])
+		wIN = float(modelParameters[13])
+		wOUT = float(modelParameters[13])
+		alpha = float(modelParameters[14]) # for how much the focal region augments attractiveness
+		beta = float(modelParameters[15]) # amplitude of the WSLS sigmoid function
+		gamma = float(modelParameters[16]) # position of the WSLS sigmoid function
+		delta = float(modelParameters[17]) # for how much the added FRA similarities augments attractiveness
+		epsilon = float(modelParameters[18]) # amplitude of the FRA sigmoid function
+		zeta = float(modelParameters[19]) # position of the FRA sigmoid function
+
+	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]))
+	assert(wRS > 0), "Incorrect biases!"
+	bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
+	# biasPrint = ["%.3f" % v for v in bias]
+	# print('bias: ', biasPrint)
+
+	# regionsCoded = regions
+	# strategies = strategies
+
+	# iV = code2Vector(strategies[i])
+	# print('iV')
+	# imprime_region(iV)
+	# print('i', i)
+	# if i==9: i = 0
+
+	attractiveness = [x for x in bias] # start from bias
+	if DEB:
+		attactPrint = ["%.3f" % v for v in attractiveness]
+		print('attractiveness before WS and FRA\n', attactPrint)
+
+	# n = (score + 128) / 160 # normalizing score
+	n = score
+
+	# Adding 'Win Stay'
+	if i != 0:
+	          attractiveness[i] += alpha * sigmoid(n, beta, gamma)
+
+	if DEB:
+		attactPrint = ["%.3f" % v for v in attractiveness]
+		print('attractiveness with WS\n', attactPrint)
+
+	# Calculating similarity to region
+	simils1 = [0] * 9
+	for k in range(1,9): # do not consider 'rs'
+		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
+		# similarity = simil(iV, kCoded, eta)
+		similarity = sim_consist(iV, kCoded)
+		# print('Similarity to', nameRegion(k), similarity)
+		simils1[k] = similarity
+	#
+	if DEB:
+		similsPrint = ["%.3f" % v for v in simils1]
+		print('Similarity to region\n', similsPrint)
+
+	# Adding similarity to complement
+	# jV = code2Vector(j)
+	jV = j
+	# print('Intersection:')
+	# imprime_region(jV)
+	simils2 = [0] * 9
+	for k in range(2,9): # do not consider 'rs' or 'all'
+		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
+		kComp = [1 - x for x in kCoded]
+		# similarity = simil(jV, kComp, epsilon)
+		similarity = sim_consist(jV, kComp)
+		# print('Similarity to complement of', nameRegion(k), similarity)
+		simils2[k] = similarity
+	#
+	if DEB:
+		similsPrint = ["%.3f" % v for v in simils2]
+		print('Similarity to complement\n', similsPrint)
+
+	simils = np.add(simils1, simils2)
+	simils = [delta * sigmoid(x, epsilon, zeta) for x in simils]
+	#
+	if DEB:
+		similsPrint = ["%.3f" % v for v in simils]
+		print('FRA similarity\n', similsPrint)
+
+	attractiveness = np.add(attractiveness, simils)
+
+	if DEB:
+		attactPrint = ["%.3f" % v for v in attractiveness]
+		print('final attractiveness\n', attactPrint)
+
+	sum = np.sum(attractiveness)
+	probs = [x/sum for x in attractiveness]
+
+	return probs
+
+def chooseStrategy(iV, i, s, j, pl):
+	# Returns the next region according to biases
+	# Input: i, which is the region that the player is in
+	#		 s, which is the player's score
+	#		 j, which is the overlapping region with the other player
+
+	# get the probability vector
+	probs = probabilities(iV, i, s, j, pl)
+
+	if DEB:
+		probsPrint = ["%.3f" % v for v in probs]
+		print('probs\n', probsPrint)
+	# print('Suma: ', np.sum(probs))
+
+	# get the selected strategy
+	# newStrategy = np.random.choice(range(9), p=probs)
+	newStrategy = np.argmax(probs)
+	# print('newStrategy', newStrategy)
+
+	if IMPR:
+		probsPrint = ["%.3f" % v for v in probs]
+		with open('fileFreqs.csv', 'a') as data_file:
+			data_file.write('AA,')
+			data_file.write('A,')
+			data_file.write(str(nameRegion(i)) + ',' + str(s) + ',')
+			for p in probsPrint:
+				data_file.write(str(p) + ',')
+			data_file.write(str(nameRegion(newStrategy)) + '\n')
+		data_file.close()
+
+	return newStrategy
+
+def list_from_row(r, cols):
+
+    lista = []
+    for c in cols:
+        lista.append(list(r[c])[0])
+
+    return lista
+
+
+#############################################################
+# PREVIOUS VERSIONS
+#############################################################
+def maxSim2FocalPREVIOUS(r):
+    # Returns maximum similarity to focal region
+    # Input: r, which is a region coded as a vector of 0s and 1s of length 64
+    # Output: number representing the closest distance
+
+    similarities = [0] * 8
+    contador = 0
+
+    for k in regionsCoded:
+        kV = code2Vector(k)
+        similarities[contador] = simil(r, kV, 1.2)
+        contador = contador + 1
+
+    valor = np.max(np.array(similarities))
+    return(valor)
+
+def probabilitiesPREVIOUS(iV, i, score, j, pl):
 
 	global modelParameters
 
@@ -444,43 +729,3 @@ def probabilities(iV, i, score, j, pl):
 	probs = [x/sum for x in attractiveness]
 
 	return probs
-
-def chooseStrategy(iV, i, s, j, pl):
-	# Returns the next region according to biases
-	# Input: i, which is the region that the player is in
-	#		 s, which is the player's score
-	#		 j, which is the overlapping region with the other player
-
-	# get the probability vector
-	probs = probabilities(iV, i, s, j, pl)
-
-	if DEB:
-		probsPrint = ["%.3f" % v for v in probs]
-		print('probs\n', probsPrint)
-	# print('Suma: ', np.sum(probs))
-
-	# get the selected strategy
-	# newStrategy = np.random.choice(range(9), p=probs)
-	newStrategy = np.argmax(probs)
-	# print('newStrategy', newStrategy)
-
-	if IMPR:
-		probsPrint = ["%.3f" % v for v in probs]
-		with open('fileFreqs.csv', 'a') as data_file:
-			data_file.write('AA,')
-			data_file.write('A,')
-			data_file.write(str(nameRegion(i)) + ',' + str(s) + ',')
-			for p in probsPrint:
-				data_file.write(str(p) + ',')
-			data_file.write(str(nameRegion(newStrategy)) + '\n')
-		data_file.close()
-
-	return newStrategy
-
-def list_from_row(r, cols):
-
-    lista = []
-    for c in cols:
-        lista.append(list(r[c])[0])
-
-    return lista

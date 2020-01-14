@@ -351,42 +351,38 @@ def probabilities(iV, i, score, j, pl):
 	global modelParameters
 
 	if pl == 0:
-		wRS = float(modelParameters[0])
-		wALL = float(modelParameters[1])
-		wNOTHING = float(modelParameters[2])
-		wDOWN = float(modelParameters[3])
-		wUP = float(modelParameters[3])
-		wLEFT = float(modelParameters[3])
-		wRIGHT = float(modelParameters[3])
-		wIN = float(modelParameters[4])
-		wOUT = float(modelParameters[4])
-		alpha = float(modelParameters[5]) # for how much the focal region augments attractiveness
-		beta = float(modelParameters[6]) # amplitude of the sigmoid function
-		gamma = float(modelParameters[7]) # position of the sigmoid function
-		delta = float(modelParameters[8]) # for how much the similarity to complement augments attractiveness
-		epsilon = float(modelParameters[9]) # for the steepness of the similarity to complementary focal region
-		zeta = float(modelParameters[10]) # for how much the similarity to focal region augments attractiveness
-		eta = float(modelParameters[11]) # for the steepness of the similarity to focal region
-		iota = float(modelParameters[12]) # for how much the winner takes all
+		wALL = float(modelParameters[0])
+		wNOTHING = float(modelParameters[1])
+		wDOWN = float(modelParameters[2])
+		wUP = float(modelParameters[2])
+		wLEFT = float(modelParameters[2])
+		wRIGHT = float(modelParameters[2])
+		wIN = float(modelParameters[3])
+		wOUT = float(modelParameters[3])
+		alpha = float(modelParameters[4]) # for how much the focal region augments attractiveness
+		beta = float(modelParameters[5]) # amplitude of the WSLS sigmoid function
+		gamma = float(modelParameters[6]) # position of the WSLS sigmoid function
+		delta = float(modelParameters[7]) # for how much the added FRA similarities augments attractiveness
+		epsilon = float(modelParameters[8]) # amplitude of the FRA sigmoid function
+		zeta = float(modelParameters[9]) # position of the FRA sigmoid function
 	else:
-		wRS = float(modelParameters[13])
-		wALL = float(modelParameters[14])
-		wNOTHING = float(modelParameters[15])
-		wDOWN = float(modelParameters[16])
-		wUP = float(modelParameters[16])
-		wLEFT = float(modelParameters[16])
-		wRIGHT = float(modelParameters[16])
-		wIN = float(modelParameters[17])
-		wOUT = float(modelParameters[17])
-		alpha = float(modelParameters[18]) # for how much the focal region augments attractiveness
-		beta = float(modelParameters[19]) # amplitude of the sigmoid function
-		gamma = float(modelParameters[20]) # position of the sigmoid function
-		delta = float(modelParameters[21]) # for how much the similarity to complement augments attractiveness
-		epsilon = float(modelParameters[22]) # for the steepness of the similarity to complementary focal region
-		zeta = float(modelParameters[23]) # for how much the similarity to focal region augments attractiveness
-		eta = float(modelParameters[24]) # for the steepness of the similarity to focal region
-		iota = float(modelParameters[25]) # for how much the winner takes all
+		wALL = float(modelParameters[10])
+		wNOTHING = float(modelParameters[11])
+		wDOWN = float(modelParameters[12])
+		wUP = float(modelParameters[12])
+		wLEFT = float(modelParameters[12])
+		wRIGHT = float(modelParameters[12])
+		wIN = float(modelParameters[13])
+		wOUT = float(modelParameters[13])
+		alpha = float(modelParameters[14]) # for how much the focal region augments attractiveness
+		beta = float(modelParameters[15]) # amplitude of the WSLS sigmoid function
+		gamma = float(modelParameters[16]) # position of the WSLS sigmoid function
+		delta = float(modelParameters[17]) # for how much the added FRA similarities augments attractiveness
+		epsilon = float(modelParameters[18]) # amplitude of the FRA sigmoid function
+		zeta = float(modelParameters[19]) # position of the FRA sigmoid function
 
+	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]))
+	assert(wRS > 0), "Incorrect biases!"
 	bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
 	# biasPrint = ["%.3f" % v for v in bias]
 	# print('bias: ', biasPrint)
@@ -416,50 +412,54 @@ def probabilities(iV, i, score, j, pl):
 		attactPrint = ["%.3f" % v for v in attractiveness]
 		print('attractiveness with WS\n', attactPrint)
 
-	# Adding similarity to region
-	simils = [0] * 9
+	# Calculating similarity to region
+	simils1 = [0] * 9
 	for k in range(1,9): # do not consider 'rs'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 		# similarity = simil(iV, kCoded, eta)
 		similarity = sim_consist(iV, kCoded)
 		# print('Similarity to', nameRegion(k), similarity)
-		simils[k] = similarity
+		simils1[k] = similarity
 	#
 	if DEB:
-		similsPrint = ["%.3f" % v for v in simils]
+		similsPrint = ["%.3f" % v for v in simils1]
 		print('Similarity to region\n', similsPrint)
-
-	attractiveness += np.multiply(zeta, simils)
-	if DEB:
-		attactPrint = ["%.3f" % v for v in attractiveness]
-		print('Attractiveness to region\n', attactPrint)
 
 	# Adding similarity to complement
 	# jV = code2Vector(j)
 	jV = j
 	# print('Intersection:')
 	# imprime_region(jV)
-	simils = [0] * 9
+	simils2 = [0] * 9
 	for k in range(2,9): # do not consider 'rs' or 'all'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 		kComp = [1 - x for x in kCoded]
 		# similarity = simil(jV, kComp, epsilon)
 		similarity = sim_consist(jV, kComp)
 		# print('Similarity to complement of', nameRegion(k), similarity)
-		simils[k] = similarity
+		simils2[k] = similarity
+	#
+	if DEB:
+		similsPrint = ["%.3f" % v for v in simils2]
+		print('Similarity to complement\n', similsPrint)
+
+	simils = np.add(simils1, simils2)
+	if DEB:
+		similsPrint = ["%.3f" % v for v in simils]
+		print('FRA Similarity\n', similsPrint)
+
+	simils = [delta * sigmoid(x, epsilon, zeta) for x in simils]
 	#
 	if DEB:
 		similsPrint = ["%.3f" % v for v in simils]
-		print('Similarity to complement\n', similsPrint)
+		print('Delta * sigmoid of FRA similarity\n', similsPrint)
 
-	attractiveness += np.multiply(delta, simils)
+	attractiveness = np.add(attractiveness, simils)
 
 	if DEB:
 		attactPrint = ["%.3f" % v for v in attractiveness]
 		print('final attractiveness\n', attactPrint)
 
-
-	attractiveness = [x**iota for x in attractiveness]
 	sum = np.sum(attractiveness)
 	probs = [x/sum for x in attractiveness]
 
@@ -509,8 +509,8 @@ def list_from_row(r, cols):
 # INSTRUCTIONS
 #########################################################################
 
-# modelParameters = [400, 1, 1, 20, 1, 200, 500, 32, 1000, 0.2, 100, 0.2, 100] #PL1
-modelParameters = [100, 1, 1, 20, 1, 200, 500, 32, 100, 0.2, 100, 0.2, 100] #PL2
+modelParameters = [0.1, 0.1, 0.1, 0.1, 200, 500, 32, 200, 500, 0.7] #PL1
+# modelParameters = [100, 1, 1, 20, 1, 200, 500, 32, 100, 0.2, 100, 0.2, 100] #PL2
 
 data = pd.read_csv('humans.csv')
 print('Data loaded!')
@@ -528,15 +528,18 @@ regionsCoded, strategies = create_regions_and_strategies(Num_Loc)
 # 	print(nameRegion(i + 1))
 # 	imprime_region(regionsCoded[i])
 
-# player = dyad + 'PL1'
-player = dyad + 'PL2'
-dataPL1 = pd.DataFrame(data.groupby('Player').get_group(player))
-dataPL1 = dataPL1[1:6]
+desde = 0
+hasta = 1
 
-# player = dyad + 'PL2'
 player = dyad + 'PL1'
+# player = dyad + 'PL2'
+dataPL1 = pd.DataFrame(data.groupby('Player').get_group(player))
+dataPL1 = dataPL1[desde:hasta]
+
+player = dyad + 'PL2'
+# player = dyad + 'PL1'
 dataPL2 = pd.DataFrame(data.groupby('Player').get_group(player))
-dataPL2 = dataPL2[1:6]
+dataPL2 = dataPL2[desde:hasta]
 
 cols = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
 
@@ -550,7 +553,7 @@ for key, grp in dataPL1.groupby('Round'):
     regionPL2 = list_from_row(grp_otro, cols)
     joint = [regionPL1[i] * regionPL2[i] for i in range(len(regionPL1))]
     # print(joint)
-    # imprime_region(regionPL1)
+    imprime_region(regionPL1)
     score = list(grp['Score'])[0]
     print('The score was', score)
     n = chooseStrategy(regionPL1, categoria, score, joint, 0)

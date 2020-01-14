@@ -198,7 +198,21 @@ def simil(k, i, o):
     distance = dist(k, i)
     return(np.exp(- o * distance))
 
-def maxSim2Focal(r):
+def sim_consist(v1, v2):
+	# Returns the similarity based on consistency
+	# v1 and v2 are two 64-bit coded regions
+
+	assert(len(v1) == 64), 'v1 must be a 64-bit coded region!'
+	assert(len(v2) == 64), 'v2 must be a 64-bit coded region!'
+
+	joint = [v1[x] * v2[x] for x in range(len(v1))]
+	union = [v1[x] + v2[x] for x in range(len(v1))]
+	union = [x/x for x in union if x != 0]
+	j = np.sum(np.array(joint))
+	u = np.sum(np.array(union))
+	return float(j)/u
+
+def maxSim2FocalPREVIOUS(r):
     # Returns maximum similarity to focal region
     # Input: r, which is a region coded as a vector of 0s and 1s of length 64
     # Output: number representing the closest distance
@@ -209,6 +223,22 @@ def maxSim2Focal(r):
     for k in regionsCoded:
         kV = code2Vector(k)
         similarities[contador] = simil(r, kV, 1.2)
+        contador = contador + 1
+
+    valor = np.max(np.array(similarities))
+    return(valor)
+
+def maxSim2Focal(r):
+    # Returns maximum similarity (BASED ON CONSISTNECY) to focal region
+    # Input: r, which is a region coded as a vector of 0s and 1s of length 64
+    # Output: number representing the highest similarity
+
+    similarities = [0] * 8
+    contador = 0
+
+    for k in regionsCoded:
+        kV = code2Vector(k)
+        similarities[contador] = sim_consist(r, kV)
         contador = contador + 1
 
     valor = np.max(np.array(similarities))
@@ -392,7 +422,7 @@ if '4' in lista:
     # --------------------------------------------------
     # Finding distance to closest focal region per round, per player
     # --------------------------------------------------
-    print("Finding distances to focal paths (please be patient)...")
+    print("Finding distances to focal regions (please be patient)...")
 
     # Deterimining list of columns
     cols1 = ['a' + str(i) + str(j) \

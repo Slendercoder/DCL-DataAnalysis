@@ -8,63 +8,48 @@ import FRA
 ###########################################################
 
 Num_Loc = 8
-regionsCoded, strategies = FRA.create_regions_and_strategies(Num_Loc)
-epsilon = 0.2
-eta = 0.2
+regions, strategies = FRA.create_regions_and_strategies(Num_Loc)
 
 ###########################################################
 # FUNCTIONS
 ###########################################################
 
-def find_sim(x):
+def find_FRAsim(x):
 	# Finds the similarity to RegionGo
 
-	global regionsCoded
-	global epsilon
+	global regions
+
+	categoria_nombre = x['RegionGo']
+	# print('categoria', categoria_nombre)
+	categoria_numero = FRA.numberRegion(categoria_nombre)
+	# print('categoria', categoria_numero)
+
+	if categoria_numero == None:
+		return np.nan
 
 	cols = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
 	reg = list(x[cols])
+	# print('Region')
 	# FRA.imprime_region(reg)
-	categoria_nombre = x['RegionGo']
-	# print('categoria', categoria_nombre)
+
+	joint = x['JointRegion']
+	joint = FRA.lettercode2Strategy(joint, Num_Loc)
+	joint = FRA.code2Vector(joint, Num_Loc)
+	# print('Joint')
+	# FRA.imprime_region(joint)
+
 	if categoria_nombre == 'RS':
-		return x['Similarity']
+		return FRA.maxFRASim(reg, joint)
 	else:
-		categoria_numero = FRA.numberRegion(categoria_nombre)
-		# print('categoria', categoria_numero)
-		regFocal = regionsCoded[categoria_numero - 1]
-		# FRA.imprime_region(reg)
-		return FRA.simil(reg, regFocal, epsilon)
-
-def find_sim_comp(x):
-	# Finds the similarity between joint and RegionGo
-
-	global eta
-
-	categoria_nombre = x['RegionGo']
-	# print('categoria', categoria_nombre)
-	if categoria_nombre == 'RS':
-		return 0
-	else:
-		joint = x['JointRegion']
-		v = []
-		for c in joint:
-			v.append(ord(c) - 65)
-
-		# print('v', v)
-		v = FRA.code2Vector(v, Num_Loc)
-		FRA.imprime_region(v)
-		cols = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-		categoria_numero = FRA.numberRegion(categoria_nombre)
-		print('categoria', categoria_numero)
-		regFocal = regionsCoded[categoria_numero - 1]
-		FRA.imprime_region(regFocal)
-		return FRA.simil(v, regFocal, eta)
+		regFocal = regions[categoria_numero - 1]
+		# FRA.imprime_region(regFocal)
+		return FRA.FRASim(reg, joint, regFocal)
 
 def vector2Code(v):
 	# Returns the coded vector out of a 64-bite region
 
-	letras = [chr(x) for x in range(65, 129)]
+	# letras = [chr(x) for x in range(65, 129)]
+	letras = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:')
 	a = ''
 	assert(len(v) == 64), 'Incorrect argument! Must be a 64-bite region'
 	for x in range(len(v)):
@@ -114,13 +99,18 @@ data['JointRegion'] = data['index'].map(dict)
 
 player = dyad + 'PL1'
 dataPL1 = pd.DataFrame(data.groupby('Player').get_group(player))
-dataPL1 = dataPL1[1:6]
+# dataPL1 = dataPL1[0:1]
 # print(dataPL1[['index', 'Category', 'RegionGo']])
 
-dataPL1['SimFocalGO'] = dataPL1.apply(lambda x: find_sim(x), axis=1)
+dataPL1['FRASim'] = dataPL1.apply(lambda x: find_FRAsim(x), axis=1)
 # print(dataPL1[['index', 'SimFocalGO']])
 
-dataPL1['SimJointGO'] = dataPL1.apply(lambda x: find_sim_comp(x), axis=1)
-print(dataPL1[['Round', 'SimFocalGO', 'JointRegion', 'SimJointGO']])
+print(dataPL1[['Round', 'Category', 'RegionGo', 'JointRegion', 'FRASim']])
 
 # print(dataPL1.columns)
+
+outputFile = 'fraFreqs.csv'
+data.to_csv(outputFile, index=False)
+print("Results saved to " + outputFile)
+
+print("Done!")
