@@ -39,11 +39,12 @@ def find_FRAsim(x):
 	# FRA.imprime_region(joint)
 
 	if categoria_nombre == 'RS':
-		return FRA.maxFRASim(reg, joint)
+		return float(round(FRA.maxFRASim(reg, joint), 4))
 	else:
 		regFocal = regions[categoria_numero - 1]
 		# FRA.imprime_region(regFocal)
-		return FRA.FRASim(reg, joint, regFocal)
+		sim = float(round(FRA.FRASim(reg, joint, regFocal), 4))
+		return sim
 
 def vector2Code(v):
 	# Returns the coded vector out of a 64-bite region

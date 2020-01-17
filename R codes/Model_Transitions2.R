@@ -176,7 +176,8 @@ head(df1)
 # Obtaining frequencies...
 ###############################################################################
 
-dfA <- df1[1:2, ]
+#dfA <- df1[1:2, ]
+dfA <- df1
 
 #########################################
 # Using Score
@@ -193,7 +194,7 @@ dfA$Freqs <- apply(dfA, 1, function(x) {
 #########################################
 # Using FRA similarity
 #########################################
-dfA$Freqs <- sapply(dfA, 1, function(x) {
+dfA$Freqs <- apply(dfA, 1, function(x) {
   i <- x[[1]][1]
   s <- x[[2]][1]
   k <- x[[3]][1]
@@ -201,12 +202,6 @@ dfA$Freqs <- sapply(dfA, 1, function(x) {
   print(x)
   return(getRelFreqFRA(i, s, k, dfA))
 })
-
-s <- dfA$FRASim[1]
-
-s <- 0.1315789
-typeof(s)
-dfA[dfA$FRASim == s, ]
 
 #########################################
 
@@ -222,7 +217,7 @@ beep()
 
 #min_score = -50
 min_score = -20
-#min_score = 0
+min_score = 0
 
 df_RS <- df[df$Region == 'RS', ]
 head(df_RS)
