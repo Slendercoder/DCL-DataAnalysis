@@ -14,13 +14,12 @@ get_legend<-function(myggplot){
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
   legend <- tmp$grobs[[leg]]
   return(legend)
-}
+} # end get_legend
 
-getRelFreq <- function(i, s, j, k, df) {
+getRelFreq <- function(i, s, k, df) {
   # Obtains the relative frequencies for transition from region i and score s to region k
   # Input: i, which is the region the player is currently in
-  #        s, which is the player's score obtained on the previous round
-  #        j, which is the overlapping region
+  #        s, which is the player's variable (either score or FRAsim) obtained on the previous round
   #        k, which is the region the player is going to
   #        df, the dataframe from which the observations are obtained
   # Output: Relative frequency
@@ -35,32 +34,88 @@ getRelFreq <- function(i, s, j, k, df) {
   } else {
     return(NA)
   }
-  
-  # auxDF <- t(as.data.frame(table(regsGo)))
-  #  print(auxDF)
-  # colnames(auxDF) <- as.character(unlist(auxDF[1, ])) # the first row will be the header
-  # auxDF <- auxDF[-1, ]          # removing the first row.
-  # auxDF <- auxDF[regiones]
-  # return(as.numeric(auxDF[1:9]))
-}
+
+} # end getRelFreq
 
 sigmoid <- function(x, beta, gamma) {
   # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
   
   return(1 / (1 + exp(-beta * (x - gamma))))
-}
+} # end sigmoid
+
+sim_consist <- function(v1, v2){
+
+  # Returns the similarity based on consistency
+  # v1 and v2 are two 64-bit coded regions
+  
+  joint <-  v1 * v2
+  union <- (v1 + v2)/(v1 + v2)
+  union[is.na(union)] <- 0 
+  j = sum(joint)
+  u = sum(union)
+  if (u != 0) {
+    return (j/u)
+  } else {
+    return(1)
+  }
+  
+} # end sim_consist
+
+FRAprob <- function(i, score, FRAsim, k, theta, regiones){
+  
+  # Returns the probability of region k according to FRA model
+  # Input:
+  # i, the region as a code between 0 and 9
+  # score, the player's score obtained in the previous round
+  # FRAsim, the player's FRA similarity obtained in the previous round
+  # k, the region (code between 0 and 9) with which the probability is calculated
+  # theta, parameter vector
+  # regiones, the region vector
+
+  wALL <- theta[1]
+  wNOTHING <- theta[2]
+  wLEFT <- theta[3]
+  wIN <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
+  aux <- c(wALL, wNOTHING, wLEFT, wLEFT, wLEFT, wLEFT, wIN, wIN)
+  
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  print("bias")
+  #  imprimir(bias)
+  
+  # Find the attractivenes:
+  attractiveness <- bias # Start from bias
+  
+  # Add attractiveness to current region according to score
+  #  if (i != 'RS') {
+  index <- which(regiones == i)
+  attractiveness[index] <- attractiveness[index] + alpha * sigmoid(score, beta, gamma) 
+  #  }
+
+  # Add attractiveness to k according to FRAsim
+  index <- which(regiones == k)
+  attractiveness[index] <- attractiveness[index] + delta * sigmoid(FRAsim, epsilon, zeta) 
+
+  probs <- attractiveness / sum(attractiveness)
+  #  probs <- replace(probs,probs<lowerEps2,lowerEps2)
+  #  probs <- replace(probs,probs>highEps2,highEps2)
+  
+  probab <- probs[which(regiones == k)]
+  
+  return(probab)
+
+} # end FRAprob
 
 WSprob <- function(i, s, k, theta, regiones){
-  
-  #  w <- theta[1]
-  #  alpha <- theta[2]
-  #  beta <- theta[3]
-  #  gamma <- theta[4]
-  #  delta <- theta[5]
-  #  epsilon <- theta[6]
-  #  zeta <- theta[7]
-  #  eta <- theta[8]
-  #  aux <- c(0.1, 0.15, 0.1, 0.1, 0.09, 0.09, 0.01, 0.01)*w
   
   wALL <- theta[1]
   wNOTHING <- theta[2]
@@ -102,14 +157,16 @@ WSprob <- function(i, s, k, theta, regiones){
   probab <- probs[which(regiones == k)]
   
   return(probab)
-}
+
+} # end WSprob
 
 #####################################################
 # Global variables
 #####################################################
 
 # Estimated parameters:
-theta <- c(0.094, 0.078, 0.017, 0.005, 10.619, 495.681, 29.002, 0, 0, 0, 0)
+#theta <- c(0.094, 0.078, 0.017, 0.005, 10.619, 495.681, 29.002, 0, 0, 0, 0)
+theta <- c(0.1, 0.1, 0.1, 0.1, 200, 500, 32, 200, 500, 0.7)
 
 regiones <- c('RS',
               'ALL', 
@@ -125,17 +182,20 @@ regiones <- c('RS',
 # Loading database
 ###############################################################################
 
-df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/fraFreqs.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
 df1 <- df1[complete.cases(df1), ]
-df1 <- df1[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
-head(df1[, 3:6])
+#df1 <- df1[c('Dyad', 'Player', 'Is_there', 'Region', 'Score', 'RegionGo')]
+df1 <- df1[c('Region', 'Score', 'RegionGo', 'FRASim')]
+head(df1)
 
 ###############################################################################
 # Obtaining frequencies...
 ###############################################################################
 
-dfA <- df1[, 3:6]
+#dfA <- df1[, 3:6]
+dfA <- df1
 dfA$Freqs <- apply(dfA, 1, function(x) {
   i <- as.character(x[[2]][1])
   s <- as.numeric(x[[3]][1])
