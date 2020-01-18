@@ -1,9 +1,9 @@
-library(stats4)
-library(bbmle)
-library(dplyr)
+#library(stats4)
+#library(bbmle)
+#library(dplyr)
 library(ggplot2)
 library(gridExtra)
-library(beepr)
+#library(beepr)
 
 #####################################################
 # Definitions
@@ -173,10 +173,19 @@ beep()
 ###############################################################################
 
 df_RS <- df[df$Region == 'RS', ]
+#df_RS <- df_RS[df_RS$RegionGo != 'RS', ]
+df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
+df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
+df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
+#df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
+df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
+df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
 head(df_RS)
 
 gRS <- ggplot() +
-  geom_point(aes(x = FRASim, y = Freqs, color=RegionGo), df_RS, alpha = 0.4, size=1.5) +
+  geom_point(aes(x = FRASim, y = Freqs, color=RegionGo), df_RS, alpha = 0.5, size=1.5) +
   scale_x_continuous(limits = c(0, 1.01)) + 
   scale_y_continuous(limits = c(0, 1.01)) + 
   xlab("FRASim to RIGHT") +

@@ -1,8 +1,7 @@
 # Class definition for solving "Seeking the unicorn" task
-# Edgar Andrade-Lotero 2020
+# Edgar Andrade-Lotero 2019
 # Run with Python 3
 # Run from main.py
-# Requires FRA.py
 
 from random import choice, uniform, random, sample, randint
 from math import floor
@@ -10,20 +9,32 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import FRA
 
 DEB = False
 IMPR = False
-TO_FILE = False
+TOLERANCIA = 1
+TO_FILE = True
 
 CONTINUO = False
 CONTADOR = 1
 TOLERANCIA = 1
 
-#################################
-# Define some functions
-# to obtain measures
-################################
+############################################################
+# Define function that initializes regions and strategies
+############################################################
+
+def new_random_strategy(Num_Loc):
+    # Creates a new random strategy to explore grid
+    # The size of this new strategy is determined by
+    # a normal distribution with mean = 48 and s.d. = 4
+
+    m = 48
+    sd = 4
+    n = int(np.random.normal(48, 4))
+    while n < 2 or n > 62:
+        n = int(np.random.normal(48, 4))
+
+    return list(np.random.choice(Num_Loc * Num_Loc, n))
 
 def obtainPresentBlocks(x):
 
@@ -47,6 +58,195 @@ def nextScore(si, siLead, s, sLEAD):
         return sLEAD
     else:
         return s
+
+def calcula_consistencia(x, y):
+    joint = np.multiply(x,y)
+    total_visited = np.add(x,y)
+    total_visited = total_visited.astype(float)
+    total_visited = total_visited * 0.5
+    total_visited = np.ceil(total_visited)
+    j = np.sum(joint)
+    t = np.sum(total_visited)
+    if t != 0:
+        return j/t
+    else:
+        return 1
+
+def nas(x, y):
+	if x == 'Unicorn_Present':
+		return np.nan
+	else:
+		return y
+
+def nameRegion(r):
+	if r == 0 or r == 9:
+		return 'RS'
+	elif r == 1:
+		return 'ALL'
+	elif r == 2:
+		return 'NOTHING'
+	elif r == 3:
+		return 'DOWN'
+	elif r == 4:
+		return 'UP'
+	elif r == 5:
+		return 'LEFT'
+	elif r == 6:
+		return 'RIGHT'
+	elif r == 7:
+		return 'IN'
+	elif r == 8:
+		return 'OUT'
+
+def create_regions_and_strategies(Num_Loc):
+	size = int(Num_Loc * Num_Loc)
+	half_size = int(Num_Loc * Num_Loc / 2)
+	half_Num_Loc = int(Num_Loc / 2)
+
+	# ALL and NOTHING
+	all = [1] * size
+	nothing = [0] * size
+	# print('ALL ', all)
+	# print('NOTHING ', nothing)
+
+	# UP and DOWN
+	up = [1] * half_size + [0] * half_size
+	down = [1 - i for i in up]
+	# print('DOWN ', down)
+	# print('UP ', up)
+
+	# LEFT and RIGHT
+	right = []
+	for i in range(0, Num_Loc):
+		right += [0] * half_Num_Loc + [1] * half_Num_Loc
+
+	left = [1 - i for i in right]
+	# print('LEFT ', left)
+	# print('RIGHT ', right)
+
+	# IN and OUT
+	In = [0] * Num_Loc
+	for i in range(Num_Loc - 2):
+		In += [0] + [1] * (Num_Loc - 2) + [0]
+
+	In += [0] * Num_Loc
+
+	out = [1 - i for i in In]
+
+	# print('IN ', In)
+	# print('OUT ', out)
+
+	# Create a set of n pairwise disjoint paths in the board
+
+	# Define the strategies
+	UP = []
+	DOWN = []
+	LEFT = []
+	RIGHT = []
+	IN = []
+	OUT = []
+	ALL = []
+	NOTHING = []
+
+	for i in range(int(Num_Loc * Num_Loc)):
+		if up[i] == 1:
+			UP.append(i)
+		if down[i] == 1:
+			DOWN.append(i)
+		if left[i] == 1:
+			LEFT.append(i)
+		if right[i] == 1:
+			RIGHT.append(i)
+		if all[i] == 1:
+			ALL.append(i)
+		if nothing[i] == 1:
+			NOTHING.append(i)
+		if In[i] == 1:
+			IN.append(i)
+		if out[i] == 1:
+			OUT.append(i)
+
+	strategies = {}
+
+	strategies[0] = new_random_strategy(Num_Loc)
+	strategies[1] = ALL
+	strategies[2] = NOTHING
+	strategies[3] = DOWN
+	strategies[4] = UP
+	strategies[5] = LEFT
+	strategies[6] = RIGHT
+	strategies[7] = IN
+	strategies[8] = OUT
+	strategies[9] = new_random_strategy(Num_Loc)
+
+	return [all, nothing, down, up, left, right, In, out], strategies
+
+def dibuja_region(reg, Num_Loc):
+	assert(len(reg) == Num_Loc * Num_Loc), "Incorrect region size!"
+
+	fig4, axes4 = plt.subplots()
+	axes4.get_xaxis().set_visible(False)
+	axes4.get_yaxis().set_visible(False)
+	step = 1. / Num_Loc
+	tangulos = []
+	for j in range(0, Num_Loc * Num_Loc):
+		x = int(j) % Num_Loc
+		y = (int(j) - x) / Num_Loc
+		# print("x: " + str(x + 1))
+		# print("y: " + str(y + 1))
+		by_x = x * step
+		by_y = 1 - (y + 1) * step
+		#     # print("by_x: " + str(by_x))
+		#     # print("by_y: " + str(by_y))
+		if reg[j] == 1:
+			tangulos.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="black", alpha=1))
+
+	for t in tangulos:
+		axes4.add_patch(t)
+
+	plt.show()
+
+def dibuja_regiones(reg1, reg2, Num_Loc, titulo):
+	assert(len(reg1) == Num_Loc * Num_Loc), "Incorrect region size 1!"
+	assert(len(reg2) == Num_Loc * Num_Loc), "Incorrect region size 2!"
+
+	fig4, axes4 = plt.subplots(1,2)
+	for a in axes4:
+		a.get_xaxis().set_visible(False)
+		a.get_yaxis().set_visible(False)
+	step = 1. / Num_Loc
+	tangulos1 = []
+	tangulos2 = []
+	for j in range(0, Num_Loc * Num_Loc):
+		x = int(j) % Num_Loc
+		y = (int(j) - x) / Num_Loc
+		# print("x: " + str(x + 1))
+		# print("y: " + str(y + 1))
+		by_x = x * step
+		by_y = 1 - (y + 1) * step
+		#     # print("by_x: " + str(by_x))
+		#     # print("by_y: " + str(by_y))
+		if reg1[j] == 1:
+			tangulos1.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="black", alpha=1))
+		if reg2[j] == 1:
+			tangulos2.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="black", alpha=1))
+		if reg1[j] == 1 and reg2[j] == 1:
+			tangulos1.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="red", alpha=1))
+			tangulos2.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="red", alpha=1))
+
+	for t in tangulos1:
+		axes4[0].add_patch(t)
+
+	for t in tangulos2:
+		axes4[1].add_patch(t)
+
+	fig4.suptitle(titulo)
+	plt.show()
 
 ###########################
 # Define player objects
@@ -74,13 +274,13 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 20), "Model parameters incorrect length!"
+		assert(len(modelParameters) == 22), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 
 		# Create regions and strategies
 		Num_Loc = gameParameters[2]
-		regions, strategies = FRA.create_regions_and_strategies(Num_Loc)
+		regions, strategies = create_regions_and_strategies(Num_Loc)
 		# for r in regions:
 		# 	dibuja_region(r, Num_Loc)
 
@@ -92,6 +292,249 @@ class Experiment(object):
 		cols += ['a' + str(i+1) + str(j+1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
 		cols += ['Score', 'Joint', 'Is_there', 'where_x', 'where_y', 'Strategy']
 		self.df = pd.DataFrame(columns=cols)
+
+	# define attractiveness and choice functions
+	def sigmoid(self, x, beta, gamma):
+		return 1. / (1 + np.exp(-beta * (x - gamma)))
+
+	def code2Vector(self, strategy):
+		Num_Loc = self.gameParameters[2]
+		size = int(Num_Loc * Num_Loc)
+		v = [0] * size
+		for i in range(size):
+			if i in strategy:
+				v[i] = 1
+
+		return v
+
+	def simil(self, k, i, o):
+	    # Returns similarity between regions k and i
+	    # Input: k, which is a region coded as a vector of 0s and 1s of length 64
+	    #        i, which is a region coded as a vector of 0s and 1s of length 64
+	    #        o, which is a parameter for the exponential
+	    # Output: number representing the similarity between k and i
+
+	    k = np.array(k)
+	    i = np.array(i)
+	    dif = np.subtract(k, i)
+	    squares = np.multiply(dif, dif)
+	    distance = np.sqrt(np.sum(squares))
+	    return(np.exp(- o * distance))
+
+	def dist(self, k, i):
+	    # Returns similarity between regions k and i
+	    # Input: k, which is a region coded as a vector of 0s and 1s of length 64
+	    #        i, which is a region coded as a vector of 0s and 1s of length 64
+	    #        o, which is a parameter for the exponential
+	    # Output: number representing the similarity between k and i
+
+	    k = np.array(k)
+	    i = np.array(i)
+	    dif = np.subtract(k, i)
+	    squares = np.multiply(dif, dif)
+	    return(np.sqrt(np.sum(squares)))
+
+	def maxSim2Focal(self, r, regionsCoded, eta):
+	    # Returns closest distance to focal region
+	    # Input: r, which is a region coded as a vector of 0s and 1s of length 64
+	    # Output: number representing the closest distance
+
+	    distances = [0] * 8
+	    contador = 0
+
+	    for k in regionsCoded:
+	        # kV = self.code2Vector(k)
+	        distances[contador] = self.simil(r, k, eta)
+	        contador = contador + 1
+
+	    valor = np.max(np.array(distances))
+	    return(valor)
+
+	def minDist2Focal(self, r, regionsCoded):
+		# Returns closest distance to focal region
+		# Input: r, which is a region coded as a vector of 0s and 1s of length 64
+		# Output: number representing the closest distance
+
+		distances = [0] * 8
+		contador = 0
+
+		# print('r:\n', list(r))
+		for k in regionsCoded:
+			# kV = self.code2Vector(k)
+			# print('k:\n', k)
+			distances[contador] = self.dist(list(r), k)
+			contador = contador + 1
+
+		# dist_print = ["%.3f" % v for v in distances]
+		# print('distancias:\n', dist_print)
+
+		valor = np.min(np.array(distances))
+		indiceMin = np.argmin(np.array(distances))
+		# print('argmin:', indiceMin, 'vale?:', valor < np.sqrt(3))
+
+		if valor < np.sqrt(TOLERANCIA):
+			reg = nameRegion(indiceMin + 1)
+			return(reg)
+		else:
+			return('RS')
+
+	    # valor = np.min(np.array(distances))
+	    # return(valor)
+
+	def probabilities(self, i, score, j, pl):
+
+		if pl == 0:
+			wALL = float(self.modelParameters[0])
+			wNOTHING = float(self.modelParameters[1])
+			wDOWN = float(self.modelParameters[2])
+			wUP = float(self.modelParameters[2])
+			wLEFT = float(self.modelParameters[2])
+			wRIGHT = float(self.modelParameters[2])
+			wIN = float(self.modelParameters[3])
+			wOUT = float(self.modelParameters[3])
+			alpha = self.modelParameters[4] # for how much the focal region augments attractiveness
+			beta = self.modelParameters[5] # amplitude of the sigmoid function
+			gamma = self.modelParameters[6] # position of the sigmoid function
+			delta = self.modelParameters[7] # for how much the similarity to complement augments attractiveness
+			epsilon = self.modelParameters[8] # for similarity to complementary focal region
+			zeta = self.modelParameters[9] # for the steepness of the similarity to focal region
+			eta = self.modelParameters[10] # for the steepness of the similarity to complementary focal region
+		else:
+			wALL = float(self.modelParameters[11])
+			wNOTHING = float(self.modelParameters[12])
+			wDOWN = float(self.modelParameters[13])
+			wUP = float(self.modelParameters[13])
+			wLEFT = float(self.modelParameters[13])
+			wRIGHT = float(self.modelParameters[13])
+			wIN = float(self.modelParameters[14])
+			wOUT = float(self.modelParameters[14])
+			alpha = self.modelParameters[15] # for how much the focal region augments attractiveness
+			beta = self.modelParameters[16] # amplitude of the sigmoid function
+			gamma = self.modelParameters[17] # position of the sigmoid function
+			delta = self.modelParameters[18] # for how much the similarity to complement augments attractiveness
+			epsilon = self.modelParameters[19] # for similarity to complementary focal region
+			zeta = self.modelParameters[20] # for the steepness of the similarity to focal region
+			eta = self.modelParameters[21] # for the steepness of the similarity to complementary focal region
+
+		bias = [0, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
+		# print('biases:', bias)
+		# print('sum', np.sum(bias))
+		wRS = 1 - np.sum(bias)
+		# print('wRS', wRS)
+		assert(wRS >= 0), "Error: wRS is negative! Incorrect parameters provided."
+		bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
+		# biasPrint = ["%.2f" % v for v in bias]
+		# print('bias: ', biasPrint)
+
+		regionsCoded = self.regions
+		strategies = self.strategies
+
+		iV = self.code2Vector(strategies[i])
+		if i==9: i = 0
+
+		attractiveness = [x for x in bias] # start from bias
+		if DEB:
+			attactPrint = ["%.2f" % v for v in attractiveness]
+			print('attractiveness before WS and FRA\n', attactPrint)
+
+		# n = (score + 128) / 160 # normalizing score
+		n = score
+
+		# Adding 'Win Stay'
+		if i != 0:
+		          attractiveness[i] += alpha * self.sigmoid(n, beta, gamma)
+
+		if DEB:
+			attactPrint = ["%.3f" % v for v in attractiveness]
+			print('attractiveness with WS\n', attactPrint)
+
+		jV = self.code2Vector(j)
+		# print('jV ', jV)
+		simils = [0] * 9
+		for k in range(2,9): # do no consider 'rs' or 'all'
+			kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
+			kComp = [1 - x for x in kCoded]
+			simils[k] = self.simil(jV, kComp, eta)
+		#
+		if DEB:
+			similsPrint = ["%.3f" % v for v in simils]
+			print('Similarity to complement\n', similsPrint)
+
+		attractiveness += np.multiply(delta, simils)
+
+		if DEB:
+			attactPrint = ["%.3f" % v for v in attractiveness]
+			print('Attractiveness to complement\n', attactPrint)
+
+		# print('jV ', jV)
+		simils = [0] * 9
+		for k in range(1,9): # do no consider 'rs'
+			kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
+			# print('Considering region: ', k)
+			simils[k] = self.simil(iV, kCoded, epsilon)
+		#
+		if DEB:
+			similsPrint = ["%.3f" % v for v in simils]
+			print('Similarity to region\n', similsPrint)
+
+		attractiveness += np.multiply(zeta, simils)
+		if DEB:
+			attactPrint = ["%.3f" % v for v in attractiveness]
+			print('final attractiveness\n', attactPrint)
+
+		# sum = np.sum(np.exp(attractiveness/0.4))
+		# probs = [np.exp(x/0.4)/sum for x in attractiveness]
+		sum = np.sum(attractiveness)
+		probs = [x/sum for x in attractiveness]
+
+		return probs
+
+	def chooseStrategy(self, i, s, j, pl):
+		# Returns the next region according to biases
+		# Input: i, which is the region that the player is in
+		#		 s, which is the player's score
+		#		 j, which is the overlapping region with the other player
+
+		# get the probability vector
+		probs = self.probabilities(i, s, j, pl)
+
+		if DEB:
+			probsPrint = ["%.3f" % v for v in probs]
+			print('probs\n', probsPrint)
+		# print('Suma: ', np.sum(probs))
+
+		# get the selected strategy
+		newStrategy = np.random.choice(range(9), p=probs)
+		# print('newStrategy', newStrategy)
+
+		if IMPR:
+			probsPrint = ["%.3f" % v for v in probs]
+			with open('fileFreqs.csv', 'a') as data_file:
+				data_file.write('AA,')
+				data_file.write('A,')
+				data_file.write(str(nameRegion(i)) + ',' + str(s) + ',')
+				for p in probsPrint:
+					data_file.write(str(p) + ',')
+				data_file.write(str(nameRegion(newStrategy)) + '\n')
+			data_file.close()
+
+		return newStrategy
+
+		# # Determines if should not randomize RS
+		# if newStrategy == 0:
+		# 	# print('Determines if should randomize RS')
+		# 	n = (s + 128) / 160 # normalizing score
+		# 	beta = self.modelParameters[2] # amplitude of the sigmoid function
+		# 	gamma = self.modelParameters[3] # position of the sigmoid function
+		# 	if uniform(0,1) > self.sigmoid(n, beta, gamma):
+		# 		# print('It should')
+		# 		return newStrategy, False
+		# 	else:
+		# 		# print('It should not')
+		# 		return newStrategy, True
+		# else:
+		# 	return newStrategy, False
+		# # return newStrategy, False
 
 	def run_dyad(self):
 
@@ -260,20 +703,19 @@ class Experiment(object):
 				# print(self.df)
 				# print("Data from player " + str(k) + " has been saved")
 
-			reg1 = FRA.code2Vector(self.strategies[Players[0].strategy], Num_Loc)
-			reg2 = FRA.code2Vector(self.strategies[Players[1].strategy], Num_Loc)
-			j = FRA.code2Vector(both, Num_Loc)
+			reg1 = self.code2Vector(self.strategies[Players[0].strategy])
+			reg2 = self.code2Vector(self.strategies[Players[1].strategy])
+			j = self.code2Vector(both)
 			# Players determine their next strategy
 			a = []
 			sc = []
 			a.append(Players[0].strategy)
 			sc.append(Players[0].score)
-			i = Players[0].strategy
-			s = Players[0].score
-			newStrategy = FRA.chooseStrategy(reg1, i, s, j, 0, self.modelParameters, Num_Loc)
+			# newStrategy, sameRS = self.chooseStrategy(Players[0].strategy, Players[0].score, both)
+			newStrategy = self.chooseStrategy(Players[0].strategy, Players[0].score, both, 0)
 			Players[0].strategy = newStrategy
 			# print('newStrategy:', newStrategy)
-			self.strategies[0] = FRA.new_random_strategy(Num_Loc)
+			self.strategies[0] = new_random_strategy(Num_Loc)
 
 			# if not sameRS:
 			# 	self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
@@ -285,14 +727,12 @@ class Experiment(object):
 			a.append(Players[1].strategy)
 			sc.append(Players[1].score)
 			# newStrategy, sameRS = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
-			i = Players[1].strategy
-			s = Players[1].score
-			newStrategy = FRA.chooseStrategy(reg2, i, s, j, 1, self.modelParameters, Num_Loc)
+			newStrategy = self.chooseStrategy(Players[1].strategy, Players[1].score, both, 1)
 			# print('newStrategy:', newStrategy)
 			if newStrategy == 0:
 				newStrategy = 9
 			Players[1].strategy = newStrategy
-			self.strategies[9] = FRA.new_random_strategy(Num_Loc)
+			self.strategies[9] = new_random_strategy(Num_Loc)
 
 			# if not sameRS:
 			# 	self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
@@ -305,12 +745,12 @@ class Experiment(object):
 				print('-----------------')
 				print('both', len(both))
 				print('scores: p0: ', sc[0], ' p1: ', sc[1])
-				print('Player 0 from region ', FRA.nameRegion(a[0]), 'to region ', FRA.nameRegion(Players[0].strategy))
-				print('Player 1 from region ', FRA.nameRegion(a[1]), 'to region ', FRA.nameRegion(Players[1].strategy))
+				print('Player 0 from region ', nameRegion(a[0]), 'to region ', nameRegion(Players[0].strategy))
+				print('Player 1 from region ', nameRegion(a[1]), 'to region ', nameRegion(Players[1].strategy))
 				print('End summary round ', i)
 				print('-----------------')
 				# dibuja_region(j, 8)
-				FRA.dibuja_regiones(reg1, reg2, 8, 'Ok')
+				dibuja_regiones(reg1, reg2, 8, 'Ok')
 
 
 	def run_simulation(self):
@@ -364,8 +804,8 @@ class Experiment(object):
 
 		# Deterimining list of columns
 		cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-		data['Category'] = data.apply(lambda x: FRA.minDist2Focal(x[cols1], self.regions), axis=1)
-		data['Category1'] = data.apply(lambda x: FRA.nameRegion(x['Strategy']), axis=1)
+		data['Category'] = data.apply(lambda x: self.minDist2Focal(x[cols1], self.regions), axis=1)
+		data['Category1'] = data.apply(lambda x: nameRegion(x['Strategy']), axis=1)
 		data['RegionGo'] = data.groupby(['Dyad', 'Player'])['Category1'].transform('shift', -1)
 		data.to_csv('output_Prev.csv', index=False)
 
@@ -445,7 +885,7 @@ class Experiment(object):
 		data['Vector'] = data.apply(lambda x: np.array(x[cols]), axis=1)
 		data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
 		# data = data.dropna()
-		data['Consistency'] = data.apply(lambda x: FRA.calcula_consistencia(x['Vector'], x['VectorLAG1']), axis=1)
+		data['Consistency'] = data.apply(lambda x: calcula_consistencia(x['Vector'], x['VectorLAG1']), axis=1)
 		del data['VectorLAG1']
 
 		# Find difference in consistency and Total_visited_dyad ----
@@ -500,7 +940,7 @@ class Experiment(object):
 		for j in range(1, Num_Loc + 1) \
 		]
 
-		data['Similarity'] = data.apply(lambda x: FRA.maxSim2Focal(x[cols1], Num_Loc), axis=1)
+		data['Similarity'] = data.apply(lambda x: self.maxSim2Focal(x[cols1], self.regions, 1), axis=1)
 		# #
 		# --------------------------------------------------
 		# Finding the lag and lead variables
