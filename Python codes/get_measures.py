@@ -263,7 +263,6 @@ print("Done!")
 
 # Opens the file with data from DCL experiment into a Pandas DataFrame
 print("Reading data...")
-
 script, data_archivo = argv
 
 print('Please input the measures to be obtained:')

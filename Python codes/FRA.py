@@ -501,12 +501,9 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		print('Player', pl)
 		print('attractiveness before WS and FRA\n', attactPrint)
 
-	# n = (score + 128) / 160 # normalizing score
-	n = score
-
 	# Adding 'Win Stay'
 	if i != 0:
-	          attractiveness[i] += alpha * sigmoid(n, beta, gamma)
+	          attractiveness[i] += alpha * sigmoid(score, beta, gamma)
 
 	if DEB:
 		attactPrint = ["%.3f" % v for v in attractiveness]

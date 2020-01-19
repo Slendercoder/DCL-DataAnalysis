@@ -528,8 +528,8 @@ regionsCoded, strategies = create_regions_and_strategies(Num_Loc)
 # 	print(nameRegion(i + 1))
 # 	imprime_region(regionsCoded[i])
 
-desde = 0
-hasta = 1
+desde = 1
+hasta = 2
 
 player = dyad + 'PL1'
 # player = dyad + 'PL2'
