@@ -124,7 +124,7 @@ ModelProb <- function(regionFrom, regionGo, s, k, theta, regiones){
 #####################################################
 
 # Estimated parameters:
-theta <- c(0.05, 0.05, 0.01, 0.001, 200, 500, 0.7) # FRA
+theta <- c(0.05, 0.05, 0.01, 0.001, 200, 88, 0.75) # FRA
 
 regiones <- c('RS',
               'ALL', 
