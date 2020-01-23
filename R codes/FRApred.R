@@ -107,7 +107,10 @@ getArgs <- function(data, regiones) {
 #  print(joints)
   
   # Create all combinations of regions, scores and joints
-  print('Creating cuadruples...')
+  cat('\nCreating cuadruples ', 
+      length(regs), 'x',
+      length(scores), 'x',
+      length(joints), '\n')
   args <- as.data.frame(expand.grid(iV = regs, s = scores, j = joints))
   args$i <- lapply(args$iV, classifyCode)
   print(args[1:5, ])

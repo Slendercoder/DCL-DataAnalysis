@@ -4,7 +4,8 @@ source("FRApred.R")
 library(dfoptim)
 library(beepr)
 
-df1 = read.csv("../Python Codes/freqs4FRA.csv")
+#df1 = read.csv("../Python Codes/freqs4FRA.csv")
+df1 = read.csv("../Python Codes/freqs4FRA-simulated.csv")
 head(df1)
 
 args <- getArgs(df1, regiones)
