@@ -2,14 +2,14 @@
 source("FRApred.R")
 #source("FRApred_full.R")
 library(dfoptim)
-library(beepr)
+#library(beepr)
 
 df1 = read.csv("../Python Codes/freqs4FRA-humans.csv")
 #df1 = read.csv("../Python Codes/freqs4FRA-simulated.csv")
 head(df1)
 
 args <- getArgs(df1, regiones)
-beep()
+#beep()
 head(args)
 #dim(args)
 
@@ -57,7 +57,7 @@ fitresFRA <- nmkb(par=c(wAll, wNoth, wLef, wIn, w2, w3, w4, w5, w6, w7),
                            1.5),
                    control=list(trace=0))
 
-beep()
+#beep()
 print(fitresFRA$value) 
 imprimir(fitresFRA$par)
 cat('wALL', fitresFRA$par[1], 
