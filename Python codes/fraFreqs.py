@@ -112,7 +112,7 @@ del dataFULL['index']
 dataFULL['index'] = dataFULL.index
 dict = {}
 cols = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-print('Working per dyad...')
+print('Working per dyad to find joint regions...')
 for dyad, data in dataFULL.groupby('Dyad'):
 	# print(data[['index', 'Player', 'Round']][:10])
 	# Obtain joint region

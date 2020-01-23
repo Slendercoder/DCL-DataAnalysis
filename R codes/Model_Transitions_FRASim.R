@@ -3,7 +3,7 @@
 #library(dplyr)
 library(ggplot2)
 library(gridExtra)
-#library(beepr)
+library(beepr)
 
 #####################################################
 # Definitions
@@ -140,8 +140,8 @@ regiones <- c('RS',
 # Loading database
 ###############################################################################
 
-#df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/fraFreqs.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/fraFreqs-humans.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/fraFreqs-simulated.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
 df1 <- df1[complete.cases(df1), ]
 df1 <- df1[c('Region', 'FRASim', 'RegionGo')]

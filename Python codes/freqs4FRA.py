@@ -91,7 +91,7 @@ print("Done!")
 
 # Obtain joint region
 dict = {}
-print('Working per dyad...')
+print('Working per dyad to find joint region...')
 for dyad, data in dataFULL.groupby('Dyad'):
 	# print(data[['index', 'Player', 'Round']][:3])
 	# Obtain joint region
