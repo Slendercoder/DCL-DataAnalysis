@@ -73,12 +73,9 @@ cat('wALL', fitresFRA$par[1],
 ) 
 
 
-theta <- c(wAll, wNoth, wLef, wIn, w2, w3, w4, w5, w6, w7)
-dev <- FRAutil(theta, args, regiones)
-dev # 2126
+#theta <- c(wAll, wNoth, wLef, wIn, w2, w3, w4, w5, w6, w7)
+#dev <- FRAutil(theta, args, regiones)
+#dev # 2126
 
-aic <- 2*8 + dev
-aic # 2142
-
-2443 - 2246
-2435 - 2230
+#aic <- 2*8 + dev
+#aic # 2142
