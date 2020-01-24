@@ -4,7 +4,7 @@ source("FRApred_scoreLevel.R")
 #source("FRApred_full.R")
 library(dfoptim)
 #library(beepr)
-library(dplyr)
+#library(dplyr)
 
 df1 = read.csv("freqs4FRA-humans.csv")
 #df1 = read.csv("../Python Codes/freqs4FRA-humans.csv")
