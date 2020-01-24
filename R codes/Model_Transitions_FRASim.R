@@ -119,12 +119,15 @@ ModelProb <- function(regionFrom, regionGo, s, k, theta, regiones){
   return(probab)
 } # end ModelProb
 
+#a <- ModelProb('RS', 'RS', 0.1, 'RIGHT', theta, regiones)
+#a
+
 #####################################################
 # Global variables
 #####################################################
 
 # Estimated parameters:
-theta <- c(0.05, 0.05, 0.01, 0.001, 200, 88, 0.75) # FRA
+theta <- c(0.035, 0.048, 0.003, 0.001, 176.88, 23.042, 1.152) # FRA
 
 regiones <- c('RS',
               'ALL', 
@@ -140,8 +143,8 @@ regiones <- c('RS',
 # Loading database
 ###############################################################################
 
-#df1 = read.csv("../Python Codes/fraFreqs-humans.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/fraFreqs-simulated.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/fraFreqs-humans.csv", na.strings=c("","NA"))
+#df1 = read.csv("../Python Codes/fraFreqs-simulated.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
 df1 <- df1[complete.cases(df1), ]
 df1 <- df1[c('Region', 'FRASim', 'RegionGo')]
@@ -197,7 +200,7 @@ gRS <- ggplot() +
 
 gRS
 
-xs <- seq(0,1,length.out=1000)
+xs <- seq(0,1.2,length.out=1000)
 
 # Transition from RS to RS
 # Model fitted 
