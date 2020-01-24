@@ -1,5 +1,6 @@
 #source("getFrequencies.R")
-source("FRApred.R")
+#source("FRApred.R")
+source("FRApred_scoreLevel.R")
 #source("FRApred_full.R")
 library(dfoptim)
 #library(beepr)
