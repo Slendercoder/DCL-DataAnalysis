@@ -3,10 +3,21 @@ source("FRApred.R")
 #source("FRApred_full.R")
 library(dfoptim)
 #library(beepr)
+library(dplyr)
 
 df1 = read.csv("freqs4FRA-humans.csv")
 #df1 = read.csv("../Python Codes/freqs4FRA-humans.csv")
 #df1 = read.csv("../Python Codes/freqs4FRA-simulated.csv")
+# Finding scoreLevel
+df1$scoreLevel <- lapply(df1$Score, function(x) {
+  if (x == 32) {
+    return (32)
+  } else if (x > 16) {
+    return (30) 
+  } else {
+    return (20)
+  }
+})
 head(df1)
 
 args <- getArgs(df1, regiones)
