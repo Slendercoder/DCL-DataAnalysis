@@ -7,12 +7,6 @@ import matplotlib.patches as patches
 # GLOBAL VARIABLES
 ###########################################################
 
-# gameParameters = []
-# modelParameters = []
-# regionsCoded = []
-# strategies = []
-# Num_Loc = 8
-
 TOLERANCIA = 1
 DEB = False
 IMPR = False
@@ -26,6 +20,16 @@ regionsCoded = ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;
                   'jklmnorstuvwzABCDEHIJKLMPQRSTUXYZ012', # IN
                   'abcdefghipqxyFGNOVW3456789;:' # OUT
                   ]
+
+regions = ['RS', \
+           'ALL', \
+           'NOTHING', \
+           'DOWN', \
+           'UP', \
+           'LEFT', \
+           'RIGHT', \
+           'IN', \
+           'OUT']
 
 ###########################################################
 # FUNCTIONS
@@ -481,6 +485,8 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		epsilon = float(modelParameters[18]) # amplitude of the FRA sigmoid function
 		zeta = float(modelParameters[19]) # position of the FRA sigmoid function
 
+	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]]
+	# print('bias: ', biasPrint)
 	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]))
 	assert(wRS > 0), "Incorrect biases!"
 	bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
@@ -565,6 +571,8 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 
 	sum = np.sum(attractiveness)
 	probs = [x/sum for x in attractiveness]
+	# sum = np.sum([x**10 for x in attractiveness])
+	# probs = [x**10/sum for x in attractiveness]
 
 	return probs
 
@@ -584,8 +592,8 @@ def chooseStrategy(iV, i, s, j, pl, modelParameters, Num_Loc):
 	# print('Suma: ', np.sum(probs))
 
 	# get the selected strategy
-	# newStrategy = np.random.choice(range(9), p=probs)
-	newStrategy = np.argmax(probs)
+	newStrategy = np.random.choice(range(9), p=probs)
+	# newStrategy = np.argmax(probs)
 	# print('newStrategy', newStrategy)
 
 	if IMPR:

@@ -11,7 +11,8 @@ get_legend<-function(myggplot){
 
 ###############################################
 
-df = read.csv("../Python Codes/FRAsimulated.csv", na.strings=c("","NA"))
+#df = read.csv("../Python Codes/FRAsimulated.csv", na.strings=c("","NA"))
+df = read.csv("../Python Codes/outputWSLS.csv", na.strings=c("","NA"))
 head(df)
 
 ###############################################
@@ -104,7 +105,7 @@ g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency)) +
   ylab("Consistency") +
   geom_smooth(method = lm)
 
-g4 <- g4 + theme_sjplot()
+#g4 <- g4 + theme_sjplot()
 
 g4
 

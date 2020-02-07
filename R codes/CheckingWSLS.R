@@ -1,0 +1,155 @@
+library(ggplot2)
+library(dplyr)
+
+###########################################################################################
+###########################################################################################
+
+getRelFreq <- function(i, s, k, df) {
+  # Obtains the relative frequencies for transition from region i and score s to region k
+  # Input: i, which is the region the player is currently in
+  #        s, which is the player's score obtained on the previous round
+  #        k, which is the region the player is going to
+  #        df, the dataframe from which the observations are obtained
+  # Output: Relative frequency
+  
+  regs <- df[df$Region == i, ]
+  regs <- regs[regs$Score == s, ]
+  n <- dim(regs)[1]
+  if (n > 5) {
+    regs <- regs[regs$RegionGo == k, ]
+    f <- dim(regs)[1]
+    return(f/n)
+  } else {
+    return(NA)
+  }
+  
+  # auxDF <- t(as.data.frame(table(regsGo)))
+  #  print(auxDF)
+  # colnames(auxDF) <- as.character(unlist(auxDF[1, ])) # the first row will be the header
+  # auxDF <- auxDF[-1, ]          # removing the first row.
+  # auxDF <- auxDF[regiones]
+  # return(as.numeric(auxDF[1:9]))
+}
+
+plot_RSTransitions <- function(df) {
+
+  df_RS <- df[df$Region == 'RS', ]
+  head(df_RS)
+  
+  gRS <- ggplot() +
+    geom_point(aes(x = Score, y = Freqs, color=RegionGo), df_RS, alpha = 0.4, size=1.5) +
+    scale_x_continuous(limits = c(min_score, 35)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("Score") +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Transitions from RS") +
+    theme_bw()
+  
+  gRS
+  
+  df_RS <- df[df$Region == 'RS', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+  head(df_RS)
+  
+  gRS2RS <- ggplot() +
+    geom_point(aes(x = Score, y = Freqs), df_RS, alpha = 0.4, size=1.5) +
+    scale_x_continuous(limits = c(min_score, 35)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("Score") +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Transition from RS to RS") +
+    theme_bw()
+  
+  return (gRS2RS)
+
+}
+
+plot_FocalTransitions <- function(df) {
+    
+  regiones <- c('RS', 'ALL', 'NOTHING', 
+                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'IN', 'OUT')
+  
+  gOTHER2OTHER <- ggplot() +
+    scale_x_continuous(limits = c(min_score, 35)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("Score") +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Frequency of staying at same focal region") +
+    theme_bw()
+  
+  
+  #other <- 'RIGHT'
+  #other <- 'LEFT'
+  for (other in regiones) {
+    df_RS <- df[df$Region == other, ]
+    for (x in regiones) {
+      if (x != other) {
+        df_RS <- df_RS[df_RS$RegionGo != x, ]
+      }
+    }
+    gOTHER2OTHER <- gOTHER2OTHER +
+      geom_point(aes(x = Score, y = Freqs), df_RS, alpha = 0.2, size=1.5)
+  }
+
+  return (gOTHER2OTHER)
+  
+}
+
+###########################################################################################
+###########################################################################################
+
+df2 = read.csv("../Python Codes/output.csv")
+df2$Region <- df2$Category
+
+model1wsls <- lm(Consistency ~ Score_LAG1, data = df2)
+summary(model1wsls) # => Positive correlation is significant
+
+#min_score = -50
+min_score = 0
+
+p <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) + 
+  geom_point(shape = 19, alpha = 0.2) + 
+  geom_smooth(method='lm', se=FALSE) + 
+  theme_bw() +
+  xlab("Score(n-1)") +
+  ylab("Consistency(n)") +
+  xlim(c(min_score,32)) +
+  ylim(c(0,1)) +
+  ggtitle('WSLS')
+
+############################
+# Obtaining frequencies...
+############################
+
+dfA <- df2 %>% select('Region', 'Score', 'RegionGo')
+dfA$Freqs <- apply(dfA, 1, function(x) {
+  i <- as.character(x[[1]][1])
+  s <- as.numeric(x[[2]][1])
+  k <- as.character(x[[3]][1])
+  #cat('\ni', i, 's', s, 'k', k)
+  return(getRelFreq(i, s, k, df1))
+})
+dfA <- unique(dfA)
+dfA <- dfA[complete.cases(dfA), ]
+head(dfA)
+df <- dfA
+
+############################
+# Ploting data...
+############################
+
+g1 <- plot_RSTransitions(df)
+g2 <- plot_FocalTransitions(df)
+gB <- grid.arrange(g1, g2, p, nrow=2)
+

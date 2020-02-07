@@ -282,6 +282,24 @@ data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True
 # data.to_csv('output_Prev.csv', index=False)
 data['Is_there_LEAD'] = data.groupby(['Dyad', 'Player'])['Is_there'].transform('shift', periods=-1)
 
+# --------------------------------------------------
+# Obtaining measures from players' performance
+# --------------------------------------------------
+# Making sure Score is an integer
+data['Score'] = data['Score'].apply(int)
+# Find the accumulated score
+print("Finding accumulated score...")
+data['Ac_Score'] = data.sort_values(['Dyad','Player']).groupby('Player')['Score'].cumsum()
+# Find normalized score
+print("Finding normalized score...")
+max_score = 32
+min_score = -64 - 64
+data['Norm_Score'] = (data['Score'] - min_score) / (max_score - min_score)
+# print data
+print("Finding the initial lag variables...")
+data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
+                            ['Joint'].transform('shift', 1)
+
 if '1' in lista:
     # --------------------------------------------------
     # Classify region per round, per player
@@ -305,10 +323,6 @@ if '2' in lista:
     # Correcting scores
     # --------------------------------------------------
     print('Correcting scores...')
-    # 0. Making sure Score is an integer
-    data['Score'] = data['Score'].apply(int)
-    # print(data[['Dyad','Player','Round', 'Is_there', 'Score','Category']][:5])
-
     # 1. Create column of indexes
     data = data.reset_index()
     data['indice'] = data.index
@@ -338,22 +352,8 @@ if '3' in lista:
     # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 
 # --------------------------------------------------
-# Obtaining measures from players' performance
+# Obtaining final measures from players' performance
 # --------------------------------------------------
-data['Score'] = data['Score'].map(lambda x: int(x), na_action='ignore')
-# Find the accumulated score
-print("Finding accumulated score...")
-data['Ac_Score'] = data.sort_values(['Dyad','Player']).groupby('Player')['Score'].cumsum()
-#
-# Dyads = data.Dyad.unique()
-#
-# Find the normalized score
-max_score = 32
-min_score = -64 - 64
-print("Finding normalized score...")
-data['Norm_Score'] = (data['Score'] - min_score) / (max_score - min_score)
-# print data
-#
 # Find Size_visited
 print("Finding Size_visited...")
 cols = ['a' + str(i+1) + str(j+1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
@@ -436,15 +436,15 @@ if '4' in lista:
 # --------------------------------------------------
 LAG = 1
 
-print("Finding the lag variables...")
+print("Finding the last lag variables...")
+data['Score_LAG1'] = data.groupby(['Dyad', 'Player'])\
+                            ['Score'].transform('shift', 1)
 data['Norm_Score_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Norm_Score'].transform('shift', 1)
 data['Consistency_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Consistency'].transform('shift', 1)
 data['Dif_consist_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Dif_consist'].transform('shift', 1)
-data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
-                            ['Joint'].transform('shift', 1)
 data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
                             ['Category'].transform('shift', -1)
 data['RegionGo2'] = data.groupby(['Dyad', 'Player'])\
