@@ -137,8 +137,8 @@ script, data_archivo = argv
 
 print('Please input the measures to be obtained:')
 print('1: Classify regions')
-print('2: Estimate blocks')
-print('3: Correct scores')
+print('2: Correct scores')
+print('3: Estimate blocks')
 print('4: Keep only absent')
 print('5: Find max similarity')
 lista = input('Input as, e.g., 124: ')
@@ -209,6 +209,38 @@ if '2' in lista:
     # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][50:60])
 
     # --------------------------------------------------
+    # Correcting scores
+    # --------------------------------------------------
+    print('Correcting scores...')
+    # 4. Correct score from last round absent to average score next block present
+    data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
+    # print('List of blocks\n', data[['indice', 'Player', 'Round', 'Is_there', 'Score', 'Category']][50:60])
+
+if '3' in lista:
+
+    CLASIFICAR = False
+    CONTINUO = False
+    CONTADOR = 1
+
+    # 1. Create column of indexes
+    data = data.reset_index()
+    data['indice'] = data.index
+
+    # 2. Indices de comienzo de jugador
+    indiceJugador = list(data.groupby('Player')['indice'].first())
+    indiceJugador.sort()
+    # print('indiceJugador', indiceJugador)
+
+    # 2. Obtain indices of blocks of Unicorn_Present
+    data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
+    # print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
+
+    # 3. Obtain average score per group of Unicorn_Present
+    data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
+    data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
+    # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][50:60])
+
+    # --------------------------------------------------
     # Estimating blocks
     # --------------------------------------------------
     print('Estimating blocks (please be patient)...')
@@ -228,6 +260,7 @@ if '2' in lista:
             valor = data.loc[c]['Cambio']
             # print('Processing estimation (c)', c, 'with Cambio', valor)
             df_aux = data[data['Cambio'] == valor]
+            proxInd = list(df_aux.indice)[-1] + 1
             # print('Block to be estimated\n', df_aux[['Round', 'Player', 'Is_there', 'a11', 'Score']])
             columnas = df_aux.columns
             # print(columnas)
@@ -250,10 +283,8 @@ if '2' in lista:
             puntaje = df_aux['Score'].mean()
             dict_aux['Score'] = puntaje
             if puntaje > 31:
-                proxInd = indicesIncluir[Ind + 1]
+                v = list(data.loc[proxInd][cols1])
                 Category_v = data.loc[proxInd]['Category']
-                v = regionsCoded[FRA.numberRegion(Category_v)]
-                v = FRA.code2Vector(FRA.lettercode2Strategy(v, Num_Loc), Num_Loc)
             else:
                 v = FRA.code2Vector(FRA.new_random_strategy(Num_Loc), Num_Loc)
                 Category_v = 'RS'
@@ -279,7 +310,12 @@ if '2' in lista:
     data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
     # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 
-if '3' in lista:
+    # Must correct scores again
+
+    CLASIFICAR = False
+    CONTINUO = False
+    CONTADOR = 1
+
     # 1. Create column of indexes
     data = data.reset_index()
     data['indice'] = data.index
@@ -317,9 +353,8 @@ if '4' in lista:
 # --------------------------------------------------
 # Find Size_visited
 print("Finding Size_visited...")
-cols = ['a' + str(i+1) + str(j+1) for i in range(0, Num_Loc) for j in range(0, Num_Loc)]
-# print('cols: ', cols)
-data['Size_visited'] = data[cols].sum(axis=1)
+# print('cols: ', cols1)
+data['Size_visited'] = data[cols1].sum(axis=1)
 # print(data[['Player', 'Round', 'Size_visited', 'Joint']][:10])
 # assert(all(data['Size_visited'] >= data['Joint']))
 # #
@@ -330,17 +365,18 @@ data['Size_visited'] = data[cols].sum(axis=1)
 # Find consistency
 print("Finding consistency...")
 # # print data[:10]
-data['Vector'] = data.apply(lambda x: np.array(x[cols]), axis=1)
+data['Vector'] = data.apply(lambda x: np.array(x[cols1]), axis=1)
 data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
 data = data.dropna()
 data['Consistency'] = data.apply(lambda x: FRA.sim_consist(x['Vector'], x['VectorLAG1']), axis=1)
 del data['VectorLAG1']
 
-# Find difference in consistency and Total_visited_dyad ----
+# Find difference in consistency, Total_visited_dyad, and reparing Joint ----
 print("Finding difference in consistency and Total_visited_dyad...")
-cols = ['Dyad','Player','Consistency','Round','Joint','Size_visited']
+cols = ['Dyad','Player','Consistency','Round','Joint', 'Size_visited', 'Vector']
 total = {}
 dif_cons = {}
+joints = {}
 for key, grp in data[cols].groupby(['Dyad']):
 	Players = grp.Player.unique()
 	# print "The players in dyad " + str(key) + " are: " + str(Players)
@@ -351,31 +387,36 @@ for key, grp in data[cols].groupby(['Dyad']):
 	# print "aux2: \n", aux2
 	# print "len(aux1)", len(aux1)
 	assert(len(aux1) == len(aux2)), "Something wrong with players!"
-	assert(all(aux1['Joint'] == aux2['Joint'])), "Something wrong with players!"
+	# assert(all(aux1['Joint'] == aux2['Joint'])), "Something wrong with players!"
 	aux3 = pd.DataFrame({'Dyad':aux1['Dyad'],\
 	'Round':aux1['Round'],\
 	'C1':aux1['Consistency'],\
 	'C2':aux2['Consistency'],\
+	'v1':aux1['Vector'],\
+	'v2':aux2['Vector'],\
 	'V1':aux1['Size_visited'],\
-	'V2':aux2['Size_visited'],\
-	'Joint':aux1['Joint']})
+	'V2':aux2['Size_visited']})
+	aux3['Joint'] = aux3.apply(lambda x: np.sum(np.multiply(x['v1'],x['v2'])), axis=1)
 	aux3['total_visited'] = aux3.apply(lambda x: x['V1'] + x['V2'] - x['Joint'], axis=1)
 	aux3['Dif_consist'] = aux3.apply(lambda x: np.abs(x['C1'] - x['C2']), axis=1)
 	aux3['Pair'] = aux3.apply(lambda x: tuple([x['Dyad'], x['Round']]), axis=1)
+	joints1 = dict(zip(aux3.Pair, aux3.Joint))
+	joints = {**joints, **joints1}
 	total1 = dict(zip(aux3.Pair, aux3.total_visited))
 	total = {**total, **total1}
 	dif_cons1 = dict(zip(aux3.Pair, aux3.Dif_consist))
 	dif_cons = {**dif_cons, **dif_cons1}
 
 data['Pair'] = data.apply(lambda x: tuple([x['Dyad'], x['Round']]), axis=1)
+data['Joint'] = data['Pair'].map(joints)
 data['Total_visited_dyad'] = data['Pair'].map(total)
 data['Dif_consist'] = data['Pair'].map(dif_cons)
 del data['Vector']
 del data['Pair']
 
-# Division of labor Index (Goldstone)
+# Division of labor Index
 data['DLIndex'] = (data['Total_visited_dyad'] - data['Joint'])/(Num_Loc*Num_Loc)
-assert(all(data['DLIndex'] >= 0))
+assert(all(data['DLIndex'] >= 0)), str(list(data.loc[data['DLIndex']==0].index))
 
 if '5' in lista:
     # --------------------------------------------------
