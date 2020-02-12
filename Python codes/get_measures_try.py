@@ -233,7 +233,7 @@ if '3' in lista:
 
     # 2. Obtain indices of blocks of Unicorn_Present
     data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
-    # print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
+    print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
 
     # 3. Obtain average score per group of Unicorn_Present
     data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
@@ -317,7 +317,7 @@ if '3' in lista:
     CONTADOR = 1
 
     # 1. Create column of indexes
-    data = data.reset_index()
+    # data = data.reset_index()
     data['indice'] = data.index
 
     # 2. Indices de comienzo de jugador
@@ -327,7 +327,7 @@ if '3' in lista:
 
     # 2. Obtain indices of blocks of Unicorn_Present
     data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
-    # print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
+    print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
 
     # 3. Obtain average score per group of Unicorn_Present
     data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
