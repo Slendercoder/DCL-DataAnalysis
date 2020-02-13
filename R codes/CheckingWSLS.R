@@ -61,7 +61,7 @@ plot_RSTransitions <- function(df) {
   head(df_RS)
   
   gRS2RS <- ggplot() +
-    geom_point(aes(x = Score, y = Freqs), df_RS, alpha = 0.4, size=1.5) +
+    geom_point(aes(x = Score, y = Freqs), df_RS, alpha = alpha, size=1.5) +
     scale_x_continuous(limits = c(min_score, 35)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     xlab("Score") +
@@ -100,7 +100,7 @@ plot_FocalTransitions <- function(df) {
       }
     }
     gOTHER2OTHER <- gOTHER2OTHER +
-      geom_point(aes(x = Score, y = Freqs), df_RS, alpha = 0.2, size=1.5)
+      geom_point(aes(x = Score, y = Freqs), df_RS, alpha = alpha, size=1.5)
   }
 
   return (gOTHER2OTHER)
@@ -118,9 +118,11 @@ summary(model1wsls) # => Positive correlation is significant
 
 #min_score = -50
 min_score = 0
+alpha <- 0.2
+
 
 p <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) + 
-  geom_point(shape = 19, alpha = 0.2) + 
+  geom_point(shape = 19, alpha = alpha) + 
   geom_smooth(method='lm', se=FALSE) + 
   theme_bw() +
   xlab("Score(n-1)") +

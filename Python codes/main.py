@@ -24,7 +24,7 @@ gameParameters = [p, pl, n, rounds, dyads]
 # Model Parameters
 # modelParameters = [0.001, 0.001, 0.001, 0.001, 200, 500, 32, 200, 500, 0.7] #PL1
 # modelParameters += [0.001, 0.001, 0.001, 0.001, 200, 500, 32, 200, 500, 0.7] #PL2
-modelParameters = [0, 0, 0.1, 0, 200, 500, 31, 0, 0, 0] #PL1
-modelParameters += [0, 0, 0.1, 0, 200, 500, 31, 0, 0, 0] #PL2
+modelParameters = [0, 0, 0.1, 0, 200, 500, 32, 0, 0, 0] #PL1
+modelParameters += [0, 0, 0.1, 0, 200, 500, 32, 0, 0, 0] #PL2
 
 RM.standard_simulation(gameParameters, modelParameters)

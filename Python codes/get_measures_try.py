@@ -124,6 +124,17 @@ def Insert_row(row_number, df, row_value):
     # return the dataframe
     return df
 
+def completeRegions(strat, columna):
+
+    if strat == 0 or strat == 9:
+        v = FRA.code2Vector(FRA.new_random_strategy(Num_Loc), Num_Loc)
+    else:
+        v = regionsCoded[strat]
+
+    i = cols1.index(columna)
+    return v[i]
+
+
 ######################################
 ######################################
 ######################################
@@ -143,6 +154,7 @@ print("Reading data...")
 script, data_archivo = argv
 
 print('Please input the measures to be obtained:')
+print('0: Complete from simulation (for simulated data only)')
 print('1: Classify regions')
 print('2: Correct scores')
 print('3: Estimate blocks')
@@ -178,6 +190,15 @@ print("Finding the initial lag variables...")
 data['Joint_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Joint'].transform('shift', 1)
 
+if '0' in lista:
+    # --------------------------------------------------
+    # Completing from simulation
+    # --------------------------------------------------
+    print("Completing regions from simulation (please be patient!)...")
+    for c in cols1:
+        # print('Working with column', c)
+        data[c] = data.apply(lambda x: completeRegions(x['Strategy'], c), axis=1)
+
 if '1' in lista:
     # --------------------------------------------------
     # Classify region per round, per player
@@ -192,7 +213,7 @@ else:
     print("Trying to obtain classification from simulation...")
     try:
         data['Category'] = data.apply(lambda x: FRA.nameRegion(x['Strategy']), axis=1)
-        print('Done!')
+        # print('Done!')
     except:
         print('Data does not seem to come from simulation!')
 
@@ -241,7 +262,7 @@ if '3' in lista:
 
     # 2. Obtain indices of blocks of Unicorn_Present
     data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
-    print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][0:20])
+    # print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][0:20])
 
     # 3. Obtain average score per group of Unicorn_Present
     data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
@@ -393,7 +414,23 @@ for key, grp in data[cols].groupby(['Dyad']):
 	aux2 = pd.DataFrame(Grp_player.get_group(Players[1])).reset_index()
 	# print "aux2: \n", aux2
 	# print "len(aux1)", len(aux1)
-	assert(len(aux1) == len(aux2)), "Something wrong with players!"
+	if len(aux1) != len(aux2):
+	       print("Oops, something went wrong with estimated blocks!")
+	       print("Trying to correct...")
+	       print(list(aux1.Round))
+	       d = aux1[aux1['Round'] == 60].index
+	       print('Index round 60', d)
+	       print(aux1.loc[d]['Round'])
+	       aux1 = aux1.drop(d)
+	       print(list(aux1.Round))
+
+	errorDebug = "Something wrong with players!\n"
+	errorDebug += "Dyad " + str(key)
+	errorDebug += "\nlen player 1 " + str(len(aux1))
+	errorDebug += "\nlen player 2 " + str(len(aux2))
+	errorDebug += "\nRounds player 1 " + str(list(aux1.Round))
+	errorDebug += "\nRounds player 1 " + str(list(aux2.Round))
+	assert(len(aux1) == len(aux2)), errorDebug
 	# assert(all(aux1['Joint'] == aux2['Joint'])), "Something wrong with players!"
 	aux3 = pd.DataFrame({'Dyad':aux1['Dyad'],\
 	'Round':aux1['Round'],\
@@ -446,6 +483,8 @@ data['Consistency_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Consistency'].transform('shift', 1)
 data['Dif_consist_LAG1'] = data.groupby(['Dyad', 'Player'])\
                             ['Dif_consist'].transform('shift', 1)
+data['Category_LAG1'] = data.groupby(['Dyad', 'Player'])\
+                            ['Category'].transform('shift', 1)
 data['RegionGo'] = data.groupby(['Dyad', 'Player'])\
                             ['Category'].transform('shift', -1)
 data['RegionGo2'] = data.groupby(['Dyad', 'Player'])\
