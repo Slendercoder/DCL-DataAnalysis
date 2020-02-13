@@ -62,7 +62,7 @@ def obtainIndicesIncluir(x):
 
 def correctavSc(x):
     if x['Is_there'] == 'Unicorn_Present':
-        return x['avScGrpUniPresent']
+        return np.ceil(x['avScGrpUniPresent'])
     else:
         return x['Score']
 
