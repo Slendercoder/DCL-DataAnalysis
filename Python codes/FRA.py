@@ -310,18 +310,20 @@ def sim_consist(v1, v2):
 	# Returns the similarity based on consistency
 	# v1 and v2 are two 64-bit coded regions
 
-	assert(len(v1) == 64), 'v1 must be a 64-bit coded region!'
-	assert(len(v2) == 64), 'v2 must be a 64-bit coded region!'
-
-	joint = [v1[x] * v2[x] for x in range(len(v1))]
-	union = [v1[x] + v2[x] for x in range(len(v1))]
-	union = [x/x for x in union if x != 0]
-	j = np.sum(np.array(joint))
-	u = np.sum(np.array(union))
-	if u != 0:
-		return float(j)/u
+	if type(v1) == type(np.nan) or type(v2) == type(np.nan):
+	       return np.nan
 	else:
-		return 1
+	       assert(len(v1) == 64), 'v1 must be a 64-bit coded region!'
+	       assert(len(v2) == 64), 'v2 must be a 64-bit coded region!'
+	       joint = [v1[x] * v2[x] for x in range(len(v1))]
+	       union = [v1[x] + v2[x] for x in range(len(v1))]
+	       union = [x/x for x in union if x != 0]
+	       j = np.sum(np.array(joint))
+	       u = np.sum(np.array(union))
+	       if u != 0:
+	              return float(j)/u
+	       else:
+	              return 1
 
 def dist(k, i):
     # Returns similarity between regions k and i

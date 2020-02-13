@@ -135,6 +135,7 @@ def completeRegions(strat, columna):
     return v[i]
 
 
+
 ######################################
 ######################################
 ######################################
@@ -395,7 +396,7 @@ print("Finding consistency...")
 # # print data[:10]
 data['Vector'] = data.apply(lambda x: np.array(x[cols1]), axis=1)
 data['VectorLAG1'] = data.groupby(['Dyad', 'Player'])['Vector'].transform('shift', 1)
-data = data.dropna()
+# data = data.dropna()
 data['Consistency'] = data.apply(lambda x: FRA.sim_consist(x['Vector'], x['VectorLAG1']), axis=1)
 del data['VectorLAG1']
 
@@ -431,7 +432,6 @@ for key, grp in data[cols].groupby(['Dyad']):
 	errorDebug += "\nRounds player 1 " + str(list(aux1.Round))
 	errorDebug += "\nRounds player 1 " + str(list(aux2.Round))
 	assert(len(aux1) == len(aux2)), errorDebug
-	# assert(all(aux1['Joint'] == aux2['Joint'])), "Something wrong with players!"
 	aux3 = pd.DataFrame({'Dyad':aux1['Dyad'],\
 	'Round':aux1['Round'],\
 	'C1':aux1['Consistency'],\
