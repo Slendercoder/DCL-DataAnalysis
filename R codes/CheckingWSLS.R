@@ -1,5 +1,6 @@
 library(ggplot2)
 library(dplyr)
+library(gridExtra)
 
 ###########################################################################################
 ###########################################################################################
@@ -66,7 +67,7 @@ plot_RSTransitions <- function(df) {
     xlab("Score") +
     #  ylab("") +
     ylab("Rel. Freq./Probability") +
-    ggtitle("Transition from RS to RS") +
+    ggtitle("Staying at RS") +
     theme_bw()
   
   return (gRS2RS)
@@ -85,7 +86,7 @@ plot_FocalTransitions <- function(df) {
     xlab("Score") +
     #  ylab("") +
     ylab("Rel. Freq./Probability") +
-    ggtitle("Frequency of staying at same focal region") +
+    ggtitle("Staying at same focal region") +
     theme_bw()
   
   
@@ -133,12 +134,13 @@ p <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) +
 ############################
 
 dfA <- df2 %>% select('Region', 'Score', 'RegionGo')
+dfA <- dfA[dfA$RegionGo != "", ]
 dfA$Freqs <- apply(dfA, 1, function(x) {
   i <- as.character(x[[1]][1])
   s <- as.numeric(x[[2]][1])
   k <- as.character(x[[3]][1])
   #cat('\ni', i, 's', s, 'k', k)
-  return(getRelFreq(i, s, k, df1))
+  return(getRelFreq(i, s, k, dfA))
 })
 dfA <- unique(dfA)
 dfA <- dfA[complete.cases(dfA), ]

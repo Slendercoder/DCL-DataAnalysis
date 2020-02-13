@@ -60,6 +60,13 @@ def obtainIndicesIncluir(x):
     else:
         return 0
 
+def correctavSc(x):
+    if x['Is_there'] == 'Unicorn_Present':
+        return x['avScGrpUniPresent']
+    else:
+        return x['Score']
+
+
 def nextScore(si, siLead, s, sLEAD):
     if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s > 29 and s > sLEAD:
         return sLEAD
@@ -205,6 +212,7 @@ if '2' in lista:
 
     # 3. Obtain average score per group of Unicorn_Present
     data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
+    data['avScGrpUniPresent'] = data.apply(correctavSc, axis=1)
     data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
     # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][50:60])
 
@@ -233,12 +241,13 @@ if '3' in lista:
 
     # 2. Obtain indices of blocks of Unicorn_Present
     data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
-    print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
+    print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][0:20])
 
     # 3. Obtain average score per group of Unicorn_Present
     data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
+    data['avScGrpUniPresent'] = data.apply(correctavSc, axis=1)
     data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
-    # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][50:60])
+    # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][0:20])
 
     # --------------------------------------------------
     # Estimating blocks
@@ -253,6 +262,8 @@ if '3' in lista:
     indicesIncluir = data.indice[data['Aux1'] == 1].tolist()
     data = data.drop(columns=['Aux1', 'Cambio_LAG1'])
     # print('indicesIncluir', indicesIncluir)
+
+    # 6. Include new row of Unicorn_Absent with estimated region and previous score
     for k in range(len(indicesIncluir)):
         Ind = len(indicesIncluir) - k - 1
         c = indicesIncluir[Ind]
@@ -261,7 +272,7 @@ if '3' in lista:
             # print('Processing estimation (c)', c, 'with Cambio', valor)
             df_aux = data[data['Cambio'] == valor]
             proxInd = list(df_aux.indice)[-1] + 1
-            # print('Block to be estimated\n', df_aux[['Round', 'Player', 'Is_there', 'a11', 'Score']])
+            # print('Block to be estimated\n', df_aux[['indice', 'Round', 'Player', 'Is_there', 'Category', 'Score']])
             columnas = df_aux.columns
             # print(columnas)
             columnas_no = ['Dyad', 'Round', 'Player', 'Answer', 'Is_there', 'where_x', 'where_y', 'Strategy', 'Is_there_LEAD', 'Category', 'indice', 'Cambio', 'puntaje']
@@ -280,7 +291,7 @@ if '3' in lista:
                 dict_aux['Is_there_LEAD'] = np.nan
             dict_aux['indice'] = c
             dict_aux['Cambio'] = 0
-            puntaje = df_aux['Score'].mean()
+            puntaje = np.ceil(df_aux['Score'].mean())
             dict_aux['Score'] = puntaje
             if puntaje > 31:
                 v = list(data.loc[proxInd][cols1])
@@ -302,16 +313,11 @@ if '3' in lista:
             # print('Dict\n', dict_aux)
             row_number = c
             row_value = [dict_aux[x] for x in columnas]
-            # print(row_value)
+            # print("Estimation:\n", row_value)
             data = Insert_row(row_number, data, row_value)
-        # print('List of blocks\n', data[['indice', 'Round', 'Player', 'Is_there', 'Cambio']][110:])
-
-    # 6. Include new row of Unicorn_Absent with estimated region and previous score
-    data['Score'] = data.apply(lambda x: nextScore(x['Is_there'], x['Is_there_LEAD'], x['Score'], x['avScGrpUniPresent_LEAD']), axis=1)
-    # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
+        # print('Estimated row\n', data[['indice', 'Round', 'Player', 'Is_there', 'Category', 'Score']][row_number-1:row_number+2])
 
     # Must correct scores again
-
     CLASIFICAR = False
     CONTINUO = False
     CONTADOR = 1
@@ -327,10 +333,11 @@ if '3' in lista:
 
     # 2. Obtain indices of blocks of Unicorn_Present
     data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
-    print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
+    # print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][50:60])
 
     # 3. Obtain average score per group of Unicorn_Present
     data['avScGrpUniPresent'] = data.groupby('Cambio')['Score'].transform('mean')
+    data['avScGrpUniPresent'] = data.apply(correctavSc, axis=1)
     data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
     # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'avScGrpUniPresent']][50:60])
 
