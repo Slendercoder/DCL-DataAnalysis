@@ -5,33 +5,6 @@ library(gridExtra)
 ###########################################################################################
 ###########################################################################################
 
-getRelFreq <- function(i, s, k, df) {
-  # Obtains the relative frequencies for transition from region i and score s to region k
-  # Input: i, which is the region the player is currently in
-  #        s, which is the player's score obtained on the previous round
-  #        k, which is the region the player is going to
-  #        df, the dataframe from which the observations are obtained
-  # Output: Relative frequency
-  
-  regs <- df[df$Region == i, ]
-  regs <- regs[regs$Score == s, ]
-  n <- dim(regs)[1]
-  if (n > 5) {
-    regs <- regs[regs$RegionGo == k, ]
-    f <- dim(regs)[1]
-    return(f/n)
-  } else {
-    return(NA)
-  }
-  
-  # auxDF <- t(as.data.frame(table(regsGo)))
-  #  print(auxDF)
-  # colnames(auxDF) <- as.character(unlist(auxDF[1, ])) # the first row will be the header
-  # auxDF <- auxDF[-1, ]          # removing the first row.
-  # auxDF <- auxDF[regiones]
-  # return(as.numeric(auxDF[1:9]))
-}
-
 plot_RSTransitions <- function(df) {
 
   df_RS <- df[df$Region == 'RS', ]
@@ -116,12 +89,18 @@ df2$Region <- df2$Category
 model1wsls <- lm(Consistency ~ Score_LAG1, data = df2)
 summary(model1wsls) # => Positive correlation is significant
 
+df1 <- df2[df2$Category != 'RS', ]
+df1 <- df2[df2$Category_LAG1 != 'RS', ]
+
+model2wsls <- lm(Consistency ~ Score_LAG1, data = df1)
+summary(model2wsls) # => Positive correlation is significant
+
 #min_score = -50
 min_score = 0
-alpha <- 0.2
+alpha <- 0.1
 
-
-p <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) + 
+# Full data
+p1 <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) + 
   geom_point(shape = 19, alpha = alpha) + 
   geom_smooth(method='lm', se=FALSE) + 
   theme_bw() +
@@ -129,25 +108,33 @@ p <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) +
   ylab("Consistency(n)") +
   xlim(c(min_score,32)) +
   ylim(c(0,1)) +
-  ggtitle('WSLS')
+  ggtitle('Full data')
+
+# Only focal regions
+p2 <- ggplot(df1, aes(x = Score_LAG1, y = Consistency)) + 
+  geom_point(shape = 19, alpha = alpha) + 
+  geom_smooth(method='lm', se=FALSE) + 
+  theme_bw() +
+  xlab("Score(n-1)") +
+  ylab("Consistency(n)") +
+  xlim(c(min_score,32)) +
+  ylim(c(0,1)) +
+  ggtitle('Only focal regions')
 
 ############################
 # Obtaining frequencies...
 ############################
 
 dfA <- df2 %>% select('Region', 'Score', 'RegionGo')
-dfA <- dfA[dfA$RegionGo != "", ]
-dfA$Freqs <- apply(dfA, 1, function(x) {
-  i <- as.character(x[[1]][1])
-  s <- as.numeric(x[[2]][1])
-  k <- as.character(x[[3]][1])
-  #cat('\ni', i, 's', s, 'k', k)
-  return(getRelFreq(i, s, k, dfA))
-})
-dfA <- unique(dfA)
-dfA <- dfA[complete.cases(dfA), ]
-head(dfA)
-df <- dfA
+df <- dfA %>%
+  dplyr::group_by(Region, Score, RegionGo) %>%
+  dplyr::summarize(n = n()) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(Region, Score) %>%
+  dplyr::mutate(n1 = sum(n),
+                Freqs = n/n1)
+
+head(df)
 
 ############################
 # Ploting data...
@@ -155,5 +142,5 @@ df <- dfA
 
 g1 <- plot_RSTransitions(df)
 g2 <- plot_FocalTransitions(df)
-gB <- grid.arrange(g1, g2, p, nrow=2)
+gB <- grid.arrange(p1, p2, g1, g2, nrow=2)
 
