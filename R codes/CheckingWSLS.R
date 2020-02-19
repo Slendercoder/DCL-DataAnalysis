@@ -48,8 +48,10 @@ plot_RSTransitions <- function(df) {
 }
 
 plot_FocalTransitions <- function(df) {
-    
-  regiones <- c('RS', 'ALL', 'NOTHING', 
+  
+  df <- df[df$Region != 'RS', ]
+
+  regiones <- c('ALL', 'NOTHING', 
                 'DOWN', 'UP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   
@@ -66,14 +68,10 @@ plot_FocalTransitions <- function(df) {
   #other <- 'RIGHT'
   #other <- 'LEFT'
   for (other in regiones) {
-    df_RS <- df[df$Region == other, ]
-    for (x in regiones) {
-      if (x != other) {
-        df_RS <- df_RS[df_RS$RegionGo != x, ]
-      }
-    }
+    df_Focal <- df[df$Region == other, ]
+    df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
     gOTHER2OTHER <- gOTHER2OTHER +
-      geom_point(aes(x = Score, y = Freqs), df_RS, alpha = alpha, size=1.5)
+      geom_point(aes(x = Score, y = Freqs), df_Focal, alpha = alpha, size=1.5)
   }
 
   return (gOTHER2OTHER)
@@ -86,14 +84,14 @@ plot_FocalTransitions <- function(df) {
 df2 = read.csv("../Python Codes/output.csv")
 df2$Region <- df2$Category
 
-model1wsls <- lm(Consistency ~ Score_LAG1, data = df2)
-summary(model1wsls) # => Positive correlation is significant
+#model1wsls <- lm(Consistency ~ Score_LAG1, data = df2)
+#summary(model1wsls) # => Positive correlation is significant
 
 df1 <- df2[df2$Category != 'RS', ]
-df1 <- df2[df2$Category_LAG1 != 'RS', ]
+df1 <- df1[df1$Category_LAG1 != 'RS', ]
 
-model2wsls <- lm(Consistency ~ Score_LAG1, data = df1)
-summary(model2wsls) # => Positive correlation is significant
+#model2wsls <- lm(Consistency ~ Score_LAG1, data = df1)
+#summary(model2wsls) # => Positive correlation is significant
 
 #min_score = -50
 min_score = 0
@@ -125,6 +123,7 @@ p2 <- ggplot(df1, aes(x = Score_LAG1, y = Consistency)) +
 # Obtaining frequencies...
 ############################
 
+df2 <- df2[df2$RegionGo != "", ]
 dfA <- df2 %>% select('Region', 'Score', 'RegionGo')
 df <- dfA %>%
   dplyr::group_by(Region, Score, RegionGo) %>%
@@ -139,6 +138,8 @@ head(df)
 ############################
 # Ploting data...
 ############################
+
+alpha <- 0.3
 
 g1 <- plot_RSTransitions(df)
 g2 <- plot_FocalTransitions(df)
