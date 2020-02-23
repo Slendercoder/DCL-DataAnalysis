@@ -12,7 +12,8 @@ get_legend<-function(myggplot){
 ###############################################
 
 #df = read.csv("../Python Codes/FRAsimulated.csv", na.strings=c("","NA"))
-df = read.csv("../Python Codes/outputWSLS.csv", na.strings=c("","NA"))
+#df = read.csv("../Python Codes/outputWSLS.csv", na.strings=c("","NA"))
+df = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
 head(df)
 
 ###############################################

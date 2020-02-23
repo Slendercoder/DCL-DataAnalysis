@@ -129,7 +129,7 @@ def completeRegions(strat, columna):
     if strat == 0 or strat == 9:
         v = FRA.code2Vector(FRA.new_random_strategy(Num_Loc), Num_Loc)
     else:
-        v = regionsCoded[strat]
+        v = regionsCoded[strat - 1] # -1 since regionsCoded does not have RS
 
     i = cols1.index(columna)
     return v[i]
