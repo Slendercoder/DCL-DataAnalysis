@@ -1,13 +1,8 @@
 library(dplyr)
 
-specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
-imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
-
-sigmoid <- function(x, beta, gamma) {
-  # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
-  
-  return(1 / (1 + exp(-beta * (x - gamma))))
-}
+####################################################################################
+# Global variables
+####################################################################################
 
 regiones <- c('RS',
               'ALL', 
@@ -22,60 +17,68 @@ regiones <- c('RS',
 lowerEps2=.00001
 highEps2 =.99999
 
-getFreq <- function(i, s, df, regiones) {
-  # Obtains the frequencies vector for each starting region region i and score s 
-  # Input: i, which is the region the player is in
-  #        s, which is the player's score obtained on the previous round
-  #        df, the dataframe from which the observations are obtained
-  #        regions, which is the vector with the regions names
-  # Output: Frequency vector of length 9
+####################################################################################
+# Functions
+####################################################################################
+
+specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
+imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
+
+sigmoid <- function(x, beta, gamma) {
+  # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
   
-  df$RegionGo <- factor(df$RegionGo, levels = regiones, ordered = TRUE)
-  
-  regs <- df[which(df$Region == i), ]
-  regsGo <- regs$RegionGo[which(regs$Score == s)]
-  #  print(regsGo)
-  auxDF <- t(as.data.frame(table(regsGo)))
-  #  print(auxDF)
-  colnames(auxDF) <- as.character(unlist(auxDF[1, ])) # the first row will be the header
-  auxDF <- auxDF[-1, ]          # removing the first row.
-  auxDF <- auxDF[regiones]
-  return(as.numeric(auxDF[1:9]))
+  return(1 / (1 + exp(-beta * (x - gamma))))
 }
 
-getArgs <- function(data) {
-  # Prepare dataFrame with frequencies
-#  regions <- unique(data$Region)
-  scores <- unique(data$Score)
-  # print(scores)
+obtainFreqVector <- function(x) {
+  a <- data.frame(table(x))
+  return(list(a$Freq))
   
-  # Create all combinations of regions, scores and joints
-  args <- as.data.frame(expand.grid(i = regiones, s = scores))
-  args$pair <- apply(args, 1, function(x) list(as.character(x[1]), as.numeric(x[2])))
-  #print(head(args))
+}
 
-  # Get the frequencies for each pair
-  args$freq <- lapply(args$pair, function(x) {
-    i <- as.character(x[[1]][1])
-    s <- as.numeric(x[[2]][1])
-    return(getFreq(i,s,data, regiones))
+getFreq <- function(df, theta) {
+  
+  df <- df[complete.cases(df), ]
+  df$Region <- df$Category
+  df <- df[c('Region', 'Score', 'RegionGo')]
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
+  df <- df %>%
+    dplyr::group_by(Region, Score) %>%
+    dplyr::summarize(Freqs = obtainFreqVector(RegionGo))
+  
+#  print(df$Region)
+#  df <- df[complete.cases(df), ]
+  df$freqs <- lapply(df$Freqs, function(x) {
+    x1 <- x[1]
+    x2 <- x[2]
+    x3 <- x[3]
+    x4 <- x[4]
+    x5 <- x[5]
+    x6 <- x[6]
+    x7 <- x[7]
+    x8 <- x[8]
+    x9 <- x[9]
+    return (c(x1, x2, x3, x4, x5, x6, x7, x8, x9))
   })
-  # print(head(args))
-  args$sumFreq <- sapply(args$freq, sum)
   
-  args <- args[args$sumFreq > 0, ]
-  # print(head(args))
+  return (df) #[c('Region', 'Score', 'freqs')])
+} 
 
-  #  args <- args[args$sumFreq > 4, ]
+WSpred <- function(i, s, theta){
   
-  return(args)
-}
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
 
-WSpred <- function(i, s, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones){
   aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
   #  aux <- rep(w, 8)
   # The probability of region 'RS' is 1 - the sum of the other probabilities
   if (sum(aux) > 1) {
+    print('Oops, incorrect biases')
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
@@ -101,42 +104,8 @@ WSpred <- function(i, s, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsi
   return(probs)
 }
 
-WSpredSL <- function(i, s, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones){
-  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
-  #  aux <- rep(w, 8)
-  # The probability of region 'RS' is 1 - the sum of the other probabilities
-  if (sum(aux) > 1) {
-    aux <- aux/sum(aux)
-  }
-  bias <- c(1 - sum(aux), aux)
-  #  print("bias")
-  #  imprimir(bias)
-  #  n <- (s + 128) / 160 # Normalizing score
-  if(s == 1){
-    n <- 10
-  } else {
-    n <- 32
-  }
-#  n <- s
-  
-  # Find the attractivenes:
-  attractiveness <- bias # Start from bias
-  
-  # Add attractiveness to current region according to score
-  if (i != 'RS') {
-    index <- which(regiones == i)
-    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(n, beta, gamma) 
-  }
-  
-  probs <- attractiveness / sum(attractiveness)
-  probs <- replace(probs,probs<lowerEps2,lowerEps2)
-  probs <- replace(probs,probs>highEps2,highEps2)
-  
-  return(probs)
-}
-
 # A function to get deviance from WSLS and FRA models
-WSutil <- function(theta, args, regiones){
+WSutil <- function(theta, args){
   # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
   # Output: Deviance of WSLSpred for all regions and scores
@@ -147,30 +116,21 @@ WSutil <- function(theta, args, regiones){
     return(10000)
   }
   
-  wAll <- theta[1]
-  wNoth <- theta[2]
-  wLef <- theta[3]
-  wIn <- theta[4]
-  alpha <- theta[5]
-  beta <- theta[6]
-  gamma <- theta[7]
-  delta <- theta[8]
-  epsilon <- theta[9]
-  zeta <- theta[10]
-  eta <- theta[11]
-  
   # Calculate the probabilities based on WSpred
   # print('Calculating probabilities')
-  args$probs <- lapply(args$pair, function(x) {
-    i <- as.character(x[[1]][1])
-    s <- as.numeric(x[[2]][1])
-    return(WSpred(i, s, wAll, wNoth, wLef, wIn, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones))
+  args$probs <- mapply(function(i,s) {
+    return(list(WSpred(i, s, theta)))
     # return(WSpredSL(i, s, w, alpha, beta, gamma, delta, epsilon, zeta, eta, regiones))
-  })
+  },
+  args$Region, args$Score)
 
   # Calculate deviance
   #  print('Calculating deviances')
-  args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
+  args$dev <- mapply(function(x,y) {
+    x <- unlist(x)
+    y <- unlist(y)
+    log(dmultinom(x, prob = y))
+    }, args$Freqs, args$probs)
   
 #  print(args$dev)
   

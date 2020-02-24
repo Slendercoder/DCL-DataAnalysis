@@ -7,15 +7,13 @@ library(beepr)
 df1 = read.csv("../Python Codes/Dyads/output-356-137PL2.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/Dyads/output-356-137PL1.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
-df1 <- df1[complete.cases(df1), ]
-df1$Region <- df1$Category
-df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df1)
 
-args <- getArgs(df1)
-args <- args[order(-args$s, args$i),] 
-args <- args[c('pair', 'freq', 'sumFreq')]
-head(args)
+args <- getFreq(df1)
+
+theta <- c(0.01, 0.01, 0.01, 0.01, 500, 500, 32)
+
+dev <- WSutil(theta, args)
 
 ## To search for best parameters WSLS model with mle2
 #fitresWSLS <- mle2(minuslogl=WSutil1,

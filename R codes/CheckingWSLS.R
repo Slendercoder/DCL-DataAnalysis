@@ -159,6 +159,17 @@ para_visualizar <- function(theta) {
   return(params)
 }
 
+getFrequencies <- function(df) {
+  df %>%
+    dplyr::group_by(Region, Score, RegionGo) %>%
+    dplyr::summarize(n = n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(Region, Score) %>%
+    dplyr::mutate(n1 = sum(n),
+                  Freqs = n/n1)
+  
+  return (df)
+} 
 
 ###########################################################################################
 ###########################################################################################
@@ -181,8 +192,8 @@ df1 <- df1[df1$Category_LAG1 != 'RS', ]
 ############################
 
 df2 <- df2[df2$RegionGo != "", ]
-dfA <- df2 %>% select('Region', 'Score', 'RegionGo')
-df <- dfA %>%
+df <- df2 %>% select('Region', 'Score', 'RegionGo')
+df <- getFrequencies(df) %>%
   dplyr::group_by(Region, Score, RegionGo) %>%
   dplyr::summarize(n = n()) %>%
   dplyr::ungroup() %>%
