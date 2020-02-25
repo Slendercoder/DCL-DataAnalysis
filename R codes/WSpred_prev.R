@@ -17,6 +17,9 @@ regiones <- c('RS',
 lowerEps2=.00001
 highEps2 =.99999
 
+lower_limits=c(0,0,0,0,0,400,0)
+upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32)
+
 ####################################################################################
 # Functions
 ####################################################################################
@@ -61,7 +64,7 @@ getFreq <- function(df, theta) {
     return (c(x1, x2, x3, x4, x5, x6, x7, x8, x9))
   })
   
-  return (df) #[c('Region', 'Score', 'freqs')])
+  return (df[c('Region', 'Score', 'freqs')])
 } 
 
 WSpred <- function(i, s, theta){
@@ -106,9 +109,9 @@ WSpred <- function(i, s, theta){
 
 # A function to get deviance from WSLS and FRA models
 WSutil <- function(theta, args){
-  # Input: theta, parameter vector of length 11
-  #        data, the dataframe from which frequencies are obtained
-  # Output: Deviance of WSLSpred for all regions and scores
+  # Input: theta, parameter vector of length 7
+  #        args, the dataframe with frequencies
+  # Output: Deviance of WSLSpred
   
   if (any(is.na(theta))) {
     print('Incorrect parameters: ')
@@ -130,7 +133,7 @@ WSutil <- function(theta, args){
     x <- unlist(x)
     y <- unlist(y)
     log(dmultinom(x, prob = y))
-    }, args$Freqs, args$probs)
+    }, args$freqs, args$probs)
   
 #  print(args$dev)
   
@@ -146,6 +149,83 @@ WSutil <- function(theta, args){
   }
   
   return(-2*sum(args$dev))
+}
+
+random_params <- function(x1, x2, x3, x4, x5, x6, x7) {
+  
+  x1 <- unlist(x1)
+  x1 <- c(1, x1)
+#  print(x1)
+  a1 <- do.call(runif, as.list(x1))
+
+  x2 <- unlist(x2)
+  x2 <- c(1, x2)
+#  print(x2)
+  a2 <- do.call(runif, as.list(x2))
+  
+  x3 <- unlist(x3)
+  x3 <- c(1, x3)
+#  print(x3)
+  a3 <- do.call(runif, as.list(x3))
+  
+  x4 <- unlist(x4)
+  x4 <- c(1, x4)
+#  print(x4)
+  a4 <- do.call(runif, as.list(x4))
+  
+  x5 <- unlist(x5)
+  x5 <- c(1, x5)
+#  print(x5)
+  a5 <- do.call(runif, as.list(x5))
+  
+  x6 <- unlist(x6)
+  x6 <- c(1, x6)
+#  print(x6)
+  a6 <- do.call(runif, as.list(x6))
+  
+  x7 <- unlist(x7)
+  x7 <- c(1, x7)
+#  print(x7)
+  a7 <- do.call(runif, as.list(x7))
+  
+  return(c(a1, a2, a3, a4, a5, a6, a7))
+   
+}
+
+searchFit <- function(params, args) {
+  
+  fitresWSLS <- nmkb(par=params,
+                     fn = function(t) WSutil(t, args),
+                     lower=lower_limits,
+                     upper=upper_limits,
+                     control=list(trace=0))
+
+  return(fitresWSLS)  
+
+}
+
+searchBestFit <- function(args, N) {
+  
+  best <- 100000
+  
+  for (n in rep(0, N)) {
+    params <- random_params(list(lower_limits[1], upper_limits[1]), 
+                            list(lower_limits[2], upper_limits[2]), 
+                            list(lower_limits[3], upper_limits[3]), 
+                            list(lower_limits[4], upper_limits[4]), 
+                            list(lower_limits[5], upper_limits[5]), 
+                            list(lower_limits[6], upper_limits[6]), 
+                            list(lower_limits[7], upper_limits[7]))
+    
+    bestFit <- searchFit(params, args)
+    if (bestFit$value < best) {
+      fitWS <- bestFit
+      best <- fitWS$value
+    }
+  }
+  
+  return(fitWS)
+  
 }
 
 WSutil1 <- function(a, b){
