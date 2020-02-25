@@ -38,13 +38,15 @@ regions = ['RS', \
 def new_random_strategy(Num_Loc):
     # Creates a new random strategy to explore grid
     # The size of this new strategy is determined by
-    # a normal distribution with mean = 48 and s.d. = 4
+    # a normal distribution with mean = m and s.d. = sd
 
-    m = 48
-    sd = 4
-    n = int(np.random.normal(48, 4))
+    # sd = 4
+    # m = 48
+    m = 32
+    sd = 8
+    n = int(np.random.normal(m, sd))
     while n < 2 or n > 62:
-        n = int(np.random.normal(48, 4))
+        n = int(np.random.normal(m, sd))
 
     return list(np.random.choice(Num_Loc * Num_Loc, n))
 

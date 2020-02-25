@@ -1,4 +1,7 @@
 library(dplyr)
+library(dfoptim)
+library(bbmle)
+library(beepr)
 
 ####################################################################################
 # Global variables
@@ -26,6 +29,14 @@ upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32)
 
 specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
 imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
+para_visualizar <- function(theta) {
+  a <- as.character(theta)
+  params <- ''
+  for (letra in a) {
+    params <- paste(params, letra, ', ', sep = "")
+  }
+  return(params)
+}
 
 sigmoid <- function(x, beta, gamma) {
   # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))
@@ -66,6 +77,44 @@ getFreq <- function(df, theta) {
   
   return (df[c('Region', 'Score', 'freqs')])
 } 
+
+getRelFreq_Rows <- function(df) {
+  # Obtains the relative frequencies for transition from region i and score s to region k
+  # Input: k, the region the player is going to
+  #        df, the dataframe from which the observations are obtained
+  # Output: Relative frequency
+  df <- df[complete.cases(df), ]
+  df$Region <- df$Category
+  df <- df[df2$RegionGo != "", ]
+  df <- df %>% select('Region', 'Score', 'RegionGo')
+  df <- df %>%
+    dplyr::group_by(Region, Score, RegionGo) %>%
+    dplyr::summarize(n = n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(Region, Score) %>%
+    dplyr::mutate(n1 = sum(n),
+                  Freqs = n/n1)  
+  return(df[c('Region', 'Score', 'RegionGo', 'Freqs')])
+}
+
+getRelFreq_k <- function(k, df) {
+  # Obtains the relative frequencies for transition from region i and score s to region k
+  # Input: k, the region the player is going to
+  #        df, the dataframe from which the observations are obtained
+  # Output: Relative frequency
+  df <- df[df2$RegionGo != "", ]
+  df <- df %>% select('Region', 'Score', 'RegionGo')
+  df <- getFrequencies(df) %>%
+    dplyr::group_by(Region, Score, RegionGo) %>%
+    dplyr::summarize(n = n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(Region, Score) %>%
+    dplyr::mutate(n1 = sum(n),
+                  Freqs = n/n1)  
+  
+  df <- df[df$RegionGo == k, ]
+  return(df)
+}
 
 WSpred <- function(i, s, theta){
   
@@ -255,4 +304,125 @@ Nombre_Region <- function(x) {
   } else if (x == '8') {
     return('OUT')
   }
+}
+
+get_legend <- function(myggplot){
+  tmp <- ggplot_gtable(ggplot_build(myggplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+
+get_legend_from_dummy <- function(True_model_color, Recovered_model_color) {
+
+    xs <- seq(min_score,32,length.out=(32-min_score + 1)*1000)
+  dummyplot <- ggplot() +
+    geom_line(aes(x = xs, y = xs, color = "True"), size = 1) + 
+    geom_line(aes(x = xs, y = xs, color = "Recovered"), size = 1) + 
+    scale_x_continuous(limits = c(min_score, 33)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    scale_color_manual(values=c("True"=True_model_color,
+                                "Recovered"=Recovered_model_color),
+                       name="")  +
+    theme_bw() +
+    theme(legend.position="bottom")
+  
+  legend2 <- get_legend(dummyplot)
+  
+  return(legend2)
+
+}
+
+WSprob <- function(i, s, k, theta){
+  
+  probs <- WSpred(i, s, theta)
+  
+  probab <- probs[which(regiones == k)]
+  
+  return(probab)
+}
+
+plot_RSTransitions <- function(df) {
+  
+  df_RS <- df[df$Region == 'RS', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+  head(df_RS)
+  
+  gRS2RS <- ggplot() +
+    geom_point(aes(x = Score, y = Freqs), df_RS, alpha = alpha, size=1.5) +
+    scale_x_continuous(limits = c(min_score, 35)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("Score") +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Staying at RS") +
+    theme_bw()
+  
+  return (gRS2RS)
+  
+}
+
+plot_FocalTransitions <- function(df) {
+  
+  df <- df[df$Region != 'RS', ]
+  
+  regiones <- c('ALL', 'NOTHING', 
+                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'IN', 'OUT')
+  
+  gOTHER2OTHER <- ggplot() +
+    scale_x_continuous(limits = c(min_score, 35)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("Score") +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Staying at same focal region") +
+    theme_bw()
+  
+  
+  #other <- 'RIGHT'
+  #other <- 'LEFT'
+  for (other in regiones) {
+    df_Focal <- df[df$Region == other, ]
+    df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
+    gOTHER2OTHER <- gOTHER2OTHER +
+      geom_point(aes(x = Score, y = Freqs), df_Focal, alpha = alpha, size=1.5)
+  }
+  
+  return (gOTHER2OTHER)
+  
+}
+
+plot_ModelTransitions_RS <- function(theta, pl, plColor) {
+  
+  xs <- seq(-128,32,length.out=161)
+  fitRS <- sapply(xs, WSprob, i='RS', k='RS', theta=theta)
+  dfB <- data.frame(xs, fitRS)
+  pl <- pl +
+    geom_line(aes(x = xs, y = fitRS), dfB, color=plColor, size=1)
+  
+  return(pl)
+}
+
+plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
+  
+  xs <- seq(-128,32,length.out=161)
+  regiones <- c('ALL', 'NOTHING', 
+                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'IN', 'OUT')
+  for (other in regiones) {
+    fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=theta)
+    dfB <- data.frame(xs, fitFocal)
+    pl <- pl +
+      geom_line(aes(x = xs, y = fitFocal), dfB, color=plColor, size=1)
+  }
+  
+  return(pl)
 }

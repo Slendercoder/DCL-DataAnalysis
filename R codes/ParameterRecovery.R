@@ -4,7 +4,7 @@ source("WSpred.R")
 # Parameter recovery for WSLS
 ########################################################################
 
-df1 = read.csv("../Python Codes/Dyads/output-356-137PL2.csv", na.strings=c("","NA"))
+df1 = read.csv("../Python Codes/Model_recovery/M0_full.csv", na.strings=c("","NA"))
 #head(df1)
 
 args <- getFreq(df1)

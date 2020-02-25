@@ -1,0 +1,14 @@
+p = 0.5 # probability of there being a unicorn
+pl = 2 # number of players
+n = 8 # number of rows/columns in grid
+rounds = 60 # number of rounds
+dyads = 20 # number of dyads
+gameParameters = [p, pl, n, rounds, dyads]
+
+output0: modelParameters = [0, 0, 0, 0.4, 500, 500, 32, 0, 0, 0]
+
+output1: modelParameters = [0, 0, 0, 0.2, 500, 500, 32, 0, 0, 0]
+
+output2: modelParameters = [0, 0, 0, 0.1, 500, 500, 32, 0, 0, 0]
+
+output3: modelParameters = [0, 0, 0, 0.05, 500, 500, 32, 0, 0, 0]
