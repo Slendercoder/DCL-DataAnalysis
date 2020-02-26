@@ -69,11 +69,12 @@ def standard_simulation(gameParameters, modelParameters):
 def sample_variation(gameParameters, modelParameters, n_samples = 100):
 
     print('Obtaining', n_samples, 'samples (please be patient!)...')
-    nombre = '/Simulations/Sample_size/sample'
+    nombre = 'Simulations/Sample_size/sample'
 
     for i in range(n_samples):
-        data = standard_simulation(gameParameters, modelParameters)
-        data = M.get_measures(data, '0')
+        E = DL.Experiment(gameParameters, modelParameters)
+        E.run_simulation()
+        data = M.get_measures(E.df, '0')
         archivo = nombre + str(i + 1) + '.csv'
         data.to_csv(archivo, index=False)
 

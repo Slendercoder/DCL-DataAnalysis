@@ -7,11 +7,10 @@ import pandas as pd
 import FRA
 
 # --------------------------------------------------
-# Parameters (Global variables)
+# Global variables
 # --------------------------------------------------
 Num_Loc = 8
 CLASIFICAR = False
-
 CONTINUO = False
 CONTADOR = 1
 
@@ -144,6 +143,8 @@ def get_measures(data, lista):
     3: Estimate blocks
     4: Keep only absent
     5: Find max similarity'''
+
+    global cols1
 
     print("Sorting by Dyad, Player, Round...")
     data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True]).reset_index(drop=True)
