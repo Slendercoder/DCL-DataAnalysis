@@ -29,4 +29,4 @@ modelParameters += modelParameters # Both players equal parameters
 # modelParameters += [0, 0, 0, 0.4, 500, 500, 32, 0, 0, 0] #PL2
 
 # RM.standard_simulation(gameParameters, modelParameters)
-RM.sample_variation(gameParameters, modelParameters, 2)
+RM.sample_variation(gameParameters, modelParameters, 100)
