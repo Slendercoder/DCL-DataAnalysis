@@ -145,11 +145,6 @@ def get_measures(data, lista):
     4: Keep only absent
     5: Find max similarity'''
 
-    print('Opening database...')
-    data = pd.read_csv(data_archivo, index_col=False)
-    print("Done!")
-    # print(data)
-
     print("Sorting by Dyad, Player, Round...")
     data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True]).reset_index(drop=True)
     # data.to_csv('output_Prev.csv', index=False)
