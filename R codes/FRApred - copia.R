@@ -30,13 +30,6 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 # Define functions
 ###########################
 
-get_legend<-function(myggplot){
-  tmp <- ggplot_gtable(ggplot_build(myggplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)
-}
-
 classifyCode <- function(cadena) {
   # Returns the code of a given lettercode
   # Input: cadena,  lettercode of a region
@@ -169,7 +162,8 @@ sim_consist <- function(v1, v2){
 FRApred <- function(i, iV, s, j, 
                     wALL, wNOTHING, wLEFT, wIN,
                     alpha, beta, gamma, 
-                    delta, epsilon, zeta){
+                    delta, epsilon, zeta, 
+                    regiones){
   # Returns the transition probability vector
   # Each position in the vector represents a region
   # and the value represents the probability of going to that region
@@ -339,3 +333,18 @@ FRAutil <- function(theta, args, regiones){
   return(-2*sum(args$dev))
 } # end FRAutil
 
+#df1 = read.csv("../Python Codes/freqs4FRA.csv")
+#head(df1)
+
+#args <- getArgs(df1, regions)
+#head(args)
+
+#i <- as.character(df1[2:2, 4])
+#iV <- as.character(df1[2:2, 5])
+#s <- as.numeric(df1[2:2, 7])
+#j <- as.character(df1[2:2, 8])
+#p <- FRApred(i, iV, s, j, 0.1, 0.1, 0.1, 0.1, 200, 500, 32, 200, 500, 0.7, regiones)
+#imprimir(p)
+#theta <- c(0.1, 0.1, 0.1, 0.1, 200, 500, 32, 200, 500, 0.7)
+#dev <- FRAutil(theta, args, regiones)
+#dev

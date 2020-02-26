@@ -2,6 +2,9 @@ library(dplyr)
 library(dfoptim)
 library(bbmle)
 library(beepr)
+library(ggplot2)
+library(gridExtra)
+library(Rmisc)
 
 ####################################################################################
 # Global variables
@@ -83,9 +86,10 @@ getRelFreq_Rows <- function(df) {
   # Input: k, the region the player is going to
   #        df, the dataframe from which the observations are obtained
   # Output: Relative frequency
+  df <- df1
   df <- df[complete.cases(df), ]
   df$Region <- df$Category
-  df <- df[df2$RegionGo != "", ]
+  df <- df[df$RegionGo != "", ]
   df <- df %>% select('Region', 'Score', 'RegionGo')
   df <- df %>%
     dplyr::group_by(Region, Score, RegionGo) %>%
@@ -277,13 +281,6 @@ searchBestFit <- function(args, N) {
   
 }
 
-WSutil1 <- function(a, b){
-
-  theta <- c(a, b, 10, 31, 0, 0, 0, 0)
-  return(WSutil(theta, args, regiones))
-
-}
-
 Nombre_Region <- function(x) {
   if (x == '0' || x== '9') {
     return('RS')
@@ -306,33 +303,6 @@ Nombre_Region <- function(x) {
   }
 }
 
-get_legend <- function(myggplot){
-  tmp <- ggplot_gtable(ggplot_build(myggplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)
-}
-
-get_legend_from_dummy <- function(True_model_color, Recovered_model_color) {
-
-    xs <- seq(min_score,32,length.out=(32-min_score + 1)*1000)
-  dummyplot <- ggplot() +
-    geom_line(aes(x = xs, y = xs, color = "True"), size = 1) + 
-    geom_line(aes(x = xs, y = xs, color = "Recovered"), size = 1) + 
-    scale_x_continuous(limits = c(min_score, 33)) + 
-    scale_y_continuous(limits = c(0, 1.01)) + 
-    scale_color_manual(values=c("True"=True_model_color,
-                                "Recovered"=Recovered_model_color),
-                       name="")  +
-    theme_bw() +
-    theme(legend.position="bottom")
-  
-  legend2 <- get_legend(dummyplot)
-  
-  return(legend2)
-
-}
-
 WSprob <- function(i, s, k, theta){
   
   probs <- WSpred(i, s, theta)
@@ -340,89 +310,4 @@ WSprob <- function(i, s, k, theta){
   probab <- probs[which(regiones == k)]
   
   return(probab)
-}
-
-plot_RSTransitions <- function(df) {
-  
-  df_RS <- df[df$Region == 'RS', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
-  head(df_RS)
-  
-  gRS2RS <- ggplot() +
-    geom_point(aes(x = Score, y = Freqs), df_RS, alpha = alpha, size=1.5) +
-    scale_x_continuous(limits = c(min_score, 35)) + 
-    scale_y_continuous(limits = c(0, 1.01)) + 
-    xlab("Score") +
-    #  ylab("") +
-    ylab("Rel. Freq./Probability") +
-    ggtitle("Staying at RS") +
-    theme_bw()
-  
-  return (gRS2RS)
-  
-}
-
-plot_FocalTransitions <- function(df) {
-  
-  df <- df[df$Region != 'RS', ]
-  
-  regiones <- c('ALL', 'NOTHING', 
-                'DOWN', 'UP', 'LEFT', 'RIGHT',
-                'IN', 'OUT')
-  
-  gOTHER2OTHER <- ggplot() +
-    scale_x_continuous(limits = c(min_score, 35)) + 
-    scale_y_continuous(limits = c(0, 1.01)) + 
-    xlab("Score") +
-    #  ylab("") +
-    ylab("Rel. Freq./Probability") +
-    ggtitle("Staying at same focal region") +
-    theme_bw()
-  
-  
-  #other <- 'RIGHT'
-  #other <- 'LEFT'
-  for (other in regiones) {
-    df_Focal <- df[df$Region == other, ]
-    df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
-    gOTHER2OTHER <- gOTHER2OTHER +
-      geom_point(aes(x = Score, y = Freqs), df_Focal, alpha = alpha, size=1.5)
-  }
-  
-  return (gOTHER2OTHER)
-  
-}
-
-plot_ModelTransitions_RS <- function(theta, pl, plColor) {
-  
-  xs <- seq(-128,32,length.out=161)
-  fitRS <- sapply(xs, WSprob, i='RS', k='RS', theta=theta)
-  dfB <- data.frame(xs, fitRS)
-  pl <- pl +
-    geom_line(aes(x = xs, y = fitRS), dfB, color=plColor, size=1)
-  
-  return(pl)
-}
-
-plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
-  
-  xs <- seq(-128,32,length.out=161)
-  regiones <- c('ALL', 'NOTHING', 
-                'DOWN', 'UP', 'LEFT', 'RIGHT',
-                'IN', 'OUT')
-  for (other in regiones) {
-    fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=theta)
-    dfB <- data.frame(xs, fitFocal)
-    pl <- pl +
-      geom_line(aes(x = xs, y = fitFocal), dfB, color=plColor, size=1)
-  }
-  
-  return(pl)
 }
