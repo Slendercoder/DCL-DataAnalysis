@@ -108,7 +108,7 @@ getRelFreq_k <- function(k, df) {
   # Output: Relative frequency
   df <- df[df2$RegionGo != "", ]
   df <- df %>% select('Region', 'Score', 'RegionGo')
-  df <- getFrequencies(df) %>%
+  df <- df %>%
     dplyr::group_by(Region, Score, RegionGo) %>%
     dplyr::summarize(n = n()) %>%
     dplyr::ungroup() %>%

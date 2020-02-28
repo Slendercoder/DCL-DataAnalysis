@@ -1,5 +1,22 @@
 library(ggplot2)
 library(gridExtra)
+library(Rmisc)
+
+####################################################################################
+# Global variables
+####################################################################################
+
+regiones <- c('RS',
+              'ALL', 
+              'NOTHING', 
+              'DOWN', 
+              'UP', 
+              'LEFT', 
+              'RIGHT', 
+              'IN', 
+              'OUT')
+
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 get_legend <- function(myggplot){
   tmp <- ggplot_gtable(ggplot_build(myggplot))
@@ -215,6 +232,26 @@ plot_4panels <- function(archivo) {
     xlim(c(min_score,32)) +
     ylim(c(0,1)) +
     ggtitle('Only focal regions')
+
+  d1 <- plot_RSTransitions(df)
+  d1 <- plot_ModelTransitions_RS(theta, d1,"#999999")
+  d2 <- plot_FocalTransitions(df)
+  d2 <- plot_ModelTransitions_Focal(theta, d2,"#999999")
+  params <- para_visualizar(theta)
+  gB <- grid.arrange(p1, p2, d1, d2, nrow=2,
+                     bottom=params)
+  
+  return (gB)
+}
+
+plot_2panels <- function(archivo) {
+  
+  df2 = read.csv(archivo)
+  df2$Region <- df2$Category
+  
+  ############################
+  # Ploting data...
+  ############################
   # Summarize data
   dfc_DLIndex <- summarySE(df2, measurevar="DLIndex", groupvars="Round")
   head(dfc_DLIndex)
@@ -238,12 +275,8 @@ plot_4panels <- function(archivo) {
     labs(color = "Source of data") +
     ggtitle('Kernel density estimate') +
     theme_bw()
-  d1 <- plot_RSTransitions(df)
-  d1 <- plot_ModelTransitions_RS(theta, d1,"#999999")
-  d2 <- plot_FocalTransitions(df)
-  d2 <- plot_ModelTransitions_Focal(theta, d2,"#999999")
-  params <- para_visualizar(theta)
-  gB <- grid.arrange(p1, p2, d1, d2, nrow=2,
+  
+  gB <- grid.arrange(g1, g2, nrow=2,
                      bottom=params)
   
   return (gB)
@@ -405,3 +438,163 @@ plot_Model_correction_and_recovery_Dyad <- function(model_to_recover,
                bottom=legend, top="Model correction and recovery - DLindex")
   
 }
+
+plot_sample_variation <- function(ruta, N) {
+  
+  # Create single data frame
+  print("Creating dataframe...")
+  archivo = paste(ruta, 1, ".csv", sep="")
+  df = read.csv(archivo)
+  df$Exp <- as.character("1")
+  df <- df[c('Round', 'DLIndex', 'Exp')]
+  for (i in seq(2, N, by=1)) {
+    
+    archivo = paste(ruta, i, ".csv", sep="")
+    df1 = read.csv(archivo)
+    df1$Exp <- as.character(i)
+    df1 <- df1[c('Round', 'DLIndex', 'Exp')]
+    df <- rbind(df, df1)
+  }
+  df$Exp <- as.factor(df$Exp)
+
+  # Summarize data
+  print("Summarizing...")
+  dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
+
+  # Plot DLIndex with error regions
+  print("Plotting...")
+  g1 <- ggplot(dfc_DLIndex, aes(x = Round, y = DLIndex, colour=Exp, group=Exp)) +
+    geom_line(size=0.7) +
+    geom_ribbon(aes(ymin = DLIndex - sd,
+                    ymax = DLIndex + sd), alpha = 1/(N)) +
+    xlab("Round (unicorn absent)") +
+    ylab("Division of labor") +
+    theme_bw() +
+    theme(legend.position="none")
+
+  # Density plot
+  g2 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+    geom_density(size=1) +
+    #  scale_y_continuous(limits = c(0, 5)) + 
+    xlab("Division of labor") +
+    theme_bw() +
+    theme(legend.position="none")
+  
+  grid.arrange(g1, g2, nrow = 1)
+  
+}
+  
+plot_RSTransitions_FRA <- function(df, k) {
+  
+  df_RS <- df[df$Region == 'RS', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+  head(df_RS)
+  
+  rotulo_x <- paste("FRASim", k, sep="")
+  
+  gRS2RS <- ggplot() +
+    geom_point(aes(x = FRASim, y = Freqs), df_RS, alpha = alpha, size=1.5) +
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab(rotulo_x) +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Staying at RS") +
+    theme_bw()
+  
+  return (gRS2RS)
+  
+}
+
+plot_FocalTransitions_FRA <- function(df, k) {
+  
+  df <- df[df$Region == k, ]
+  df_Focal <- df[df$Region == k, ]
+  df_Focal <- df_Focal[df_Focal$RegionGo == k, ]
+  
+  rotulo_x <- paste("FRASim", k, sep="")
+  titulo <- paste("Staying at", k)
+  color_a_usar <- cbPalette[which(regiones == k)]
+  
+  gOTHER2OTHER <- ggplot() +
+    geom_point(aes(x = FRASim, y = Freqs, group = Region, color = Region),
+               df_Focal, color = color_a_usar, alpha = alpha, size=1.5) +
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab(rotulo_x) +
+    ylab("Rel. Freq./Probability") +
+    ggtitle(titulo) +
+    theme_bw()
+  
+  return (gOTHER2OTHER)
+  
+}
+
+plot_Transitions_FRASim <- function(df1, k) {
+  
+  df1 <- getFreq_based_on_FRASim(df, k)
+  # Plot RS to RS
+  df_Focal <- df1[df1$Region == 'RS', ]
+  df_Focal <- df_Focal[df_Focal$RegionGo == 'RS', ]
+  color_a_usar <- cbPalette[which(regiones == 'RS')]
+  g1 <- ggplot() +
+    geom_point(aes(x = FRASim, y = Freqs, shape=RegionGo, color=RegionGo, group=RegionGo),
+               df_Focal, color = color_a_usar, alpha = alpha, size=1.5) +
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab(rotulo_x) +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Staying at RS") +
+    theme_bw() +
+    theme(legend.position="none")
+
+  # Plot RS to k
+  titulo <- paste("Transition from RS to", k)
+  df_Focal <- df1[df1$Region == 'RS', ]
+  df_Focal <- df_Focal[df_Focal$RegionGo == k, ]
+  color_a_usar <- cbPalette[which(regiones == k)]
+  g2 <- ggplot() +
+    geom_point(aes(x = FRASim, y = Freqs, shape=RegionGo, color=RegionGo, group=RegionGo),
+               df_Focal, color = color_a_usar, alpha = alpha, size=1.5) +
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab(rotulo_x) +
+    ylab("Rel. Freq./Probability") +
+    ggtitle(titulo) +
+    theme_bw() +
+    theme(legend.position="none")
+
+  p <- grid.arrange(g1, g2, nrow = 1)
+  
+  return(p)
+  
+}
+
+plot_FRATransitions <- function(df, regs) {
+  
+  k = regs[1]
+  df1 <- getFreq_based_on_FRASim(df, k)
+  df1 <- df1[complete.cases(df1), ]
+  d1 <- plot_Transitions_FRASim(df1, k)
+  p <- grid.arrange(d1, d2, nrow = 1)
+  
+  regions_iteration <- regs[2:length(regs)]
+  
+  for (k in regions_iteration) {
+    df1 <- getFreq_based_on_FRASim(df, k)
+    d1 <- plot_RSTransitions_FRA(df1, k)
+    d2 <- plot_FocalTransitions_FRA(df1, k)
+    p <- grid.arrange(p, d1, d2, layout_matrix = lay)
+  }
+  
+  return (p)
+  
+}
+

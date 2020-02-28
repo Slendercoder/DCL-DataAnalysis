@@ -1,21 +1,51 @@
-source("getFrequencies.R")
 source("FRApred.R")
+source("Model_Plots.R")
 library(dfoptim)
 library(beepr)
 
-#df1 = read.csv("../Python Codes/Dyads/output-356-137.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/Dyads/output-379-897.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/Dyads/output-435-261.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/Dyads/output-140-615.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/humans.csv")
-head(df1)
-getFreqFromGameFRA(df1)
+#archivo <- "../Python Codes/Simulations/M5_full.csv"
+archivo <- "../Python Codes/Simulations/N1_full.csv"
 
-data = read.csv("frequencies.csv")
-head(data)
+df = read.csv(archivo)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+#finding joint region
+df <- find_joint_region(df)
+df <- get_FRASims(df)
+beep()
+head(df)
 
-args <- getArgs(data, regiones)
-args <- args[order(-args$s, args$i),] 
+###############################################################
+# Plotting...
+###############################################################
+
+alpha <- 0.3
+min_score = 0
+max_score = 2
+theta <- c(0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7)
+params <- para_visualizar(imprimir(theta))
+
+plot_2panels(archivo)
+
+regs <- c('DOWN', 'RIGHT')
+
+k = regs[2]
+
+p <- plot_Transitions_FRASim(df, k)
+
+regions_iteration <- regs[2:length(regs)]
+
+for (k in regions_iteration) {
+  df1 <- getFreq_based_on_FRASim(df, k)
+  d1 <- plot_RSTransitions_FRA(df1, k)
+  d2 <- plot_FocalTransitions_FRA(df1, k)
+  p <- grid.arrange(p, d1, d2, layout_matrix = lay)
+}
+
+
+
+
+
+args <- getFreq(df)
 beep()
 #head(args)
 #dim(args)

@@ -1,3 +1,5 @@
+Python codes/Simulations/
+
 p = 0.5 # probability of there being a unicorn
 pl = 2 # number of players
 n = 8 # number of rows/columns in grid
@@ -5,10 +7,29 @@ rounds = 60 # number of rounds
 dyads = 20 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
-output0: modelParameters = [0, 0, 0, 0.4, 500, 500, 32, 0, 0, 0]
+output0
+M0_full: modelParameters = [0, 0, 0, 0.4, 500, 500, 32, 0, 0, 0]
 
-output1: modelParameters = [0, 0, 0, 0.2, 500, 500, 32, 0, 0, 0]
+output1
+M1_full: modelParameters = [0, 0, 0, 0.2, 500, 500, 32, 0, 0, 0]
 
-output2: modelParameters = [0, 0, 0, 0.1, 500, 500, 32, 0, 0, 0]
+output2
+M2_full: modelParameters = [0, 0, 0, 0.1, 500, 500, 32, 0, 0, 0]
 
-output3: modelParameters = [0, 0, 0, 0.05, 500, 500, 32, 0, 0, 0]
+output3
+M3_full: modelParameters = [0, 0, 0, 0.05, 500, 500, 32, 0, 0, 0]
+
+output4
+M4_full: modelParameters = [0.1, 0.1, 0.1, 0.1, 500, 500, 32, 0, 0, 0]
+
+output5
+M5_full: modelParameters = [0.05, 0.05, 0.05, 0.05, 500, 500, 32, 0, 0, 0]
+
+output6
+M6_full: modelParameters = [0.01, 0.01, 0.01, 0.01, 500, 500, 32, 0, 0, 0]
+
+output7
+M7_full: modelParameters = [0.005, 0.005, 0.005, 0.005, 500, 500, 32, 0, 0, 0]
+
+output8
+N1_full: modelParameters = [0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7]

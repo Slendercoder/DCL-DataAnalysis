@@ -1,3 +1,4 @@
+library(dplyr)
 
 ###########################
 # Global variables
@@ -26,15 +27,37 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
                   'jklmnorstuvwzABCDEHIJKLMPQRSTUXYZ012', # IN
                   'abcdefghipqxyFGNOVW3456789;:') # OUT
 
+
+lowerEps2=.00001
+highEps2 =.99999
+
+lower_limits=c(0,0,0,0,0,400,0)
+upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32)
+
 ###########################
 # Define functions
 ###########################
 
-get_legend<-function(myggplot){
-  tmp <- ggplot_gtable(ggplot_build(myggplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)
+specify_decimal3 <- function(x) trimws(format(round(x, 3), nsmall=3))
+imprimir <- function(x) print(as.numeric(unlist(lapply(x, specify_decimal3))))
+para_visualizar <- function(theta) {
+  a <- as.character(theta)
+  params <- ''
+  for (letra in a) {
+    params <- paste(params, letra, ', ', sep = "")
+  }
+  return(params)
+}
+
+letterCode <- function(x, letras) {
+  code <- ''
+  for (i in 1:length(x)) {
+    if (x[i]==1) {
+      code <- paste(code, letras[i], sep = '')
+    }
+  }
+  #  if (code=='') {code <- 'NOTHING'}
+  return(code)
 }
 
 classifyCode <- function(cadena) {
@@ -75,80 +98,153 @@ sigmoid <- function(x, beta, gamma) {
   return(1 / (1 + exp(-beta * (x - gamma))))
 } # end sigmoid
 
-getFreq <- function(i, iV, s, j, df) {
-  # Obtains the frequencies vector for a given region, score s and overlapping region j
-  # Input: i, the name of the region the player is in
-  #        iV (lettercode), the region the player is in
-  #        s, which is the player's scoreLevel on the round
-  #        j (lettercode), the overlapping region from players' strategies
-  #        df, the dataframe from which the observations are obtained
-  # Output: Frequency vector of length 9
-  
-  #  print(regiones)
-  df$RegionGo <- factor(df$RegionGo, levels = regiones, ordered = TRUE)
-  #  print(levels(df$RegionGo))
-  
-  regs <- df[which(df$RegionCoded == iV), ]
-#  print('Considering region', i)
-  scores <- regs[which(regs$Score == s), ]
-#  print('Considering score', s)
-  regsGo <- scores$RegionGo[which(scores$JointRegion == j)]
-  auxDF <- t(as.data.frame(table(regsGo)))
-  colnames(auxDF) <- as.character(unlist(auxDF[1, ])) # the first row will be the header
-  auxDF <- auxDF[-1, ]          # removing the first row.
-  auxDF <- auxDF[regiones]
-  return(as.numeric(auxDF[1:9]))
-} # end getFreq
+find_regionVector <- function(df) {
 
-getArgs <- function(data, regiones) {
-  # Obtains the dataframe with the frequencies vector 
-  # Input: data, dataFrame from which to
-  #        regiones, the vector with the regions names
-  # Output: dataFrame
-
-  # Prepare dataFrame with frequencies
-  regs <- unique(data$RegionCoded)
-  scores <- unique(data$Score)
-  joints <- unique(data$JointRegion)
-#  print('joints')
-#  print(joints)
+  df <- df[complete.cases(df), ]
   
-  # Create all combinations of regions, scores and joints
-  cat('\nCreating cuadruples ', 
-      length(regs), 'x',
-      length(scores), 'x',
-      length(joints), '\n')
-  args <- as.data.frame(expand.grid(iV = regs, s = scores, j = joints))
-  args$i <- lapply(args$iV, classifyCode)
-  print(args[1:5, ])
-  args$cuadruple <- apply(args, 1, function(x) list(classifyCode(as.character(x[1])),
-                                                 as.character(x[1]), 
-                                                 as.numeric(x[2]), 
-                                                 as.character(x[3])))
-  print('Number of rows:')
-  print(length(args$cuadruple))
+  # Create vector for columns with region
+  columns <- c()
+  for (i in c(1:8)) {
+    for (j in c(1:8)) {
+      columns <- append(columns, paste('a', paste(i, j, sep=''), sep=''))
+    }
+  }
+  
+  # Build the region column per player
+  df$vR <- lapply(as.list(as.data.frame(t(df[columns]))), function(x) x)
 
-  # Get the frequencies for each cuadruple
-  print('Finding frequencies (please be patient!)...')
-  args$freq <- lapply(args$cuadruple, function(x) {
-    i <- as.character(x[[1]][1])
-    iV <- as.character(x[[2]][1])
-    s <- as.numeric(x[[3]][1])
-    j <- as.character(x[[4]][1])
-#    cat('\ni', i, 'iV', iV, 's', s, 'j', j)
-    return(getFreq(i, iV, s, j, data))
+  return (df)
+
+}
+
+find_joint_region <- function(df1) {
+  
+  # Find the visited regions as vectors
+  df1 <- find_regionVector(df1)
+  
+  # Must optimize this procedure with dplyr!
+  # Initialize auxiliary dataframe
+  auxDF <- data.frame(c('Dyad', NA), 
+                      c('Player', NA), 
+                      #                    c('Region', NA), 
+                      c('RegionFULL', NA), 
+                      #                    c('RegionGo', NA), 
+                      c('RJoint', NA), 
+                      c('Score', NA))
+  colnames(auxDF) = as.character(unlist(auxDF[1, ])) # the first row will be the header
+  auxDF = auxDF[-1, ]          # removing the first row.
+  auxDF = auxDF[-1, ]          # removing the first row.
+  #auxDF$RJoint <- list(0)
+  #auxDF$Score <- 0
+  
+  parejas <- unique(df1$Dyad)
+  pareja <- parejas[2]
+  
+  for (pareja in unique(df1$Dyad)) {
+    # Create the joint region
+    parejaDF <- df1[which(df1$Dyad == pareja), ]
+    parejaDF[order(parejaDF$Round), ]
+    jugador <- unique(parejaDF$Player)
+    r1 <- parejaDF$vR[which(parejaDF$Player == jugador[1])]
+    r2 <- parejaDF$vR[which(parejaDF$Player == jugador[2])]
+    newDF <- data.frame(rep(0, length(r1)))
+    newDF$a <- r1
+    newDF$b <- r2
+    lst <- as.list(as.data.frame(t(newDF)))
+    newDF$rJoint <- lapply(lst, function(x) as.numeric(unlist(x[2])) * as.numeric(unlist(x[3])))
+    
+    # Create dataframe for first player
+    DF <- data.frame(seq(1, length(r1), by=1))
+    DF$Dyad <- rep(pareja, length(r1))
+    DF$Player <- rep(as.character(jugador[1]), length(r1))
+    DF$Region <- parejaDF$Category[which(parejaDF$Player == jugador[1])]
+    DF$RegionFULL <- parejaDF$vR[which(parejaDF$Player == jugador[1])]
+    DF$RegionGo <- lead(DF$Region, 2)
+    DF$RJoint <- newDF$rJoint
+    DF$Score <- parejaDF$Score[which(parejaDF$Player == jugador[1])]
+    DF <- DF[c('Dyad', 'Player', 'Region', 'RegionFULL', 'RegionGo', 'RJoint', 'Score')]
+    #  DF <- DF[c('Dyad', 'Player', 'RegionFULL', 'RJoint', 'Score')]
+    
+    # Add dataframe to big dataframe
+    auxDF <- rbind(auxDF, DF)
+    #  auxDF <- na.omit(auxDF)
+    
+    # Create dataframe for second player
+    DF <- data.frame(seq(1, length(r2), by=1))
+    DF$Dyad <- rep(pareja, length(r2))
+    DF$Player <- rep(as.character(jugador[2]), length(r2))
+    DF$Region <- parejaDF$Category[which(parejaDF$Player == jugador[2])]
+    DF$RegionFULL <- parejaDF$vR[which(parejaDF$Player == jugador[2])]
+    DF$RegionGo <- lead(DF$Region, 2)
+    DF$RJoint <- newDF$rJoint
+    DF$Score <- parejaDF$Score[which(parejaDF$Player == jugador[2])]
+    DF <- DF[c('Dyad', 'Player', 'Region', 'RegionFULL', 'RegionGo', 'RJoint', 'Score')]
+    #  DF <- DF[c('Dyad', 'Player', 'RegionFULL', 'RJoint', 'Score')]
+    
+    # Add dataframe to big dataframe
+    auxDF <- rbind(auxDF, DF)
+    #  auxDF <- na.omit(auxDF)
+  }
+  head(auxDF)
+  dim(auxDF)
+  auxDF$Player <- as.character(auxDF$Player)
+  
+  # Code RegionFULL
+  lst <- as.list(as.data.frame(t(auxDF$RegionFULL)))
+  regionesJuntos <- lapply(lst, function(x) {
+    cadena <- as.character(unlist(x))
+    letterCode(cadena, letras)
   })
+  auxDF$RegionFULL <- regionesJuntos
+  
+  # Code overlapping regions 
+  lst <- as.list(as.data.frame(t(auxDF$RJoint)))
+  regionesJuntos <- lapply(lst, function(x) {
+    cadena <- as.character(unlist(x))
+    letterCode(cadena, letras)
+  })
+  auxDF$RJcode <- regionesJuntos
+  
+  aux <- auxDF[c('Dyad', 'Player', 'Region', 'RegionFULL', 'RegionGo', 'RJcode', 'Score')]
+  aux$Region <- as.character(aux$Region)
+  aux$RegionGo <- as.character(aux$RegionGo)
+  #  aux$Rcode <- as.character(aux$Rcode)
+  aux$RJcode <- as.character(aux$RJcode)
+  head(aux)
+  
+  return(aux)
+  
+}
 
-  # Get the sum of frequencies for each pair
-  print('Finding sum of frequencies...')
-  args$sumFreq <- lapply(args$freq, function(x) {
-    return(sum(x))
+obtainFreqVector <- function(x) {
+  a <- data.frame(table(x))
+  return(list(a$Freq))
+}
+
+getFreq <- function(df, theta) {
+  
+  df <- df[c('Region', 'RegionFULL', 'Score', 'RJcode', 'RegionGo')]
+  df <- df %>%
+    dplyr::group_by(Region, Score, RJcode) %>%
+    dplyr::summarize(Freqs = obtainFreqVector(RegionGo))
+  
+  #  print(df$Region)
+  #  df <- df[complete.cases(df), ]
+  df$freqs <- lapply(df$Freqs, function(x) {
+    x1 <- x[1]
+    x2 <- x[2]
+    x3 <- x[3]
+    x4 <- x[4]
+    x5 <- x[5]
+    x6 <- x[6]
+    x7 <- x[7]
+    x8 <- x[8]
+    x9 <- x[9]
+    return (c(x1, x2, x3, x4, x5, x6, x7, x8, x9))
   })
   
-  args <- args[args$sumFreq > 0, ]
-  print('Done!')
-  return(args)
-} # end getArgs
+  return (df[c('Region', 'Score', 'RJcode', 'freqs')])
+} 
 
 sim_consist <- function(v1, v2){
   # Returns the similarity based on consistency
@@ -165,6 +261,186 @@ sim_consist <- function(v1, v2){
     return (1)
   }
 } # end sim_consist
+
+FRAsim <- function(i, iV, j, k) {
+ 
+  # Returns the FRAsim of i and j with respect to focal k
+  #Input: i, the name of the region the player is in
+  #        iV (lettercode), the region the player is in
+  #        s, the player's score on the round
+  #        j  (lettercode), the overlapping region
+  #        k  (lettercode), a focal region
+  
+  index1 <- which(regiones == k)
+  kCoded <- regionsCoded[index1 - 1] # regionsCoded does not have 'RS'
+  kV <- code2Vector(kCoded)
+  
+  simil1 <- sim_consist(code2Vector(iV), kV)
+  kVComp <- 1 - code2Vector(kCoded)
+  simil2 <- sim_consist(code2Vector(j), kVComp)
+  
+  return (simil1 + simil2)
+   
+}
+
+get_FRASims <- function(df) {
+  
+  df$FRASimALL <- mapply(function(i, iv, j) FRAsim(i, iv, j,'ALL'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+  
+  df$FRASimDOWN <- mapply(function(i, iv, j) FRAsim(i, iv, j,'DOWN'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+
+  df$FRASimUP <- mapply(function(i, iv, j) FRAsim(i, iv, j,'UP'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+
+  df$FRASimLEFT <- mapply(function(i, iv, j) FRAsim(i, iv, j,'LEFT'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+
+  df$FRASimRIGHT <- mapply(function(i, iv, j) FRAsim(i, iv, j,'RIGHT'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+
+  df$FRASimIN <- mapply(function(i, iv, j) FRAsim(i, iv, j,'IN'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+
+  df$FRASimOUT <- mapply(function(i, iv, j) FRAsim(i, iv, j,'OUT'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+
+  return (df)
+  
+}
+
+getFreq_based_on_FRASim <- function(df, k) {
+  
+  if (k == 'ALL') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimALL', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimALL, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimALL) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+
+    df$FRASim <- df$FRASimALL
+    
+  } # end k='ALL'
+
+  if (k == 'DOWN') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimDOWN', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimDOWN, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimDOWN) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+    
+    df$FRASim <- df$FRASimDOWN
+    
+  } # end k='DOWN'
+
+  if (k == 'UP') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimUP', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimUP, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimUP) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+    
+    df$FRASim <- df$FRASimUP
+    
+  } # end k='UP'
+
+  if (k == 'LEFT') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimLEFT', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimLEFT, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimLEFT) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+    
+    df$FRASim <- df$FRASimLEFT
+    
+  } # end k='LEFT'
+  
+  if (k == 'RIGHT') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimRIGHT', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimRIGHT, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimRIGHT) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+    
+    df$FRASim <- df$FRASimRIGHT
+    
+  } # end k='RIGHT'
+
+  if (k == 'IN') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimIN', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimIN, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimIN) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+    
+    df$FRASim <- df$FRASimIN
+    
+  } # end k='IN'
+
+  if (k == 'OUT') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimOUT', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimOUT, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimOUT) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+    
+    df$FRASim <- df$FRASimOUT
+    
+  } # end k='OUT'
+  
+  return(df[c('Region', 'FRASim', 'RegionGo', 'Freqs')])
+    
+} 
 
 FRApred <- function(i, iV, s, j, 
                     wALL, wNOTHING, wLEFT, wIN,
@@ -235,7 +511,7 @@ FRApred <- function(i, iV, s, j,
   jV <- code2Vector(j)
 #  print("jV")
 #  print(jV)
-  kVcompVector <- lapply(regiones[3:9], function(k) {
+  kVcompVector <- lapply(regiones[4:9], function(k) { # do not consider 'rs', 'all' and 'nothing'
     index <- which(regiones == k)
     kCoded <- regionsCoded[index - 1] # regionsCoded does not have 'RS'
 #    print('kCoded')
@@ -258,15 +534,6 @@ FRApred <- function(i, iV, s, j,
 #  print('Attractiveness with FRA similarity:')
 #  imprimir(attractiveness)
 
-#  negative <- which(attractiveness < 0)
-#  if (length(negative) > 0) {
-#    print('Error: attractiveness negative')
-#    print(attractiveness)
-#    for (k in negative) {
-#      attractiveness[k] <- 0.00001
-#    }
-#  }
-  
   probs <- attractiveness / sum(attractiveness)
   return(probs)
 } # end FRApred
