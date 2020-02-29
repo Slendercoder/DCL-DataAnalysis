@@ -27,5 +27,5 @@ modelParameters = [0.001, 0.001, 0.001, 0.001, 500, 500, 32, 50, 500, 0.9] #PL1
 modelParameters += modelParameters # Both players equal parameters
 # modelParameters += [0, 0, 0, 0.4, 500, 500, 32, 0, 0, 0] #PL2
 
-RM.standard_simulation(gameParameters, modelParameters)
+# RM.standard_simulation(gameParameters, modelParameters)
 RM.sample_variation(gameParameters, modelParameters, 100, "FRA")
