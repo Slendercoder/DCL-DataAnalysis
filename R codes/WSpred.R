@@ -86,7 +86,6 @@ getRelFreq_Rows <- function(df) {
   # Input: k, the region the player is going to
   #        df, the dataframe from which the observations are obtained
   # Output: Relative frequency
-  df <- df1
   df <- df[complete.cases(df), ]
   df$Region <- df$Category
   df <- df[df$RegionGo != "", ]

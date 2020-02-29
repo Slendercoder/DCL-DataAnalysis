@@ -356,6 +356,8 @@ def get_measures(data, lista):
         # print('List of blocks\n', data[['indice', 'Player', 'Round', 'Is_there', 'Score', 'Category']][50:60])
 
     if '4' in lista:
+        # 7. Keep only rounds with Unicorn_Absent
+        print('Keeping only rounds with Unicorn Absent...')
         # 1. Create column of indexes
         data = data.reset_index()
         data['indice'] = data.index
@@ -369,14 +371,16 @@ def get_measures(data, lista):
         data['Cambio'] = data.apply(obtainPresentBlocks, axis=1)
         # print('List of blocks\n', data[['Player', 'Round', 'Is_there', 'Cambio']][0:20])
 
-        # 7. Keep only rounds with Unicorn_Absent
-        print('Keeping only rounds with Unicorn Absent...')
         # Obtaining nans from unicorn_present blocks
         # data['Score'] = data.groupby('Cambio').transform(deleteScore)
         data['Score'] = data.apply(deleteScore, axis=1)
         data['ScoreLEAD'] = data.groupby(['Dyad', 'Player'])\
                                     ['Score'].transform('shift', -1)
+        # data['avScGrpUniPresent_LEAD'] = data.groupby(['Dyad', 'Player'])['avScGrpUniPresent'].transform('shift', -1)
         print('List of blocks\n', data[['Round', 'Is_there', 'Score', 'ScoreLEAD']][0:20])
+
+        data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
+        # print('List of blocks\n', data[['Player', 'Is_there', 'Score', 'Category', 'RegionGo']][:30])
 
     # --------------------------------------------------
     # Obtaining final measures from players' performance
@@ -478,8 +482,8 @@ def get_measures(data, lista):
                                 ['Score'].transform('shift', 1)
     data['Norm_Score_LAG1'] = data.groupby(['Dyad', 'Player'])\
                                 ['Norm_Score'].transform('shift', 1)
-    data['Consistency_LEAD1'] = data.groupby(['Dyad', 'Player'])\
-                                ['Consistency'].transform('shift', -1)
+    data['Consistency_LAG1'] = data.groupby(['Dyad', 'Player'])\
+                                ['Consistency'].transform('shift', 1)
     data['Dif_consist_LAG1'] = data.groupby(['Dyad', 'Player'])\
                                 ['Dif_consist'].transform('shift', 1)
     data['Category_LAG1'] = data.groupby(['Dyad', 'Player'])\
@@ -491,11 +495,5 @@ def get_measures(data, lista):
     if '5' in lista:
         data['Similarity_LAG1'] = data.groupby(['Dyad', 'Player'])\
                                 ['Similarity'].transform('shift', 1)
-
-    if '4' in lista:
-        data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))#.reset_index()
-        data = data[data['ScoreLEAD'].notna()]
-        print('List of blocks\n', data[['Round', 'Is_there', 'Score', 'ScoreLEAD']][0:20])
-
 
     return data

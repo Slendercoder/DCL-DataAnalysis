@@ -33,3 +33,12 @@ M7_full: modelParameters = [0.005, 0.005, 0.005, 0.005, 500, 500, 32, 0, 0, 0]
 
 output8
 N1_full: modelParameters = [0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7]
+
+output9
+N2_full: modelParameters = [0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7]
+
+output10
+N3_full: modelParameters = [0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7]
+
+output11
+N4_full: modelParameters = [0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7]

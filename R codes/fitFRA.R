@@ -24,26 +24,10 @@ max_score = 2
 theta <- c(0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7)
 params <- para_visualizar(imprimir(theta))
 
-plot_2panels(archivo)
-
-regs <- c('DOWN', 'RIGHT')
-
-k = regs[2]
-
-p <- plot_Transitions_FRASim(df, k)
-
-regions_iteration <- regs[2:length(regs)]
-
-for (k in regions_iteration) {
-  df1 <- getFreq_based_on_FRASim(df, k)
-  d1 <- plot_RSTransitions_FRA(df1, k)
-  d2 <- plot_FocalTransitions_FRA(df1, k)
-  p <- grid.arrange(p, d1, d2, layout_matrix = lay)
-}
-
-
-
-
+q <- plot_6panels(archivo)
+regs <- c('ALL', 'DOWN', 'IN')
+p <- plot_FRA_regs(df, regs)
+grid.arrange(q, p, ncol=2, widths=c(2/3, 1/3))
 
 args <- getFreq(df)
 beep()

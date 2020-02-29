@@ -221,7 +221,7 @@ obtainFreqVector <- function(x) {
   return(list(a$Freq))
 }
 
-getFreq <- function(df, theta) {
+getFreqFRA <- function(df, theta) {
   
   df <- df[c('Region', 'RegionFULL', 'Score', 'RJcode', 'RegionGo')]
   df <- df %>%
@@ -538,6 +538,36 @@ FRApred <- function(i, iV, s, j,
   return(probs)
 } # end FRApred
 
+getFreqsFRA <- function(df) {
+  
+  df <- df[complete.cases(df), ]
+  df$Region <- df$Category
+  df <- df[c('Region', 'Score', 'RegionGo')]
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
+  df <- df %>%
+    dplyr::group_by(Region, Score) %>%
+    dplyr::summarize(Freqs = obtainFreqVector(RegionGo))
+  
+  #  print(df$Region)
+  #  df <- df[complete.cases(df), ]
+  df$freqs <- lapply(df$Freqs, function(x) {
+    x1 <- x[1]
+    x2 <- x[2]
+    x3 <- x[3]
+    x4 <- x[4]
+    x5 <- x[5]
+    x6 <- x[6]
+    x7 <- x[7]
+    x8 <- x[8]
+    x9 <- x[9]
+    return (c(x1, x2, x3, x4, x5, x6, x7, x8, x9))
+  })
+  
+  return (df[c('Region', 'Score', 'RJcode', 'freqs')])
+  
+  
+}
+
 # A function to get deviance from WSLS and FRA models
 FRAutil <- function(theta, args, regiones){
   # Input: theta, parameter vector of length 11
@@ -574,35 +604,71 @@ FRAutil <- function(theta, args, regiones){
                    delta, epsilon, zeta, 
                    regiones))
   })
-  #  print(args$probs[1:6])
-  
-  #  if (any(is.na(args$probs))) {
-  #    print('Incorrect probabilities: ')
-  #    head(args$probs)
-  #    return(10000)
-  #  }
-  
-  #  args$zeros <- lapply(args$probs, function(x) {if (any(x == 0)) {return(0)} else {return(1)}})
-  #  zeroProbs <- args$pair[which(args$zeros == 0)]
-  #  if (length(zeroProbs) > 0) {
-  #    print('Some probabilities equal 0!')
-  #    print('Parameters: ')
-  #    print(theta)
-  #    print('Freqs')
-  #    print(zeroProbs)
-  #    return(10000)
-  #  }
-  
+
   # Calculate deviance
   #  print('Calculating deviances')
   args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
   
-  #  if (any(is.infinite(args$dev) | is.na(args$dev))) {
-  #    print('Incorrect dev: ')
-  #    head(args$dev)
-  #    return(10000)
-  #  }
-  
   return(-2*sum(args$dev))
+
 } # end FRAutil
 
+ModelProb <- function(regionFrom, regionGo, s, k, theta){
+  
+  # FRA model returns probability of going from regionFrom to regionGo
+  # given FRA similarity to region k
+  
+  # Do not use WSLS parameters (theta[5:7])
+  theta <- c(theta[1:4], theta[8:10])
+  
+  wALL <- theta[1]
+  wNOTHING <- theta[2]
+  wLEFT <- theta[3]
+  wIN <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  
+  aux <- c(wALL, wNOTHING, wLEFT, wLEFT, wLEFT, wLEFT, wIN, wIN)
+  
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  # print('bias')
+  # imprimir(bias)
+  
+  if (k=='RS') {
+    return (bias[1])
+  } else if (k=='ALL') {
+    return (bias[2])
+  } else if (k=='NOTHING') {
+    return (bias[3])
+  }
+  
+  # Find the attractivenes:
+  focal <- 0
+  index <- which(regiones == regionGo)
+  attractiveness <- bias[index]
+  if (regionFrom == 'RS') { 
+    if (regionGo != 'RS') {
+      if(k == regionGo) {
+        attractiveness <- attractiveness + alpha * sigmoid(s, beta, gamma)
+      }
+    }
+  } else {
+    if(regionFrom == regionGo) {
+      attractiveness <- attractiveness + alpha
+      focal <- alpha
+    }
+    if(k == regionGo) {
+      attractiveness <- attractiveness + alpha * sigmoid(s, beta, gamma)
+      focal <- alpha
+    }
+  }
+  
+  probab <- attractiveness / (1 + alpha * sigmoid(s, beta, gamma) + focal)
+  
+  return(probab)
+} # end ModelProb

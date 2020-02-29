@@ -23,7 +23,8 @@ legend2 <- get_legend_from_dummy(True_model_color, Recovered_model_color)
 #df1 = read.csv("../Python Codes/Simulations/M5_full.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/Data_correction/Only_absent/M5_OnlyA.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/Data_correction/Score_correction/M5_ScoreC.csv")
-df1 = read.csv("../Python Codes/Data_correction/Block_estimation/M5_Estimated.csv")
+#df1 = read.csv("../Python Codes/Data_correction/Block_estimation/M5_Estimated.csv")
+df1 = read.csv("../Python Codes/output.csv")
 head(df1)
 
 ###############################################################################

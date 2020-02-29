@@ -66,10 +66,10 @@ def standard_simulation(gameParameters, modelParameters):
 
     return E.df
 
-def sample_variation(gameParameters, modelParameters, n_samples = 100):
+def sample_variation(gameParameters, modelParameters, n_samples = 100, model):
 
     print('Obtaining', n_samples, 'samples (please be patient!)...')
-    nombre = 'Simulations/Sample_size/sample'
+    nombre = 'Simulations/Sample_size/' + model + '/sample'
 
     for i in range(n_samples):
         E = DL.Experiment(gameParameters, modelParameters)

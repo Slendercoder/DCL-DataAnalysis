@@ -4,7 +4,7 @@ source("Model_Plots.R")
 # Sample variation effect
 ###############################################
 
-plot_sample_variation("../Python Codes/Simulations/Sample_size/sample", 100)
+plot_sample_variation("../Python Codes/Simulations/Sample_size/WSLS/sample", 100)
 
 ###############################################
 # Model recovery

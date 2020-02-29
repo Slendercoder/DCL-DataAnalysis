@@ -1,3 +1,5 @@
+source("WSPred.R")
+source("FRApred.R")
 library(ggplot2)
 library(gridExtra)
 library(Rmisc)
@@ -145,7 +147,7 @@ plot_6panels <- function(archivo) {
   # Ploting data...
   ############################
   # Regression full data
-  p1 <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) + 
+  p1 <- ggplot(df2, aes(x = Score, y = Consistency_LEAD1)) + 
     geom_point(shape = 19, alpha = alpha) + 
     geom_smooth(method='lm', se=FALSE) + 
     theme_bw() +
@@ -155,7 +157,7 @@ plot_6panels <- function(archivo) {
     ylim(c(0,1)) +
     ggtitle('Full data')
   # Regression only focal regions
-  p2 <- ggplot(df1, aes(x = Score_LAG1, y = Consistency)) + 
+  p2 <- ggplot(df1, aes(x = Score, y = Consistency_LEAD1)) + 
     geom_point(shape = 19, alpha = alpha) + 
     geom_smooth(method='lm', se=FALSE) + 
     theme_bw() +
@@ -513,33 +515,10 @@ plot_RSTransitions_FRA <- function(df, k) {
   
 }
 
-plot_FocalTransitions_FRA <- function(df, k) {
-  
-  df <- df[df$Region == k, ]
-  df_Focal <- df[df$Region == k, ]
-  df_Focal <- df_Focal[df_Focal$RegionGo == k, ]
+plot_FRASim_k_RS2RS <- function(df1, k) {
   
   rotulo_x <- paste("FRASim", k, sep="")
-  titulo <- paste("Staying at", k)
-  color_a_usar <- cbPalette[which(regiones == k)]
-  
-  gOTHER2OTHER <- ggplot() +
-    geom_point(aes(x = FRASim, y = Freqs, group = Region, color = Region),
-               df_Focal, color = color_a_usar, alpha = alpha, size=1.5) +
-    scale_x_continuous(limits = c(min_score, max_score)) + 
-    scale_y_continuous(limits = c(0, 1.01)) + 
-    xlab(rotulo_x) +
-    ylab("Rel. Freq./Probability") +
-    ggtitle(titulo) +
-    theme_bw()
-  
-  return (gOTHER2OTHER)
-  
-}
 
-plot_Transitions_FRASim <- function(df1, k) {
-  
-  df1 <- getFreq_based_on_FRASim(df, k)
   # Plot RS to RS
   df_Focal <- df1[df1$Region == 'RS', ]
   df_Focal <- df_Focal[df_Focal$RegionGo == 'RS', ]
@@ -555,8 +534,26 @@ plot_Transitions_FRASim <- function(df1, k) {
     theme_bw() +
     theme(legend.position="none")
 
+  color_a_usar <- cbPalette[which(regiones == 'RS')]
+  
+  xs <- seq(0,2,length.out=200)
+  thetaRS <- 1 - sum(c(theta[1], theta[2], theta[3], theta[3], theta[3], theta[3], theta[4], theta[4]))
+  # print(thetaRS)
+  fitFocal <- sapply(xs, function(x) thetaRS)
+  dfB <- data.frame(xs, fitFocal)
+  g1 <- g1 +
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=1)
+  
+  return(g1)
+
+}
+  
+plot_Transitions_FRASim_k <- function(df1, k) {
+  
+  rotulo_x <- paste("FRASim", k, sep="")
+  titulo <- paste("From RS to", k)
+  
   # Plot RS to k
-  titulo <- paste("Transition from RS to", k)
   df_Focal <- df1[df1$Region == 'RS', ]
   df_Focal <- df_Focal[df_Focal$RegionGo == k, ]
   color_a_usar <- cbPalette[which(regiones == k)]
@@ -571,30 +568,47 @@ plot_Transitions_FRASim <- function(df1, k) {
     theme_bw() +
     theme(legend.position="none")
 
-  p <- grid.arrange(g1, g2, nrow = 1)
-  
-  return(p)
+  return(g2)
   
 }
 
-plot_FRATransitions <- function(df, regs) {
+plot_ModelTransition_k_FRA <- function(df1, theta, k) {
   
-  k = regs[1]
+  pl <- plot_Transitions_FRASim_k(df1, k)
+  
+  color_a_usar <- cbPalette[which(regiones == k)]
+
+  xs <- seq(0,2,length.out=200)
+  fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo=k, k=k, theta=theta)
+  dfB <- data.frame(xs, fitFocal)
+  pl <- pl +
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=1)
+  
+  return(pl)
+
+}
+
+plot_FRA_regs <- function(df, regs) {
+  
+  n <- length(regs)
+  k <- regs[1]
   df1 <- getFreq_based_on_FRASim(df, k)
-  df1 <- df1[complete.cases(df1), ]
-  d1 <- plot_Transitions_FRASim(df1, k)
-  p <- grid.arrange(d1, d2, nrow = 1)
+  q <- plot_FRASim_k_RS2RS(df1, k)
+  p <- plot_ModelTransition_k_FRA(df1, theta, k)
+  pl <- grid.arrange(q, p, nrow=1)
   
-  regions_iteration <- regs[2:length(regs)]
-  
-  for (k in regions_iteration) {
+  contador <- 2
+  for (k in regs[2:n]) {
+    
     df1 <- getFreq_based_on_FRASim(df, k)
-    d1 <- plot_RSTransitions_FRA(df1, k)
-    d2 <- plot_FocalTransitions_FRA(df1, k)
-    p <- grid.arrange(p, d1, d2, layout_matrix = lay)
+    q <- plot_FRASim_k_RS2RS(df1, k)
+    p <- plot_ModelTransition_k_FRA(df1, theta, k)
+    pl1 <- grid.arrange(q, p, nrow=1)
+    pl <- grid.arrange(pl, pl1, nrow=2, heights=c((contador - 1)/contador, 1/contador))
+    contador <- contador + 1
+  
   }
   
-  return (p)
+  return (pl)
   
 }
-
