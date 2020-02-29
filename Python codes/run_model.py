@@ -66,7 +66,7 @@ def standard_simulation(gameParameters, modelParameters):
 
     return E.df
 
-def sample_variation(gameParameters, modelParameters, n_samples = 100, model):
+def sample_variation(gameParameters, modelParameters, model, n_samples = 100):
 
     print('Obtaining', n_samples, 'samples (please be patient!)...')
     nombre = 'Simulations/Sample_size/' + model + '/sample'
