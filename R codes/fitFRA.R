@@ -29,32 +29,80 @@ regs <- c('ALL', 'DOWN', 'IN')
 p <- plot_FRA_regs(df, regs)
 grid.arrange(q, p, ncol=2, widths=c(2/3, 1/3))
 
-args <- getFreq(df)
+args <- getFreqFRA(df, theta)
 beep()
+head(args)
 #head(args)
 #dim(args)
 
+
+wAll <- theta[1]
+wNoth <- theta[2]
+wLef <- theta[3]
+wIn <- theta[4]
+alpha <- theta[5]
+beta <- theta[6]
+gamma <- theta[7]
+delta <- theta[8]
+epsilon <- theta[9]
+zeta <- theta[10]
+
+FRApred <- function(x, y, z,
+                    wAll, wNoth, wLef, wIn,
+                    alpha, beta, gamma, 
+                    delta, epsilon, zeta) {
+  
+  # First we calculate the prior probabilities
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  
+  return (bias)
+}
+
+args <- args %>%
+  dplyr::group_by(Region, Score, RJcode) %>%
+  dplyr::mutate(probs = FRApred(Region, Score, RJcode,
+                                wAll, wNoth, wLef, wIn,
+                                alpha, beta, gamma, 
+                                delta, epsilon, zeta))
+
+a <- FRAutil(theta, args)
+
+f <- searchFit(theta, args)
+
 # To search for best parameters FRA model
-w1 <- 0.1 # bias FOCAL
-w2 <- 10 # win stay 
-w3 <- 0.05 # delta
-w4 <- 0.5 # zeta
-fitresFRA <- nmkb(par=c(w1, w2, w3, w4),
-                   fn = function(theta) FRAutil(c(theta[1],
-                                                 theta[2], 
-                                                 10, 
-                                                 31, 
-                                                 theta[3], 
-                                                 1, 
-                                                 theta[4], 
-                                                 1.2), args, regiones),
+w1 <- 0.1 # bias ALL
+w2 <- 0.1 # bias NOTHING
+w3 <- 0.1 # bias LEFT
+w4 <- 0.1 # bias IN
+w5 <- 0.05 # alpha
+w6 <- 0.5 # beta
+w7 <- 0.5 # gamma
+w8 <- 0.5 # delta
+w9 <- 0.5 # epsilon
+w10 <- 0.5 # zeta
+fitresFRA <- nmkb(par=c(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10),
+                   fn = function(theta) FRAutil(theta, args, regiones),
                    lower=c(0,
                            0,
                            0,
+                           0,
+                           0,
+                           0,
+                           0,
+                           0,
+                           0,
                            0),
-                   upper=c(1,
-                           200,
-                           15,
+                   upper=c(0.1,
+                           0.1,
+                           0.1,
+                           0.1,
+                           500,
+                           1000,
                            10),
                    control=list(trace=0))
 

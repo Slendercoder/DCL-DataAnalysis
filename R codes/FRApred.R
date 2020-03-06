@@ -31,8 +31,8 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.00001
 highEps2 =.99999
 
-lower_limits=c(0,0,0,0,0,400,0)
-upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32)
+lower_limits=c(0,0,0,0,0,0,0,0,0,0)
+upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32,500,1000,2)
 
 ###########################
 # Define functions
@@ -569,7 +569,7 @@ getFreqsFRA <- function(df) {
 }
 
 # A function to get deviance from WSLS and FRA models
-FRAutil <- function(theta, args, regiones){
+FRAutil <- function(theta, args){
   # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
   # Output: Deviance of WSLSpred for all regions and scores
@@ -593,17 +593,13 @@ FRAutil <- function(theta, args, regiones){
   
   # Calculate the probabilities based on FRAWSpred
   #  print('Calculating probabilities')
-  args$probs <- lapply(args$cuadruple, function(x) {
-    i <- as.character(x[[1]][1])
-    iV <- as.character(x[[2]][1])
-    s <- as.numeric(x[[3]][1])
-    j <- as.character(x[[4]][1])
-    return(FRApred(i, iV, s, j,
+  args <- args %>%
+    dplyr::group_by(Region, Score, RJcode) %>%
+    dplyr::mutate(probs = FRApred(Region, Score, RJcode,
                    wAll, wNoth, wLef, wIn,
                    alpha, beta, gamma, 
-                   delta, epsilon, zeta, 
-                   regiones))
-  })
+                   delta, epsilon, zeta)
+  )
 
   # Calculate deviance
   #  print('Calculating deviances')
@@ -612,6 +608,99 @@ FRAutil <- function(theta, args, regiones){
   return(-2*sum(args$dev))
 
 } # end FRAutil
+
+random_params <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) {
+  
+  x1 <- unlist(x1)
+  x1 <- c(1, x1)
+  #  print(x1)
+  a1 <- do.call(runif, as.list(x1))
+  
+  x2 <- unlist(x2)
+  x2 <- c(1, x2)
+  #  print(x2)
+  a2 <- do.call(runif, as.list(x2))
+  
+  x3 <- unlist(x3)
+  x3 <- c(1, x3)
+  #  print(x3)
+  a3 <- do.call(runif, as.list(x3))
+  
+  x4 <- unlist(x4)
+  x4 <- c(1, x4)
+  #  print(x4)
+  a4 <- do.call(runif, as.list(x4))
+  
+  x5 <- unlist(x5)
+  x5 <- c(1, x5)
+  #  print(x5)
+  a5 <- do.call(runif, as.list(x5))
+  
+  x6 <- unlist(x6)
+  x6 <- c(1, x6)
+  #  print(x6)
+  a6 <- do.call(runif, as.list(x6))
+  
+  x7 <- unlist(x7)
+  x7 <- c(1, x7)
+  #  print(x7)
+  a7 <- do.call(runif, as.list(x7))
+  
+  x8 <- unlist(x8)
+  x8 <- c(1, x8)
+  #  print(x8)
+  a8 <- do.call(runif, as.list(x8))
+
+  x9 <- unlist(x9)
+  x9 <- c(1, x9)
+  #  print(x9)
+  a9 <- do.call(runif, as.list(x9))
+
+  x10 <- unlist(x10)
+  x10 <- c(1, x10)
+  #  print(x10)
+  a10 <- do.call(runif, as.list(x10))
+  
+  return(c(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10))
+  
+}
+
+searchFit <- function(params, args) {
+  
+  fitresFRA <- nmkb(par=params,
+                     fn = function(t) FRAutil(t, args),
+                     lower=lower_limits,
+                     upper=upper_limits,
+                     control=list(trace=0))
+  
+  return(fitresFRA)  
+  
+}
+
+searchBestFit <- function(args, N) {
+  
+  best <- 100000
+  
+  for (n in rep(0, N)) {
+    params <- random_params(list(lower_limits[1], upper_limits[1]), 
+                            list(lower_limits[2], upper_limits[2]), 
+                            list(lower_limits[3], upper_limits[3]), 
+                            list(lower_limits[4], upper_limits[4]), 
+                            list(lower_limits[5], upper_limits[5]), 
+                            list(lower_limits[6], upper_limits[6]), 
+                            list(lower_limits[7], upper_limits[7]))
+    
+    bestFit <- searchFit(params, args)
+    if (bestFit$value < best) {
+      fitFRA <- bestFit
+      best <- bestFit$value
+    }
+  }
+  
+  return(fitFRA)
+  
+}
+
 
 ModelProb <- function(regionFrom, regionGo, s, k, theta){
   
