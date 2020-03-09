@@ -100,7 +100,7 @@ sigmoid <- function(x, beta, gamma) {
 
 find_regionVector <- function(df) {
 
-  df <- df[complete.cases(df), ]
+#  df <- df[complete.cases(df), ]
   
   # Create vector for columns with region
   columns <- c()
@@ -119,7 +119,7 @@ find_regionVector <- function(df) {
 
 find_joint_region <- function(df1) {
   
-  # Find the visited regions as vectors
+  # Requires the visited regions as vectors
   df1 <- find_regionVector(df1)
   
   # Must optimize this procedure with dplyr!
@@ -221,16 +221,27 @@ obtainFreqVector <- function(x) {
   return(list(a$Freq))
 }
 
+regNoCod <- function(x) {
+  index1 <- which(df$RegionFULL == x)
+  b <- unique(df$Region[index1])
+  if (length(b) > 1) {
+    msg <- paste('Oops!', l, index1)
+    print(msg)
+  }
+  return(b)
+}
+
 getFreqFRA <- function(df, theta) {
   
-  df <- df[c('Region', 'RegionFULL', 'Score', 'RJcode', 'RegionGo')]
-  df <- df %>%
-    dplyr::group_by(Region, Score, RJcode) %>%
+  df <- df[c('RegionFULL', 'Score', 'RJcode', 'RegionGo')]
+  dfA <- df %>%
+    dplyr::group_by(RegionFULL, Score, RJcode) %>%
     dplyr::summarize(Freqs = obtainFreqVector(RegionGo))
   
-  #  print(df$Region)
-  #  df <- df[complete.cases(df), ]
-  df$freqs <- lapply(df$Freqs, function(x) {
+  dfA$Region <- lapply(dfA$RegionFULL, regNoCod)
+  dfA$Region <- unlist(dfA$Region)
+  
+  dfA$freqs <- lapply(dfA$Freqs, function(x) {
     x1 <- x[1]
     x2 <- x[2]
     x3 <- x[3]
@@ -243,7 +254,7 @@ getFreqFRA <- function(df, theta) {
     return (c(x1, x2, x3, x4, x5, x6, x7, x8, x9))
   })
   
-  return (df[c('Region', 'Score', 'RJcode', 'freqs')])
+  return (dfA[c('Region', 'RegionFULL', 'Score', 'RJcode', 'freqs')])
 } 
 
 sim_consist <- function(v1, v2){
@@ -535,38 +546,8 @@ FRApred <- function(i, iV, s, j,
 #  imprimir(attractiveness)
 
   probs <- attractiveness / sum(attractiveness)
-  return(probs)
+  return(list(probs))
 } # end FRApred
-
-getFreqsFRA <- function(df) {
-  
-  df <- df[complete.cases(df), ]
-  df$Region <- df$Category
-  df <- df[c('Region', 'Score', 'RegionGo')]
-  df$RegionGo <- factor(df$RegionGo, levels = regiones)
-  df <- df %>%
-    dplyr::group_by(Region, Score) %>%
-    dplyr::summarize(Freqs = obtainFreqVector(RegionGo))
-  
-  #  print(df$Region)
-  #  df <- df[complete.cases(df), ]
-  df$freqs <- lapply(df$Freqs, function(x) {
-    x1 <- x[1]
-    x2 <- x[2]
-    x3 <- x[3]
-    x4 <- x[4]
-    x5 <- x[5]
-    x6 <- x[6]
-    x7 <- x[7]
-    x8 <- x[8]
-    x9 <- x[9]
-    return (c(x1, x2, x3, x4, x5, x6, x7, x8, x9))
-  })
-  
-  return (df[c('Region', 'Score', 'RJcode', 'freqs')])
-  
-  
-}
 
 # A function to get deviance from WSLS and FRA models
 FRAutil <- function(theta, args){

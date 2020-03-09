@@ -10,7 +10,8 @@ df = read.csv(archivo)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)
 #finding joint region
 df <- find_joint_region(df)
-df <- get_FRASims(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+#df <- get_FRASims(df)
 beep()
 head(df)
 
@@ -35,6 +36,40 @@ head(args)
 #head(args)
 #dim(args)
 
+FRApred <- function(i, iV, s, j, 
+                    wAll, wNoth, wLef, wIn,
+                    alpha, beta, gamma, 
+                    delta, epsilon, zeta) {
+
+  # First we calculate the prior probabilities
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  imprimir(bias)
+
+  # Start from biases
+  attractiveness <- bias
+  # Add WinStay
+  index <- which(regiones == i)
+  # adding win stay only to focal regions
+  if (i != 'RS') {
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
+  }
+  #  print('Attractiveness with WS:')
+  #  imprimir(attractiveness)
+  
+  similarities <- lapply(regiones[4:9], function(x) {
+    f <- FRAsim(i, iV, j, x) 
+    return(delta * sigmoid(f, epsilon, zeta))
+  })
+  similarities <- c(0, 0, 0, unlist(similarities))
+  attractiveness <- attractiveness + similarities
+  
+  return (attractiveness)
+}
 
 wAll <- theta[1]
 wNoth <- theta[2]
@@ -46,31 +81,27 @@ gamma <- theta[7]
 delta <- theta[8]
 epsilon <- theta[9]
 zeta <- theta[10]
+a <- args[1,]
+a <- a[c('Region', 'RegionFULL', 'Score', 'RJcode')]
+x <- a$Region
+y <- a$RegionFULL
+z <- a$Score
+u <- a$RJcode
 
-FRApred <- function(x, y, z,
-                    wAll, wNoth, wLef, wIn,
-                    alpha, beta, gamma, 
-                    delta, epsilon, zeta) {
-  
-  # First we calculate the prior probabilities
-  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
-  # The probability of region 'RS' is 1 - the sum of the other probabilities
-  if (sum(aux) > 1) {
-    aux <- aux/sum(aux)
-  }
-  bias <- c(1 - sum(aux), aux)
-  
-  return (bias)
-}
+xx <- FRApred(x, y, z, u, wAll, wNoth, wLef, wIn,
+        alpha, beta, gamma,
+        delta, epsilon, zeta)
+imprimir(xx)
 
 args <- args %>%
-  dplyr::group_by(Region, Score, RJcode) %>%
-  dplyr::mutate(probs = FRApred(Region, Score, RJcode,
+  dplyr::group_by(RegionFULL, Score, RJcode) %>%
+  dplyr::mutate(probs = FRApred(Region, RegionFULL, Score, RJcode,
                                 wAll, wNoth, wLef, wIn,
                                 alpha, beta, gamma, 
-                                delta, epsilon, zeta))
+                                delta, epsilon, zeta)) %>%
+  ungroup()
 
-a <- FRAutil(theta, args)
+
 
 f <- searchFit(theta, args)
 
