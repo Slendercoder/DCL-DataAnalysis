@@ -36,41 +36,6 @@ head(args)
 #head(args)
 #dim(args)
 
-FRApred <- function(i, iV, s, j, 
-                    wAll, wNoth, wLef, wIn,
-                    alpha, beta, gamma, 
-                    delta, epsilon, zeta) {
-
-  # First we calculate the prior probabilities
-  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
-  # The probability of region 'RS' is 1 - the sum of the other probabilities
-  if (sum(aux) > 1) {
-    aux <- aux/sum(aux)
-  }
-  bias <- c(1 - sum(aux), aux)
-  imprimir(bias)
-
-  # Start from biases
-  attractiveness <- bias
-  # Add WinStay
-  index <- which(regiones == i)
-  # adding win stay only to focal regions
-  if (i != 'RS') {
-    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
-  }
-  #  print('Attractiveness with WS:')
-  #  imprimir(attractiveness)
-  
-  similarities <- lapply(regiones[4:9], function(x) {
-    f <- FRAsim(i, iV, j, x) 
-    return(delta * sigmoid(f, epsilon, zeta))
-  })
-  similarities <- c(0, 0, 0, unlist(similarities))
-  attractiveness <- attractiveness + similarities
-  
-  return (attractiveness)
-}
-
 wAll <- theta[1]
 wNoth <- theta[2]
 wLef <- theta[3]
@@ -81,7 +46,7 @@ gamma <- theta[7]
 delta <- theta[8]
 epsilon <- theta[9]
 zeta <- theta[10]
-a <- args[1,]
+a <- args[2,]
 a <- a[c('Region', 'RegionFULL', 'Score', 'RJcode')]
 x <- a$Region
 y <- a$RegionFULL

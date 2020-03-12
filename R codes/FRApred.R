@@ -286,13 +286,17 @@ FRAsim <- function(i, iV, j, k) {
   kCoded <- regionsCoded[index1 - 1] # regionsCoded does not have 'RS'
   kV <- code2Vector(kCoded)
   
-  simil1 <- sim_consist(code2Vector(iV), kV)
-  kVComp <- 1 - code2Vector(kCoded)
-  simil2 <- sim_consist(code2Vector(j), kVComp)
+  simil <- sim_consist(code2Vector(iV), kV)
   
-  return (simil1 + simil2)
-   
-}
+  if (k!='ALL' && k!='NOTHING') {
+    kVComp <- 1 - code2Vector(kCoded)
+    simil2 <- sim_consist(code2Vector(j), kVComp)
+    simil <- simil + simil2
+  }
+  
+  return (simil)
+
+} # End FRAsim
 
 get_FRASims <- function(df) {
   
@@ -451,103 +455,43 @@ getFreq_based_on_FRASim <- function(df, k) {
   
   return(df[c('Region', 'FRASim', 'RegionGo', 'Freqs')])
     
-} 
+} # End get_freq_based_on_FRAsim
 
 FRApred <- function(i, iV, s, j, 
-                    wALL, wNOTHING, wLEFT, wIN,
+                    wAll, wNoth, wLef, wIn,
                     alpha, beta, gamma, 
-                    delta, epsilon, zeta){
-  # Returns the transition probability vector
-  # Each position in the vector represents a region
-  # and the value represents the probability of going to that region
-  # Input: i, the name of the region the player is in
-  #        iV (lettercode), the region the player is in
-  #        s, the player's score on the round
-  #        j  (lettercode), the overlapping region
-  #        wALL, the prior probability of choosing ALL region
-  #        wNOTHING, the prior probability of choosing NOTHING region
-  #        wLEFT, the prior probability of choosing LEFT, RIGHT, TOP, BOTTOM regions
-  #        wIN, the prior probability of choosing IN, OUT regions
-  #        alpha, how much Win makes the player Stay
-  #        beta, the wideness of the WSLS sigmoid
-  #        gamma, the position of the threshold in the WSLS sigmoid
-  #        delta, how much FRASim attracts the player
-  #        epsilon, the wideness of the FRA sigmoid
-  #        zeta, the position of the threshold in the FRA sigmoid
-
-#  if (any(is.na(c(w, alpha, beta, gamma, delta, epsilon, zeta, eta)))) {
-#    print('Incorrect parameters on FRAWSpred: ')
-#    print(c(w, alpha, beta, gamma, delta, epsilon, zeta, eta))
-#  }
-
+                    delta, epsilon, zeta) {
+  
   # First we calculate the prior probabilities
-  aux <- c(wALL, wNOTHING, wLEFT, wLEFT, wLEFT, wLEFT, wIN, wIN)
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
   # The probability of region 'RS' is 1 - the sum of the other probabilities
   if (sum(aux) > 1) {
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-#  print("bias")
-#  imprimir(bias)
+  #  imprimir(bias)
   
   # Start from biases
   attractiveness <- bias
-
   # Add WinStay
   index <- which(regiones == i)
-  # print('i')
   # adding win stay only to focal regions
   if (i != 'RS') {
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
   }
-#  print('Attractiveness with WS:')
-#  imprimir(attractiveness)
-
-  # Calculating similarity to region
-  # Consider distance from i to each focal region k and augment attractiveness
-  kVector <- lapply(regiones[2:9], function(k) {
-    index1 <- which(regiones == k)
-    kCoded <- regionsCoded[index1 - 1] # regionsCoded does not have 'RS'
-    kV <- code2Vector(kCoded)
-  })
-  similarities <- lapply(kVector, function(x) {
-    sim_consist(code2Vector(iV), x) 
-  })
-  simil1 <- as.numeric(unlist(similarities))
-  simil1 <- c(0, simil1)
-#  print('Similarity to region:')
-#  imprimir(simil1)
-
-  # Consider distance from j to complementary k
-  jV <- code2Vector(j)
-#  print("jV")
-#  print(jV)
-  kVcompVector <- lapply(regiones[4:9], function(k) { # do not consider 'rs', 'all' and 'nothing'
-    index <- which(regiones == k)
-    kCoded <- regionsCoded[index - 1] # regionsCoded does not have 'RS'
-#    print('kCoded')
-#    print(kCoded)
-    kVComp <- 1 - code2Vector(kCoded)
-  })
-  simil2 <- lapply(kVcompVector, function(x) {
-    sim_consist(jV, x) 
-  })
-  simil2 <- as.numeric(unlist(simil2))
-  simil2 <- c(0, 0, simil2)
-#  print('Similarity to complement:')
-#  imprimir(simil2)
+  #  print('Attractiveness with WS:')
+  #  imprimir(attractiveness)
   
-  simils <- simil1 + simil2 
-#  print('FRA Similarity:')
-#  imprimir(simils)
+  similarities <- lapply(regiones[2:9], function(x) {
+    f <- FRAsim(i, iV, j, x) 
+    return(delta * sigmoid(f, epsilon, zeta))
+  })
+  similarities <- c(0, unlist(similarities))
+  attractiveness <- attractiveness + similarities
   
-  attractiveness <- attractiveness + delta * sigmoid(simils, epsilon, zeta) 
-#  print('Attractiveness with FRA similarity:')
-#  imprimir(attractiveness)
-
-  probs <- attractiveness / sum(attractiveness)
-  return(list(probs))
-} # end FRApred
+  return (attractiveness)
+  
+} # End FRApred
 
 # A function to get deviance from WSLS and FRA models
 FRAutil <- function(theta, args){

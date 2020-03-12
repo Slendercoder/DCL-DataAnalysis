@@ -421,8 +421,8 @@ def FRASim(r, joint, focal, Num_Loc):
     # finding similarity between Joint and Complement to focal
 	# first check whether focal is ALL (should not add similarity to complement here)
     aux = [x for x in focal if x == 0]
-    if len(aux) == 0:
-    	# print('Ignore focal region ALL for similarity to complement')
+    if (len(aux) == 0) or (len(aux) == Num_Loc*Num_Loc):
+    	# print('Ignore focal regions ALL and NOTHING for similarity to complement')
     	sss2 = 0
     else:
     	kComp = [1 - x for x in focal]
