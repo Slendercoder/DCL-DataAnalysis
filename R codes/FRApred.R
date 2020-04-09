@@ -511,11 +511,11 @@ FRAutil <- function(theta, args){
   #        data, the dataframe from which frequencies are obtained
   # Output: Deviance of WSLSpred for all regions and scores
   
-  #  if (any(is.na(theta))) {
-  #    print('Incorrect parameters: ')
-  #    print(theta)
-  #    return(10000)
-  #  }
+  if (any(is.na(theta))) {
+    print('Incorrect parameters: ')
+    print(theta)
+    return(10000)
+  }
   
   # Calculate the probabilities based on FRAWSpred
   #  print('Calculating probabilities')
@@ -530,9 +530,22 @@ FRAutil <- function(theta, args){
 
   # Calculate deviance
   #  print('Calculating deviances')
-  args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freqs, args$probs)
+  args$dev <- mapply(function(x,y) dmultinom(x, prob = y), args$freqs, args$probs)
+
+  if (any(is.infinite(args$dev) | is.na(args$dev))) {
+    print('Incorrect dev: ')
+    #    new_DF <- args[is.infinite(args$dev), ]
+    #    print(new_DF)
+    #    print(theta)
+    #    print(head(args$probs))
+    #    print(head(args$freq))
+    #    print(head(args$dev))
+    return(10000)
+  }
   
-  return(-2*sum(args$dev))
+  a <- -sum(log(args$dev))
+  print(paste("Dev:", a))
+  return(a)
 
 } # end FRAutil
 
@@ -592,6 +605,28 @@ random_params <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) {
   
 } # end random_params
 
+searchFitMLE2 <- function(params, args) {
+  
+  fitresFRA <- mle2(function(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) FRAutil(c(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10), 
+                                                                              args),
+                    start = list(a1=params[1], 
+                                 a2=params[2], 
+                                 a3=params[3], 
+                                 a4=params[4], 
+                                 a5=params[5], 
+                                 a6=params[6], 
+                                 a7=params[7], 
+                                 a8=params[8], 
+                                 a9=params[9], 
+                                 a10=params[10]),
+                    lower=lower_limits,
+                    upper=upper_limits,
+                    method="L-BFGS-B")
+  
+  return(fitresFRA)  
+  
+} # end searchFitMLE2
+
 searchFit <- function(params, args) {
   
   fitresFRA <- nmkb(par=params,
@@ -615,9 +650,13 @@ searchBestFit <- function(args, N) {
                             list(lower_limits[4], upper_limits[4]), 
                             list(lower_limits[5], upper_limits[5]), 
                             list(lower_limits[6], upper_limits[6]), 
-                            list(lower_limits[7], upper_limits[7]))
+                            list(lower_limits[7], upper_limits[7]), 
+                            list(lower_limits[8], upper_limits[8]), 
+                            list(lower_limits[9], upper_limits[9]), 
+                            list(lower_limits[10], upper_limits[10]))
     
-    bestFit <- searchFit(params, args)
+#    bestFit <- searchFit(params, args)
+    bestFit <- searchFitMLE2(params, args)
     if (bestFit$value < best) {
       fitFRA <- bestFit
       best <- bestFit$value
