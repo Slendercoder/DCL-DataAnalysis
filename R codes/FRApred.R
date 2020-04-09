@@ -234,6 +234,7 @@ regNoCod <- function(x) {
 getFreqFRA <- function(df, theta) {
   
   df <- df[c('RegionFULL', 'Score', 'RJcode', 'RegionGo')]
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
   dfA <- df %>%
     dplyr::group_by(RegionFULL, Score, RJcode) %>%
     dplyr::summarize(Freqs = obtainFreqVector(RegionGo))
@@ -457,10 +458,18 @@ getFreq_based_on_FRASim <- function(df, k) {
     
 } # End get_freq_based_on_FRAsim
 
-FRApred <- function(i, iV, s, j, 
-                    wAll, wNoth, wLef, wIn,
-                    alpha, beta, gamma, 
-                    delta, epsilon, zeta) {
+FRApred <- function(i, iV, s, j, theta) {
+  
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
   
   # First we calculate the prior probabilities
   aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
@@ -489,7 +498,10 @@ FRApred <- function(i, iV, s, j,
   similarities <- c(0, unlist(similarities))
   attractiveness <- attractiveness + similarities
   
-  return (attractiveness)
+  attractiveness <- replace(attractiveness,attractiveness<lowerEps2,lowerEps2)
+  attractiveness <- replace(attractiveness,attractiveness>highEps2,highEps2)
+  
+  return (list(attractiveness))
   
 } # End FRApred
 
@@ -505,30 +517,20 @@ FRAutil <- function(theta, args){
   #    return(10000)
   #  }
   
-  wAll <- theta[1]
-  wNoth <- theta[2]
-  wLef <- theta[3]
-  wIn <- theta[4]
-  alpha <- theta[5]
-  beta <- theta[6]
-  gamma <- theta[7]
-  delta <- theta[8]
-  epsilon <- theta[9]
-  zeta <- theta[10]
-  
   # Calculate the probabilities based on FRAWSpred
   #  print('Calculating probabilities')
   args <- args %>%
-    dplyr::group_by(Region, Score, RJcode) %>%
-    dplyr::mutate(probs = FRApred(Region, Score, RJcode,
-                   wAll, wNoth, wLef, wIn,
-                   alpha, beta, gamma, 
-                   delta, epsilon, zeta)
+    dplyr::group_by(RegionFULL, Score, RJcode) %>%
+    dplyr::mutate(probs = FRApred(Region, 
+                                  RegionFULL,
+                                  Score, 
+                                  RJcode,
+                                  theta)
   )
 
   # Calculate deviance
   #  print('Calculating deviances')
-  args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freq, args$probs)
+  args$dev <- mapply(function(x,y) log(dmultinom(x, prob = y)), args$freqs, args$probs)
   
   return(-2*sum(args$dev))
 
@@ -588,7 +590,7 @@ random_params <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) {
   
   return(c(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10))
   
-}
+} # end random_params
 
 searchFit <- function(params, args) {
   
@@ -600,7 +602,7 @@ searchFit <- function(params, args) {
   
   return(fitresFRA)  
   
-}
+} # end searchFit
 
 searchBestFit <- function(args, N) {
   
@@ -624,7 +626,7 @@ searchBestFit <- function(args, N) {
   
   return(fitFRA)
   
-}
+} # end searchBestFit
 
 
 ModelProb <- function(regionFrom, regionGo, s, k, theta){

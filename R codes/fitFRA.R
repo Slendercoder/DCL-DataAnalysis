@@ -3,17 +3,31 @@ source("Model_Plots.R")
 library(dfoptim)
 library(beepr)
 
+###############################################################
+# Loading and preparing the data...
+###############################################################
+
 #archivo <- "../Python Codes/Simulations/M5_full.csv"
 archivo <- "../Python Codes/Simulations/N1_full.csv"
-
 df = read.csv(archivo)
-df$RegionGo <- factor(df$RegionGo, levels = regiones)
-#finding joint region
 df <- find_joint_region(df)
+df <- get_FRASims(df)
 df$RegionFULL <- unlist(df$RegionFULL)
-#df <- get_FRASims(df)
-beep()
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
 head(df)
+args <- getFreqFRA(df, theta)
+head(args)
+beep()
+
+###############################################################
+# Parameter recovery...
+###############################################################
+theta <- c(0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7)
+params <- para_visualizar(imprimir(theta))
+
+f <- FRAutil(theta, args)
+
+f <- searchFit(theta, args)
 
 ###############################################################
 # Plotting...
@@ -22,53 +36,10 @@ head(df)
 alpha <- 0.3
 min_score = 0
 max_score = 2
-theta <- c(0.001, 0.001, 0.001, 0.001, 500, 500, 32, 500, 500, 0.7)
-params <- para_visualizar(imprimir(theta))
-
 q <- plot_6panels(archivo)
 regs <- c('ALL', 'DOWN', 'IN')
 p <- plot_FRA_regs(df, regs)
 grid.arrange(q, p, ncol=2, widths=c(2/3, 1/3))
-
-args <- getFreqFRA(df, theta)
-beep()
-head(args)
-#head(args)
-#dim(args)
-
-wAll <- theta[1]
-wNoth <- theta[2]
-wLef <- theta[3]
-wIn <- theta[4]
-alpha <- theta[5]
-beta <- theta[6]
-gamma <- theta[7]
-delta <- theta[8]
-epsilon <- theta[9]
-zeta <- theta[10]
-a <- args[2,]
-a <- a[c('Region', 'RegionFULL', 'Score', 'RJcode')]
-x <- a$Region
-y <- a$RegionFULL
-z <- a$Score
-u <- a$RJcode
-
-xx <- FRApred(x, y, z, u, wAll, wNoth, wLef, wIn,
-        alpha, beta, gamma,
-        delta, epsilon, zeta)
-imprimir(xx)
-
-args <- args %>%
-  dplyr::group_by(RegionFULL, Score, RJcode) %>%
-  dplyr::mutate(probs = FRApred(Region, RegionFULL, Score, RJcode,
-                                wAll, wNoth, wLef, wIn,
-                                alpha, beta, gamma, 
-                                delta, epsilon, zeta)) %>%
-  ungroup()
-
-
-
-f <- searchFit(theta, args)
 
 # To search for best parameters FRA model
 w1 <- 0.1 # bias ALL
