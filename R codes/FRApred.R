@@ -1,4 +1,6 @@
 library(dplyr)
+library(dfoptim)
+library(bbmle)
 
 ###########################
 # Global variables
@@ -506,10 +508,12 @@ FRApred <- function(i, iV, s, j, theta) {
 } # End FRApred
 
 # A function to get deviance from WSLS and FRA models
-FRAutil <- function(theta, args){
+FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
   # Output: Deviance of WSLSpred for all regions and scores
+  
+  theta <- c(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
   
   if (any(is.na(theta))) {
     print('Incorrect parameters: ')
@@ -544,6 +548,10 @@ FRAutil <- function(theta, args){
   }
   
   a <- -sum(log(args$dev))
+  
+  if (a == Inf) {
+    a <- 10000
+  }
   print(paste("Dev:", a))
   return(a)
 
@@ -607,8 +615,7 @@ random_params <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) {
 
 searchFitMLE2 <- function(params, args) {
   
-  fitresFRA <- mle2(function(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) FRAutil(c(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10), 
-                                                                              args),
+  fitresFRA <- mle2(function(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) FRAutil(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10),
                     start = list(a1=params[1], 
                                  a2=params[2], 
                                  a3=params[3], 
