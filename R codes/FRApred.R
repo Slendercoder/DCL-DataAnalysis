@@ -308,7 +308,12 @@ get_FRASims <- function(df) {
                          df$RegionFULL,
                          df$RJcode)
   
-  df$FRASimDOWN <- mapply(function(i, iv, j) FRAsim(i, iv, j,'DOWN'),
+  df$FRASimNOTHING <- mapply(function(i, iv, j) FRAsim(i, iv, j,'NOTHING'),
+                         df$Region,
+                         df$RegionFULL,
+                         df$RJcode)
+
+    df$FRASimDOWN <- mapply(function(i, iv, j) FRAsim(i, iv, j,'DOWN'),
                          df$Region,
                          df$RegionFULL,
                          df$RJcode)
@@ -340,7 +345,26 @@ get_FRASims <- function(df) {
 
   return (df)
   
-}
+} # end get_FRASims
+
+get_FRASims_list <- function(df) {
+  
+  aux <- get_FRASims(df)
+  aux <- aux %>% 
+    dplyr::mutate(FRASims = as.list(data.frame(c(FRASimALL, 
+                                                 FRASimNOTHING, 
+                                                 FRASimDOWN, 
+                                                 FRASimUP, 
+                                                 FRASimLEFT, 
+                                                 FRASimRIGHT, 
+                                                 FRASimIN, 
+                                                 FRASimOUT)))
+    )
+  #v <- c(FRASimALL, FRASimNOTHING, FRASimDOWN, FRASimUP, FRASimLEFT, FRASimRIGHT, FRASimIN, FRASimOUT)
+  return (aux$FRASims)
+  
+} # end get_FRASims_list
+
 
 getFreq_based_on_FRASim <- function(df, k) {
   
