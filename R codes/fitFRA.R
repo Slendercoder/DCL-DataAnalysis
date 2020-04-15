@@ -14,16 +14,16 @@ df <- find_joint_region(df)
 #df <- get_FRASims(df)
 df$RegionFULL <- unlist(df$RegionFULL)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)
-head(df)
+print(head(df))
 args <- getFreqFRA(df, theta)
-head(args)
+print(head(args))
 beep()
 
 ###############################################################
 # Parameter recovery...
 ###############################################################
 
-#args <- args[1:2, ]
+args <- args[1:2, ]
 f <- searchBestFit(args, 1)
 print(f)
 beep()

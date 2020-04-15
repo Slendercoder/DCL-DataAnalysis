@@ -1,5 +1,4 @@
 library(stats4)
-library(stats4)
 library(bbmle)
 library(dplyr)#
 library(ggplot2)#
@@ -56,8 +55,6 @@ sigmoid <- function(x, beta, gamma) {#
   # Returns the value of the sigmoid function 1/(1+exp(b(x-c)))#
   return(1 / (1 + exp(-beta * (x - gamma))))#
 } # end sigmoid
-df1 = read.csv("../Python Codes/fraFreqs.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/fraFreqs.csv", na.strings=c("","NA"))
 df1 = read.csv("../Python Codes/fraFreqs.csv", na.strings=c("","NA"))
 df1$Region <- df1$Category
 df1 <- df1[complete.cases(df1), ]
