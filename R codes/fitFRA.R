@@ -7,7 +7,8 @@ library(beepr)
 
 #archivo <- "../Python Codes/Simulations/M5_full.csv"
 #archivo <- "../Python Codes/Simulations/N1_full.csv"
-archivo <- "../Python Codes/Dyads/output-435-261.csv"
+#archivo <- "../Python Codes/Dyads/output-435-261.csv"
+archivo <- "output-435-261.csv"
 df = read.csv(archivo)
 df <- find_joint_region(df)
 df$RegionFULL <- unlist(df$RegionFULL)
