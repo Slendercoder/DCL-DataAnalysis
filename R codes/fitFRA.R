@@ -15,19 +15,7 @@ df$RegionFULL <- unlist(df$RegionFULL)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)
 print(head(df))
 args <- getFreqFRA(df, theta)
-
-#aux <- get_FRASims(args)
-#aux <- aux %>% 
-#  dplyr::mutate(FRASims = as.list(data.frame(c(FRASimALL, 
-#                                FRASimNOTHING, 
-#                                FRASimDOWN, 
-#                                FRASimUP, 
-#                                FRASimLEFT, 
-#                                FRASimRIGHT, 
-#                                FRASimIN, 
-#                                FRASimOUT)))
-#                )
-#args$FRAsims <- get_FRASims_list(args)
+args <- get_FRASims_list(args)
 print(head(args))
 beep()
 
@@ -35,7 +23,21 @@ beep()
 # Parameter recovery...
 ###############################################################
 
-#args <- args[1:2, ]
 f <- searchBestFit(args, 1)
-print(f)
+print(f$message)
+print(paste("Dev:", f$value))
+print(imprimir(f$par))
 beep()
+
+###############################################################
+# Plotting...
+###############################################################
+
+source("Model_Plots.R")
+df <- get_FRASims(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+min_score <- 0
+max_score <- 32
+regs <- c('ALL', 'DOWN', 'IN')
+p <- plot_FRA_regs(df, regs)

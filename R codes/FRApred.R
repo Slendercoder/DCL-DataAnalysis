@@ -349,7 +349,7 @@ get_FRASims <- function(df) {
 
 get_FRASims_list <- function(df) {
   
-  aux <- get_FRASims(df)
+  aux <- get_FRASims(args)
   aux <- aux %>% 
     dplyr::mutate(FRASims = as.list(data.frame(c(FRASimALL, 
                                                  FRASimNOTHING, 
@@ -359,9 +359,10 @@ get_FRASims_list <- function(df) {
                                                  FRASimRIGHT, 
                                                  FRASimIN, 
                                                  FRASimOUT)))
-    )
-  #v <- c(FRASimALL, FRASimNOTHING, FRASimDOWN, FRASimUP, FRASimLEFT, FRASimRIGHT, FRASimIN, FRASimOUT)
-  return (aux$FRASims)
+    ) %>%
+    select(Region, RegionFULL, Score, RJcode, FRASims, freqs)
+  
+  return(aux)
   
 } # end get_FRASims_list
 
@@ -531,6 +532,50 @@ FRApred <- function(i, iV, s, j, theta) {
   
 } # End FRApred
 
+FRApred1 <- function(i, iV, s, j, FRASims, theta) {
+  
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
+  
+  # First we calculate the prior probabilities
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  imprimir(bias)
+  
+  # Start from biases
+  attractiveness <- bias
+  # Add WinStay
+  index <- which(regiones == i)
+  # adding win stay only to focal regions
+  if (i != 'RS') {
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
+  }
+  #  print('Attractiveness with WS:')
+  #  imprimir(attractiveness)
+  
+  similarities <- sigmoid(unlist(FRASims), epsilon, zeta)
+  similarities <- c(0, unlist(similarities))
+  attractiveness <- attractiveness + similarities
+  
+  attractiveness <- replace(attractiveness,attractiveness<lowerEps2,lowerEps2)
+  attractiveness <- replace(attractiveness,attractiveness>highEps2,highEps2)
+  
+  return (list(attractiveness))
+  
+} # End FRApred1
+
 # A function to get deviance from WSLS and FRA models
 FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   # Input: theta, parameter vector of length 11
@@ -549,10 +594,11 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   #  print('Calculating probabilities')
   args <- args %>%
     dplyr::group_by(RegionFULL, Score, RJcode) %>%
-    dplyr::mutate(probs = FRApred(Region, 
+    dplyr::mutate(probs = FRApred1(Region, 
                                   RegionFULL,
                                   Score, 
                                   RJcode,
+                                  FRASims,
                                   theta)
   )
 
@@ -576,7 +622,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   if (a == Inf) {
     a <- 10000
   }
-  print(paste("Dev:", a))
+  # print(paste("Dev:", a))
   return(a)
 
 } # end FRAutil
@@ -661,7 +707,16 @@ searchFitMLE2 <- function(params, args) {
 searchFit <- function(params, args) {
   
   fitresFRA <- nmkb(par=params,
-                     fn = function(t) FRAutil(t, args),
+                     fn = function(t) FRAutil(t[1], 
+                                              t[2], 
+                                              t[3], 
+                                              t[4], 
+                                              t[5], 
+                                              t[6], 
+                                              t[7], 
+                                              t[8], 
+                                              t[9], 
+                                              t[10]),
                      lower=lower_limits,
                      upper=upper_limits,
                      control=list(trace=0))
@@ -686,8 +741,8 @@ searchBestFit <- function(args, N) {
                             list(lower_limits[9], upper_limits[9]), 
                             list(lower_limits[10], upper_limits[10]))
     
-#    bestFit <- searchFit(params, args)
-    bestFit <- searchFitMLE2(params, args)
+    bestFit <- searchFit(params, args)
+#    bestFit <- searchFitMLE2(params, args)
     if (bestFit$value < best) {
       fitFRA <- bestFit
       best <- bestFit$value
