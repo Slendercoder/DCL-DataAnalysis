@@ -313,7 +313,7 @@ get_FRASims <- function(df) {
                          df$RegionFULL,
                          df$RJcode)
 
-    df$FRASimDOWN <- mapply(function(i, iv, j) FRAsim(i, iv, j,'DOWN'),
+  df$FRASimDOWN <- mapply(function(i, iv, j) FRAsim(i, iv, j,'DOWN'),
                          df$Region,
                          df$RegionFULL,
                          df$RJcode)
@@ -601,7 +601,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
                                   FRASims,
                                   theta)
   )
-
+  
   # Calculate deviance
   #  print('Calculating deviances')
   args$dev <- mapply(function(x,y) dmultinom(x, prob = y), args$freqs, args$probs)
@@ -683,9 +683,16 @@ random_params <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) {
   
 } # end random_params
 
-searchFitMLE2 <- function(params, args) {
+searchFitMLE2 <- function(params, args, max_iter=5) {
+
+  contador <- 1
   
-  fitresFRA <- mle2(function(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) FRAutil(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10),
+  while (contador < max_iter + 1) {
+    
+    print(paste("Trying mle2...", contador))
+
+    fitresFRA <- tryCatch({
+      f <- mle2(function(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) FRAutil(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10),
                     start = list(a1=params[1], 
                                  a2=params[2], 
                                  a3=params[3], 
@@ -699,36 +706,66 @@ searchFitMLE2 <- function(params, args) {
                     lower=lower_limits,
                     upper=upper_limits,
                     method="L-BFGS-B")
-  
+        contador <- max_iter + 2
+        return(f)
+      }, error = function(e) {
+          print(paste("Error:", e))
+          print(paste("New attempt...(", contador, "/", max_iter, ")", sep=""))
+          contador <- contador - 1
+          return (NA)
+      }
+    )
+    contador <- contador + 1
+  }
+
   return(fitresFRA)  
   
 } # end searchFitMLE2
 
-searchFit <- function(params, args) {
+searchFit <- function(params, args, max_iter=10) {
   
-  fitresFRA <- nmkb(par=params,
-                     fn = function(t) FRAutil(t[1], 
-                                              t[2], 
-                                              t[3], 
-                                              t[4], 
-                                              t[5], 
-                                              t[6], 
-                                              t[7], 
-                                              t[8], 
-                                              t[9], 
-                                              t[10]),
-                     lower=lower_limits,
-                     upper=upper_limits,
-                     control=list(trace=0))
+  contador <- 1
+  
+  while (contador < max_iter + 1) {
+    
+    print(paste("Trying nmkb...", contador))
+    
+    fitresFRA <- tryCatch({
+        f <- nmkb(par=params, 
+             fn = function(t) FRAutil(t[1], 
+                                      t[2],
+                                      t[3],
+                                      t[4],
+                                      t[5],
+                                      t[6], 
+                                      t[7], 
+                                      t[8], 
+                                      t[9], 
+                                      t[10]),
+             lower=lower_limits,
+             upper=upper_limits,
+             control=list(trace=0))
+        contador <- max_iter + 2
+        return(f)
+        }, error = function(e) {
+          print(paste("Error:", e))
+          print(paste("New attempt...(", contador, "/", max_iter, ")", sep=""))
+          contador <- contador - 1
+          return (NA)
+        }
+    )
+    contador <- contador + 1
+  }
   
   return(fitresFRA)  
   
 } # end searchFit
 
-searchBestFit <- function(args, N) {
+searchBestFit <- function(args, N=1, module="nmkb") {
   
   best <- 100000
-  
+  fitFRA <- NA
+
   for (n in rep(0, N)) {
     params <- random_params(list(lower_limits[1], upper_limits[1]), 
                             list(lower_limits[2], upper_limits[2]), 
@@ -741,14 +778,46 @@ searchBestFit <- function(args, N) {
                             list(lower_limits[9], upper_limits[9]), 
                             list(lower_limits[10], upper_limits[10]))
     
-    bestFit <- searchFit(params, args)
-#    bestFit <- searchFitMLE2(params, args)
-    if (bestFit$value < best) {
-      fitFRA <- bestFit
-      best <- bestFit$value
+    if (module=="nmkb"){
+      bestFit <- searchFit(params, args)
+    } else if (module=="mle2") {
+      bestFit <- searchFitMLE2(params, args)
+    } else {
+      print("Invalid module!")
+      print("Try with either \'optim\' or \'mle2\'")
+      return(NA)
     }
+    
+    b <- tryCatch({
+          bestFit$value
+         }, error = function(e){
+          print(paste("Oops, optimizer", module, "didn\'t work this time!"))
+          return(1000000) 
+         })
+    
+    if (b < best) {
+        fitFRA <- bestFit
+        best <- bestFit$value
+    }
+
+    print(paste("Best value so far:", best))
   }
   
+    b <- tryCatch({
+            print(fitFRA$message)
+            print(paste("Dev:", fitFRA$value))
+            print(imprimir(fitFRA$par))
+            archivo <- paste("Parameter_fit_", module, ".csv", sep = "")
+            df <- data.frame(fitFRA)
+            # print(head(df))
+            write.csv(df, archivo, row.names = FALSE)
+            print(paste("Data saved to", archivo))
+            return(NA)
+         }, error = function(e){
+           print("Optimizer didn\'t work at all :(")
+          return(NA) 
+         })
+    
   return(fitFRA)
   
 } # end searchBestFit

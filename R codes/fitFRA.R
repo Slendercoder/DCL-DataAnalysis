@@ -5,10 +5,11 @@ library(beepr)
 # Loading and preparing the data...
 ###############################################################
 
+print("Loading and preparing the data...")
 #archivo <- "../Python Codes/Simulations/M5_full.csv"
-#archivo <- "../Python Codes/Simulations/N1_full.csv"
+archivo <- "../Python Codes/Simulations/N1_full.csv"
 #archivo <- "../Python Codes/Dyads/output-435-261.csv"
-archivo <- "output-435-261.csv"
+#archivo <- "output-435-261.csv"
 df = read.csv(archivo)
 df <- find_joint_region(df)
 df$RegionFULL <- unlist(df$RegionFULL)
@@ -23,21 +24,20 @@ beep()
 # Parameter recovery...
 ###############################################################
 
-f <- searchBestFit(args, 1)
-print(f$message)
-print(paste("Dev:", f$value))
-print(imprimir(f$par))
+f <- searchBestFit(args, N=5, module="mle2")
+f <- searchBestFit(args, N=5, module="nmkb")
 beep()
 
 ###############################################################
 # Plotting...
 ###############################################################
 
-source("Model_Plots.R")
-df <- get_FRASims(df)
-df$RegionFULL <- unlist(df$RegionFULL)
-df$RegionGo <- factor(df$RegionGo, levels = regiones)
-min_score <- 0
-max_score <- 32
-regs <- c('ALL', 'DOWN', 'IN')
-p <- plot_FRA_regs(df, regs)
+#source("Model_Plots.R")
+#df <- get_FRASims(df)
+#df$RegionFULL <- unlist(df$RegionFULL)
+#df$RegionGo <- factor(df$RegionGo, levels = regiones)
+#min_score <- 0
+#max_score <- 32
+#theta <- f$par
+#regs <- c('ALL', 'DOWN', 'IN')
+#p <- plot_FRA_regs(df, regs)
