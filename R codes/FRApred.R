@@ -791,7 +791,7 @@ searchBestFit <- function(args, N=1, module="nmkb") {
     b <- tryCatch({
           bestFit$value
          }, error = function(e){
-          print(paste("Oops, optimizer", module, "didn\'t work this time!"))
+          print(paste("Oops, optimizer didn\'t work this time!"))
           return(1000000) 
          })
     
@@ -814,7 +814,7 @@ searchBestFit <- function(args, N=1, module="nmkb") {
             print(paste("Data saved to", archivo))
             return(NA)
          }, error = function(e){
-           print("Optimizer didn\'t work at all :(")
+           print("Optimizer", module, "didn\'t work at all :(")
           return(NA) 
          })
     
