@@ -350,17 +350,31 @@ get_FRASims <- function(df) {
 get_FRASims_list <- function(df) {
   
   aux <- get_FRASims(args)
-  aux <- aux %>% 
-    dplyr::mutate(FRASims = as.list(data.frame(c(FRASimALL, 
-                                                 FRASimNOTHING, 
-                                                 FRASimDOWN, 
-                                                 FRASimUP, 
-                                                 FRASimLEFT, 
-                                                 FRASimRIGHT, 
-                                                 FRASimIN, 
-                                                 FRASimOUT)))
-    ) %>%
-    select(Region, RegionFULL, Score, RJcode, FRASims, freqs)
+  
+  aux$FRASims <- mapply(function(x1,x2,x3,x4,x5,x6,x7,x8) as.list(data.frame(c(x1,x2,x3,x4,x5,x6,x7,x8))),
+                        aux$FRASimALL, 
+                        aux$FRASimNOTHING, 
+                        aux$FRASimDOWN, 
+                        aux$FRASimUP, 
+                        aux$FRASimLEFT, 
+                        aux$FRASimRIGHT, 
+                        aux$FRASimIN, 
+                        aux$FRASimOUT
+                        )
+  
+  # dplyr is creating problems: it returns lists longer than expected for some rows 
+#  aux <- aux %>% 
+#    dplyr::mutate(FRASims = as.list(data.frame(c(FRASimALL, 
+#                                                 FRASimNOTHING, 
+#                                                 FRASimDOWN, 
+#                                                 FRASimUP, 
+#                                                 FRASimLEFT, 
+#                                                 FRASimRIGHT, 
+#                                                 FRASimIN, 
+#                                                 FRASimOUT)))
+#    ) %>%
+
+  aux <- aux %>% select(Region, RegionFULL, Score, RJcode, FRASims, freqs)
   
   return(aux)
   
