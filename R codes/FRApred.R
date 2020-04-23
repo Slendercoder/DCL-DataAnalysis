@@ -33,8 +33,11 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.00001
 highEps2 =.99999
 
-lower_limits=c(0,0,0,0,0,0,0,0,0,0)
-upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32,500,1000,2)
+#lower_limits=c(0,0,0,0,0,0,0,0,0,0)
+#upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32,500,1000,2)
+
+lower_limits=c(0,0,0,0,0,500,0,0,500,0)
+upper_limits=c(0.1,0.1,0.1,0.1,500,500,32,500,500,2)
 
 ###########################
 # Define functions
