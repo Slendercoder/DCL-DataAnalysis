@@ -18,7 +18,19 @@ regiones <- c('RS',
               'IN', 
               'OUT')
 
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cbPalette <- c("#999999","#004949","#ff6db6",
+               "#490092","#b66dff","#b6dbff",
+               "#924900","#24ff24","#ffff6d")
+#cbPalette <- c("#999999","#004949","#009292","#ff6db6","#ffb6db",
+#               "#490092","#006ddb","#b66dff","#6db6ff","#b6dbff",
+#               "#920000","#924900","#db6d00","#24ff24","#ffff6d")
+#cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+alpha <- 0.5
+
+####################################################################################
+# Functions
+####################################################################################
 
 get_legend <- function(myggplot){
   tmp <- ggplot_gtable(ggplot_build(myggplot))
@@ -502,7 +514,11 @@ plot_RSTransitions_FRA <- function(df, k) {
   rotulo_x <- paste("FRASim", k, sep="")
   
   gRS2RS <- ggplot() +
-    geom_point(aes(x = FRASim, y = Freqs), df_RS, alpha = alpha, size=1.5) +
+    geom_point(aes(x = FRASim, y = Freqs), 
+               data = df_RS, 
+               alpha = alpha, 
+               size = 3,
+               shape = 4) +
     scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     xlab(rotulo_x) +
@@ -517,6 +533,8 @@ plot_RSTransitions_FRA <- function(df, k) {
 
 plot_FRASim_k_RS2RS <- function(df1, k) {
   
+  min_score <- 0
+  max_score <- 2
   rotulo_x <- paste("FRASim", k, sep="")
 
   # Plot RS to RS
@@ -525,7 +543,11 @@ plot_FRASim_k_RS2RS <- function(df1, k) {
   color_a_usar <- cbPalette[which(regiones == 'RS')]
   g1 <- ggplot() +
     geom_point(aes(x = FRASim, y = Freqs, shape=RegionGo, color=RegionGo, group=RegionGo),
-               df_Focal, color = color_a_usar, alpha = alpha, size=1.5) +
+               data = df_Focal, 
+               color = color_a_usar, 
+               alpha = alpha, 
+               size=3,
+               shape = 4) +
     scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     xlab(rotulo_x) +
@@ -537,12 +559,10 @@ plot_FRASim_k_RS2RS <- function(df1, k) {
   color_a_usar <- cbPalette[which(regiones == 'RS')]
   
   xs <- seq(0,2,length.out=200)
-  thetaRS <- 1 - sum(c(theta[1], theta[2], theta[3], theta[3], theta[3], theta[3], theta[4], theta[4]))
-  # print(thetaRS)
-  fitFocal <- sapply(xs, function(x) thetaRS)
+  fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo='RS', k=k, theta=theta)
   dfB <- data.frame(xs, fitFocal)
   g1 <- g1 +
-    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=1)
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=0.8)
   
   return(g1)
 
@@ -550,6 +570,8 @@ plot_FRASim_k_RS2RS <- function(df1, k) {
   
 plot_Transitions_FRASim_k <- function(df1, k) {
   
+  min_score <- 0
+  max_score <- 2
   rotulo_x <- paste("FRASim", k, sep="")
   titulo <- paste("From RS to", k)
   
@@ -559,7 +581,11 @@ plot_Transitions_FRASim_k <- function(df1, k) {
   color_a_usar <- cbPalette[which(regiones == k)]
   g2 <- ggplot() +
     geom_point(aes(x = FRASim, y = Freqs, shape=RegionGo, color=RegionGo, group=RegionGo),
-               df_Focal, color = color_a_usar, alpha = alpha, size=1.5) +
+               data = df_Focal, 
+               color = color_a_usar, 
+               alpha = alpha, 
+               size=3,
+               shape = 4) +
     scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     xlab(rotulo_x) +
@@ -575,15 +601,15 @@ plot_Transitions_FRASim_k <- function(df1, k) {
 plot_ModelTransition_k_FRA <- function(df1, theta, k) {
   
   pl <- plot_Transitions_FRASim_k(df1, k)
-  
+
   color_a_usar <- cbPalette[which(regiones == k)]
 
   xs <- seq(0,2,length.out=200)
   fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo=k, k=k, theta=theta)
   dfB <- data.frame(xs, fitFocal)
   pl <- pl +
-    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=1)
-  
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=0.8)
+
   return(pl)
 
 }
@@ -594,21 +620,29 @@ plot_FRA_regs <- function(df, regs) {
   k <- regs[1]
   df1 <- getFreq_based_on_FRASim(df, k)
   q <- plot_FRASim_k_RS2RS(df1, k)
+  print(paste('Plotting from RS to', k))
   p <- plot_ModelTransition_k_FRA(df1, theta, k)
   pl <- grid.arrange(q, p, nrow=1)
   
-  contador <- 2
-  for (k in regs[2:n]) {
-    
-    df1 <- getFreq_based_on_FRASim(df, k)
-    q <- plot_FRASim_k_RS2RS(df1, k)
-    p <- plot_ModelTransition_k_FRA(df1, theta, k)
-    pl1 <- grid.arrange(q, p, nrow=1)
-    pl <- grid.arrange(pl, pl1, nrow=2, heights=c((contador - 1)/contador, 1/contador))
-    contador <- contador + 1
-  
+  if (n > 1) {
+    contador <- 2
+    for (k in regs[2:n]) {
+      print(paste('Plotting from RS to', k))
+      df1 <- getFreq_based_on_FRASim(df, k)
+      q <- plot_FRASim_k_RS2RS(df1, k)
+      p <- plot_ModelTransition_k_FRA(df1, theta, k)
+      pl1 <- grid.arrange(q, p, nrow=1)
+      pl <- grid.arrange(pl, pl1, nrow=2, heights=c((contador - 1)/contador, 1/contador))
+      contador <- contador + 1
+    }
   }
   
   return (pl)
   
+}
+
+savePlot <- function(file, myPlot) {
+  pdf(file)
+  print(myPlot)
+  dev.off()
 }

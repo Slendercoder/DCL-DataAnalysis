@@ -131,9 +131,7 @@ find_joint_region <- function(df1) {
   # Initialize auxiliary dataframe
   auxDF <- data.frame(c('Dyad', NA), 
                       c('Player', NA), 
-                      #                    c('Region', NA), 
                       c('RegionFULL', NA), 
-                      #                    c('RegionGo', NA), 
                       c('RJoint', NA), 
                       c('Score', NA))
   colnames(auxDF) = as.character(unlist(auxDF[1, ])) # the first row will be the header
@@ -164,7 +162,7 @@ find_joint_region <- function(df1) {
     DF$Player <- rep(as.character(jugador[1]), length(r1))
     DF$Region <- parejaDF$Category[which(parejaDF$Player == jugador[1])]
     DF$RegionFULL <- parejaDF$vR[which(parejaDF$Player == jugador[1])]
-    DF$RegionGo <- lead(DF$Region, 2)
+    DF$RegionGo <- lead(DF$Region, 1)
     DF$RJoint <- newDF$rJoint
     DF$Score <- parejaDF$Score[which(parejaDF$Player == jugador[1])]
     DF <- DF[c('Dyad', 'Player', 'Region', 'RegionFULL', 'RegionGo', 'RJoint', 'Score')]
@@ -180,7 +178,7 @@ find_joint_region <- function(df1) {
     DF$Player <- rep(as.character(jugador[2]), length(r2))
     DF$Region <- parejaDF$Category[which(parejaDF$Player == jugador[2])]
     DF$RegionFULL <- parejaDF$vR[which(parejaDF$Player == jugador[2])]
-    DF$RegionGo <- lead(DF$Region, 2)
+    DF$RegionGo <- lead(DF$Region, 1)
     DF$RJoint <- newDF$rJoint
     DF$Score <- parejaDF$Score[which(parejaDF$Player == jugador[2])]
     DF <- DF[c('Dyad', 'Player', 'Region', 'RegionFULL', 'RegionGo', 'RJoint', 'Score')]
@@ -830,7 +828,7 @@ searchBestFit <- function(args, N=1, module="nmkb") {
             # print(head(df))
             write.csv(df, archivo, row.names = FALSE)
             print(paste("Data saved to", archivo))
-            return(NA)
+            return(fitFRA)
          }, error = function(e){
            print("Optimizer", module, "didn\'t work at all :(")
           return(NA) 
@@ -846,9 +844,6 @@ ModelProb <- function(regionFrom, regionGo, s, k, theta){
   # FRA model returns probability of going from regionFrom to regionGo
   # given FRA similarity to region k
   
-  # Do not use WSLS parameters (theta[5:7])
-  theta <- c(theta[1:4], theta[8:10])
-  
   wALL <- theta[1]
   wNOTHING <- theta[2]
   wLEFT <- theta[3]
@@ -856,6 +851,9 @@ ModelProb <- function(regionFrom, regionGo, s, k, theta){
   alpha <- theta[5]
   beta <- theta[6]
   gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
   
   aux <- c(wALL, wNOTHING, wLEFT, wLEFT, wLEFT, wLEFT, wIN, wIN)
   
@@ -864,39 +862,41 @@ ModelProb <- function(regionFrom, regionGo, s, k, theta){
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-  # print('bias')
-  # imprimir(bias)
-  
-  if (k=='RS') {
-    return (bias[1])
-  } else if (k=='ALL') {
-    return (bias[2])
-  } else if (k=='NOTHING') {
-    return (bias[3])
-  }
+#  print('bias')
+#  imprimir(bias)
   
   # Find the attractivenes:
   focal <- 0
   index <- which(regiones == regionGo)
+#  print(paste('Indice regiones:', index))
   attractiveness <- bias[index]
+#  print(paste('attractiveness:', attractiveness))
+  
+#  print(paste('Considering case from', regionFrom, 'to', regionGo))
   if (regionFrom == 'RS') { 
+#    print('Entering case from RS')
     if (regionGo != 'RS') {
+#      print('Entering case to Focal')
       if(k == regionGo) {
-        attractiveness <- attractiveness + alpha * sigmoid(s, beta, gamma)
+        attractiveness <- attractiveness + delta * sigmoid(s, epsilon, zeta)
+        focal <- delta * sigmoid(s, epsilon, zeta)
       }
+    } else {
+#      print('Entering case to RS')
+      focal <- delta * sigmoid(s, epsilon, zeta)
     }
   } else {
+#    print('Entering case from Focal')
     if(regionFrom == regionGo) {
-      attractiveness <- attractiveness + alpha
-      focal <- alpha
-    }
-    if(k == regionGo) {
-      attractiveness <- attractiveness + alpha * sigmoid(s, beta, gamma)
-      focal <- alpha
+      attractiveness <- attractiveness + delta
+      focal <- delta
+    } else if(k == regionGo) {
+      attractiveness <- attractiveness +  delta * sigmoid(s, epsilon, zeta)
+      focal <- delta * sigmoid(s, epsilon, zeta)
     }
   }
   
-  probab <- attractiveness / (1 + alpha * sigmoid(s, beta, gamma) + focal)
+  probab <- attractiveness / (1 + focal)
   
   return(probab)
 } # end ModelProb

@@ -5,7 +5,7 @@ library(beepr)
 # Loading and preparing data...
 ###############################################################
 
-print("Loading and preparing the data...")
+print("Loading and preparing data...")
 #archivo <- "../Python Codes/Simulations/M5_full.csv"
 #archivo <- "../Python Codes/Simulations/N1_full.csv"
 #archivo <- "../Python Codes/Dyads/output-435-261.csv"
@@ -34,12 +34,16 @@ beep()
 # Plotting...
 ###############################################################
 
-#source("Model_Plots.R")
-#df <- get_FRASims(df)
-#df$RegionFULL <- unlist(df$RegionFULL)
-#df$RegionGo <- factor(df$RegionGo, levels = regiones)
-#min_score <- 0
-#max_score <- 32
-#theta <- f$par
-#regs <- c('ALL', 'DOWN', 'IN')
-#p <- plot_FRA_regs(df, regs)
+source("Model_Plots.R")
+df <- get_FRASims(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+theta <- f$par
+lista_regs <- list(c('DOWN', 'UP'), c('LEFT', 'RIGHT'), c('IN', 'OUT'))
+for (regs in lista_regs) {
+  print(regs)
+  p <- plot_FRA_regs(df, regs)
+  r <- paste(regs, collapse="-")
+  grafico <- paste('PlotFRA-', r, '.pdf',sep="")
+  ggsave(grafico, p)
+}
