@@ -36,7 +36,7 @@ highEps2 =.99999
 #lower_limits=c(0,0,0,0,0,0,0,0,0,0)
 #upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32,500,1000,2)
 
-lower_limits=c(0,0,0,0,0,500,0,0,500,0)
+lower_limits=c(0,0,0,0,0,499,0,0,499,0)
 upper_limits=c(0.1,0.1,0.1,0.1,500,500,32,500,500,2)
 
 ###########################
@@ -795,6 +795,7 @@ searchBestFit <- function(args, N=1, module="nmkb") {
                             list(lower_limits[9], upper_limits[9]), 
                             list(lower_limits[10], upper_limits[10]))
     
+    # imprimir(params)
     if (module=="nmkb"){
       bestFit <- searchFit(params, args)
     } else if (module=="mle2") {
@@ -823,7 +824,7 @@ searchBestFit <- function(args, N=1, module="nmkb") {
     b <- tryCatch({
             print(fitFRA$message)
             print(paste("Dev:", fitFRA$value))
-            print(imprimir(fitFRA$par))
+            imprimir(fitFRA$par)
             archivo <- paste("Parameter_fit_", module, ".csv", sep = "")
             df <- data.frame(fitFRA)
             # print(head(df))
