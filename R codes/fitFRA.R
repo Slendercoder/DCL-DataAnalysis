@@ -26,7 +26,7 @@ beep()
 # Parameter recovery...
 ###############################################################
 
-f <- searchBestFit(args, N=5, module="mle2")
+#f <- searchBestFit(args, N=5, module="mle2")
 f <- searchBestFit(args, N=5, module="nmkb")
 beep()
 
