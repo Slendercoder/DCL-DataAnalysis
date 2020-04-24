@@ -1,17 +1,17 @@
-source("FRApred.R")
+source("Model_Plots.R")
+#source("FRApred.R")
 library(beepr)
 
 ###############################################################
 # Loading and preparing data...
 ###############################################################
 
-print("Loading and preparing data...")
 #archivo <- "../Python Codes/Simulations/M5_full.csv"
 #archivo <- "../Python Codes/Simulations/N1_full.csv"
 #archivo <- "../Python Codes/Dyads/output-435-261.csv"
-
 archivo <- "N1_full.csv"
 #archivo <- "output-435-261.csv"
+print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
 df <- find_joint_region(df)
 df$RegionFULL <- unlist(df$RegionFULL)
@@ -34,14 +34,14 @@ beep()
 # Plotting...
 ###############################################################
 
-source("Model_Plots.R")
 df <- get_FRASims(df)
 df$RegionFULL <- unlist(df$RegionFULL)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)
 theta <- f$par
-lista_regs <- list(c('DOWN', 'UP'), c('LEFT', 'RIGHT'), c('IN', 'OUT'))
+#lista_regs <- list(c('DOWN', 'UP'), c('LEFT', 'RIGHT'), c('IN', 'OUT'))
+lista_regs <- list(c('ALL', 'NOTHING'))
 for (regs in lista_regs) {
-  print(regs)
+#  print(regs)
   p <- plot_FRA_regs(df, regs)
   r <- paste(regs, collapse="-")
   grafico <- paste('PlotFRA-', r, '.pdf',sep="")

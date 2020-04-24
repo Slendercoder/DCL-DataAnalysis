@@ -400,6 +400,22 @@ getFreq_based_on_FRASim <- function(df, k) {
     
   } # end k='ALL'
 
+  if (k == 'NOTHING') {
+    df <- df[complete.cases(df$RegionGo), ]
+    df <- df[df$RegionGo != "", ]
+    df <- df %>% select('Region', 'FRASimNOTHING', 'RegionGo')
+    df <- df %>%
+      dplyr::group_by(Region, FRASimNOTHING, RegionGo) %>%
+      dplyr::summarize(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(Region, FRASimNOTHING) %>%
+      dplyr::mutate(n1 = sum(n),
+                    Freqs = n/n1)  
+    
+    df$FRASim <- df$FRASimNOTHING
+    
+  } # end k='NOTHING'
+  
   if (k == 'DOWN') {
     df <- df[complete.cases(df$RegionGo), ]
     df <- df[df$RegionGo != "", ]
