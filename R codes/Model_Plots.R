@@ -1,4 +1,4 @@
-source("WSPred.R")
+source("WSpred.R")
 source("FRApred.R")
 library(ggplot2)
 library(gridExtra)
