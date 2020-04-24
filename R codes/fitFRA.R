@@ -38,8 +38,7 @@ df <- get_FRASims(df)
 df$RegionFULL <- unlist(df$RegionFULL)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)
 theta <- f$par
-#lista_regs <- list(c('DOWN', 'UP'), c('LEFT', 'RIGHT'), c('IN', 'OUT'))
-lista_regs <- list(c('ALL', 'NOTHING'))
+lista_regs <- list(c('DOWN', 'UP'), c('LEFT', 'RIGHT'), c('IN', 'OUT'))
 for (regs in lista_regs) {
 #  print(regs)
   p <- plot_FRA_regs(df, regs)
