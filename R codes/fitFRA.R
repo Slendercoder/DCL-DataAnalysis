@@ -10,6 +10,7 @@ library(beepr)
 #archivo <- "../Python Codes/Simulations/N1_full.csv"
 #archivo <- "../Python Codes/Dyads/output-435-261.csv"
 archivo <- "N1_full.csv"
+archivo <- "humans.csv"
 #archivo <- "output-435-261.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
