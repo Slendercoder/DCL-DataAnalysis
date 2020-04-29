@@ -23,7 +23,7 @@ for j in range(1, Num_Loc + 1) \
 regionsCod = ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:', # ALL
                   '', # NOTHING
                   'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # DOWN
-                  'abcdefghijklmnopqrstuvwxyzABCDEF', # UP
+                  'abcdefghijklmnopqrstuvwxyzABCDEF', # TOP
                   'abcdijklqrstyzABGHIJOPQRWXYZ4567', # LEFT
                   'efghmnopuvwxCDEFKLMNSTUV012389;:', # RIGHT
                   'jklmnorstuvwzABCDEHIJKLMPQRSTUXYZ012', # IN
@@ -468,7 +468,7 @@ def get_measures(data, lista):
         # Finding distance to closest focal region per round, per player
         # --------------------------------------------------
         print("Finding distances to focal regions (please be patient)...")
-        data['Similarity'] = data.apply(lambda x: FRA.maxSim2Focal(x[cols1]), axis=1)
+        data['Similarity'] = data.apply(lambda x: FRA.maxSim2Focal(x[cols1], Num_Loc), axis=1)
 
     # --------------------------------------------------
     # Finding the lag and lead variables

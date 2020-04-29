@@ -3,6 +3,8 @@ source("FRApred.R")
 library(ggplot2)
 library(gridExtra)
 library(Rmisc)
+library(sjPlot)
+library(sjmisc)
 
 ####################################################################################
 # Global variables
@@ -41,11 +43,13 @@ get_legend <- function(myggplot){
 
 get_legend_from_dummy <- function(True_model_color, Recovered_model_color) {
   
+  min_score <- 0
+  max_score <- 33
   xs <- seq(min_score,32,length.out=(32-min_score + 1)*1000)
   dummyplot <- ggplot() +
     geom_line(aes(x = xs, y = xs, color = "True"), size = 1) + 
     geom_line(aes(x = xs, y = xs, color = "Recovered"), size = 1) + 
-    scale_x_continuous(limits = c(min_score, 33)) + 
+    scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     scale_color_manual(values=c("True"=True_model_color,
                                 "Recovered"=Recovered_model_color),
@@ -61,6 +65,8 @@ get_legend_from_dummy <- function(True_model_color, Recovered_model_color) {
 
 plot_RSTransitions <- function(df) {
   
+  min_score <- 0
+  max_score <- 33
   df_RS <- df[df$Region == 'RS', ]
   df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
   df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
@@ -74,7 +80,7 @@ plot_RSTransitions <- function(df) {
   
   gRS2RS <- ggplot() +
     geom_point(aes(x = Score, y = Freqs), df_RS, alpha = alpha, size=1.5) +
-    scale_x_continuous(limits = c(min_score, 35)) + 
+    scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     xlab("Score") +
     #  ylab("") +
@@ -94,8 +100,11 @@ plot_FocalTransitions <- function(df) {
                 'DOWN', 'UP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   
+  min_score <- 0
+  max_score <- 33
+  
   gOTHER2OTHER <- ggplot() +
-    scale_x_continuous(limits = c(min_score, 35)) + 
+    scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     xlab("Score") +
     #  ylab("") +
@@ -212,7 +221,7 @@ plot_6panels <- function(archivo) {
   return (gB)
 }
 
-plot_4panels <- function(archivo) {
+plot_4panels <- function(archivo, theta) {
   
   df2 = read.csv(archivo)
   df2$Region <- df2$Category
@@ -226,6 +235,8 @@ plot_4panels <- function(archivo) {
   ############################
   # Ploting data...
   ############################
+  min_score <- 0
+  max_score <- 33
   # Regression full data
   p1 <- ggplot(df2, aes(x = Score_LAG1, y = Consistency)) + 
     geom_point(shape = 19, alpha = alpha) + 
@@ -233,7 +244,7 @@ plot_4panels <- function(archivo) {
     theme_bw() +
     xlab("Score(n-1)") +
     ylab("Consistency(n)") +
-    xlim(c(min_score,32)) +
+    xlim(c(min_score,max_score)) +
     ylim(c(0,1)) +
     ggtitle('Full data')
   # Regression only focal regions
@@ -638,6 +649,120 @@ plot_FRA_regs <- function(df, regs) {
   }
   
   return (pl)
+  
+}
+
+plot_FRA_regs1 <- function(df, regs, theta) {
+  
+  # NO RS2RS Transition
+  
+  n <- length(regs)
+  k <- regs[1]
+  df1 <- getFreq_based_on_FRASim(df, k)
+  print(paste('Plotting from RS to', k))
+  pl <- plot_ModelTransition_k_FRA(df1, theta, k)
+
+  if (n > 1) {
+    contador <- 2
+    for (k in regs[2:n]) {
+      print(paste('Plotting from RS to', k))
+      df1 <- getFreq_based_on_FRASim(df, k)
+      p <- plot_ModelTransition_k_FRA(df1, theta, k)
+      pl <- grid.arrange(pl, p, nrow=1, widths=c((contador - 1)/contador, 1/contador))
+      contador <- contador + 1
+    }
+  }
+  
+  return (pl)
+  
+}
+
+plot_behavior <- function(df2, theta, model=TRUE) {
+  
+  # Plots the behavior of data in terms of:
+  # Top left -- Scatter plot: Consistency(n) ~ Score(n-1)
+  # Top middle -- Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
+  # Top right -- Scatter plot: Consistency(n) ~ log max similarity to focal region
+  # Center left -- DLindex vs. round
+  # Center middle -- Kernel Density Estimate of DLindex
+  # Center right -- WSLS
+  
+  min_score <- 0
+  max_score <- 33
+
+  # 1...
+  # Top left -- Scatter plot: Consistency(n) ~ Score(n-1)
+  # Regression full data
+  p1 <- ggplot(df2, aes(x = Score, y = Consistency_LEAD1)) + 
+    geom_point(shape = 19, alpha = alpha) + 
+    geom_smooth(method='lm', se=FALSE) + 
+    theme_bw() +
+    xlab("Score(n-1)") +
+    ylab("Consistency(n)") +
+    xlim(c(min_score,32)) +
+    ylim(c(0,1)) +
+    ggtitle('Full data')
+
+  # 2...
+  # Top middle -- Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
+  model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df2)
+  p2 <- plot_model(model3h, 
+                   type = "pred", 
+                   terms = c("Dif_consist", "Joint_LAG1"), 
+                   colors = c("black", "red", "blue"),
+                   title = "",
+                   legend.title = "Overlap",
+                   axis.title = c("Absolute difference\nin consistency", "DLindex"))
+  
+  # 3...
+  # Top right -- Scatter plot: Consistency(n) ~ log max similarity to focal region
+  p3 <- ggplot(df2, aes(log(Similarity_LAG1), Consistency)) +
+    geom_point(alpha = 1/8) +
+    xlab("Log of max similarity w.r.t.\nfocal regions on Round n-1") +
+    ylab("Consistency\n on Round n") +
+    geom_smooth(method = lm)
+  
+  # 4...
+  # Center left -- DLindex vs. round
+  # Summarize data
+  dfc_DLIndex <- summarySE(df2, measurevar="DLIndex", groupvars=c("Round"))
+  # Plot DLIndex with error regions
+  p4 <- ggplot(dfc_DLIndex, aes(x = Round, y = DLIndex)) +
+    geom_line(size=0.7) +
+    geom_ribbon(aes(ymin = DLIndex - sd,
+                    ymax = DLIndex + sd), alpha = alpha) +
+    xlab("Round (unicorn absent)") +
+    ylab("Division of labor") +
+    theme_bw()
+  
+  # 5...
+  # Center middle -- Kernel Density Estimate of DLindex
+  p5 <- ggplot(df2, aes(DLIndex)) +
+    geom_density(size=1) +
+    #  scale_y_continuous(limits = c(0, 5)) + 
+    xlab("Division of labor") +
+    theme_bw()
+  
+  # 6...
+  # Center right -- WSLS
+  df2 <- getRelFreq_Rows(df2)
+  p6 <- plot_FocalTransitions(df2)
+
+  if (model==TRUE) {
+    p6 <- plot_ModelTransitions_Focal(theta, p6,"#999999")
+    parametros <- para_visualizar(theta)
+    parametros <- paste("Parameters:", parametros)
+  } else {
+    parametros <- ""
+  }
+  
+  top <- grid.arrange(p1, p2, p3, nrow=1)
+  center <- grid.arrange(p4, p5, p6, nrow=1)
+  gB <- grid.arrange(top, center, 
+                     nrow=2,
+                     bottom=parametros)
+  
+  return(gB)
   
 }
 

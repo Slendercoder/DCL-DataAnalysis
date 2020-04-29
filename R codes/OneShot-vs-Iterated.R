@@ -1,17 +1,23 @@
 library(ggplot2)
+library(gridExtra)
 
-df1 = read.csv("humans_full.csv")
+#df1 = read.csv("humans_full.csv")
+df1 = read.csv("humans_only_absent.csv")
 head(df1)
 
 # ----------------------------------
 
 # Check the performance on the first round, as if one-shot task
-DLIRound60 <- df1$DLIndex[which(df1$Round == 60)]
+DLIRound60 <- df1$DLIndex[which(df1$Round == 59)]
 mean(DLIRound60)
 sd(DLIRound60)
+n <- length(DLIRound60)
+print(paste("Number of trials last round:", n))
 DLIRound1 <- df1$DLIndex[which(df1$Round == 1)]
 mean(DLIRound1)
 sd(DLIRound1)
+n <- length(DLIRound1)
+print(paste("Number of trials first round:", n))
 wilcox.test(DLIRound60, DLIRound1) # => Difference one-shot task vs iterated task is significant
 
 DLIRound60 <- data.frame(DLIRound60)
@@ -36,11 +42,13 @@ g2
 
 # Plot frequencies of regions
 n <- length(df1$Category[which(df1$Round == 1)])
+print(paste("Number of trials round 1:", n))
 A <- as.data.frame(rep('First Round', n))
 colnames(A) = c('Condition')
 A$Strategy <- df1$Category[which(df1$Round == 1)]
 head(A)
 n <- length(df1$Category)
+print(paste("Number of trials all rounds:", n))
 B <- as.data.frame(rep('60 Rounds', n))
 colnames(B) = c('Condition')
 B$Strategy <- df1$Category
@@ -67,7 +75,7 @@ df$Strategy <- factor(df$Strategy, levels = c('RS',
                                               'ALL', 
                                               'NOTH', 
                                               'DOWN', 
-                                              'UP', 
+                                              'TOP', 
                                               'LEFT', 
                                               'RIGHT', 
                                               'IN', 

@@ -14,7 +14,7 @@ IMPR = False
 regionsCoded = ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:', # ALL
                   '', # NOTHING
                   'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # DOWN
-                  'abcdefghijklmnopqrstuvwxyzABCDEF', # UP
+                  'abcdefghijklmnopqrstuvwxyzABCDEF', # TOP
                   'abcdijklqrstyzABGHIJOPQRWXYZ4567', # LEFT
                   'efghmnopuvwxCDEFKLMNSTUV012389;:', # RIGHT
                   'jklmnorstuvwzABCDEHIJKLMPQRSTUXYZ012', # IN
@@ -25,7 +25,7 @@ regions = ['RS', \
            'ALL', \
            'NOTHING', \
            'DOWN', \
-           'UP', \
+           'TOP', \
            'LEFT', \
            'RIGHT', \
            'IN', \
@@ -71,7 +71,7 @@ def nameRegion(r):
 	elif r == 3:
 		return 'DOWN'
 	elif r == 4:
-		return 'UP'
+		return 'TOP'
 	elif r == 5:
 		return 'LEFT'
 	elif r == 6:
@@ -90,7 +90,7 @@ def numberRegion(r):
 		return 2
 	elif r == 'DOWN':
 		return 3
-	elif r == 'UP':
+	elif r == 'TOP':
 		return 4
 	elif r == 'LEFT':
 		return 5
@@ -133,11 +133,11 @@ def create_regions_and_strategies(Num_Loc):
 	# print('ALL ', all)
 	# print('NOTHING ', nothing)
 
-	# UP and DOWN
+	# TOP and DOWN
 	up = [1] * half_size + [0] * half_size
 	down = [1 - i for i in up]
 	# print('DOWN ', down)
-	# print('UP ', up)
+	# print('TOP ', up)
 
 	# LEFT and RIGHT
 	right = []
@@ -163,7 +163,7 @@ def create_regions_and_strategies(Num_Loc):
 	# Create a set of n pairwise disjoint paths in the board
 
 	# Define the strategies
-	UP = []
+	TOP = []
 	DOWN = []
 	LEFT = []
 	RIGHT = []
@@ -174,7 +174,7 @@ def create_regions_and_strategies(Num_Loc):
 
 	for i in range(int(Num_Loc * Num_Loc)):
 		if up[i] == 1:
-			UP.append(i)
+			TOP.append(i)
 		if down[i] == 1:
 			DOWN.append(i)
 		if left[i] == 1:
@@ -199,7 +199,7 @@ def create_regions_and_strategies(Num_Loc):
 	strategies[1] = ALL
 	strategies[2] = NOTHING
 	strategies[3] = DOWN
-	strategies[4] = UP
+	strategies[4] = TOP
 	strategies[5] = LEFT
 	strategies[6] = RIGHT
 	strategies[7] = IN
@@ -462,7 +462,7 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		wALL = float(modelParameters[0])
 		wNOTHING = float(modelParameters[1])
 		wDOWN = float(modelParameters[2])
-		wUP = float(modelParameters[2])
+		wTOP = float(modelParameters[2])
 		wLEFT = float(modelParameters[2])
 		wRIGHT = float(modelParameters[2])
 		wIN = float(modelParameters[3])
@@ -477,7 +477,7 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		wALL = float(modelParameters[10])
 		wNOTHING = float(modelParameters[11])
 		wDOWN = float(modelParameters[12])
-		wUP = float(modelParameters[12])
+		wTOP = float(modelParameters[12])
 		wLEFT = float(modelParameters[12])
 		wRIGHT = float(modelParameters[12])
 		wIN = float(modelParameters[13])
@@ -489,11 +489,11 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		epsilon = float(modelParameters[18]) # amplitude of the FRA sigmoid function
 		zeta = float(modelParameters[19]) # position of the FRA sigmoid function
 
-	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]]
+	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]]
 	# print('bias: ', biasPrint)
-	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]))
+	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]))
 	assert(wRS > 0), "Incorrect biases!"
-	bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
+	bias = [wRS, wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]
 	# biasPrint = ["%.3f" % v for v in bias]
 	# print('bias: ', biasPrint)
 
@@ -669,7 +669,7 @@ def probabilitiesPREVIOUS(iV, i, score, j, pl):
 		wALL = float(modelParameters[1])
 		wNOTHING = float(modelParameters[2])
 		wDOWN = float(modelParameters[3])
-		wUP = float(modelParameters[3])
+		wTOP = float(modelParameters[3])
 		wLEFT = float(modelParameters[3])
 		wRIGHT = float(modelParameters[3])
 		wIN = float(modelParameters[4])
@@ -687,7 +687,7 @@ def probabilitiesPREVIOUS(iV, i, score, j, pl):
 		wALL = float(modelParameters[14])
 		wNOTHING = float(modelParameters[15])
 		wDOWN = float(modelParameters[16])
-		wUP = float(modelParameters[16])
+		wTOP = float(modelParameters[16])
 		wLEFT = float(modelParameters[16])
 		wRIGHT = float(modelParameters[16])
 		wIN = float(modelParameters[17])
@@ -701,7 +701,7 @@ def probabilitiesPREVIOUS(iV, i, score, j, pl):
 		eta = float(modelParameters[24]) # for the steepness of the similarity to focal region
 		iota = float(modelParameters[25]) # for how much the winner takes all
 
-	bias = [wRS, wALL, wNOTHING, wDOWN, wUP, wLEFT, wRIGHT, wIN, wOUT]
+	bias = [wRS, wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]
 	# biasPrint = ["%.3f" % v for v in bias]
 	# print('bias: ', biasPrint)
 

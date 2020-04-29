@@ -1,141 +1,37 @@
-library(ggplot2)
-library(gridExtra)
-library(Rmisc)
-
-get_legend<-function(myggplot){
-  tmp <- ggplot_gtable(ggplot_build(myggplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)
-}
+source("Model_Plots.R")
 
 ###############################################
-
-#df = read.csv("../Python Codes/FRAsimulated.csv", na.strings=c("","NA"))
-#df = read.csv("../Python Codes/outputWSLS.csv", na.strings=c("","NA"))
-df = read.csv("../Python Codes/output.csv", na.strings=c("","NA"))
-head(df)
-
+# Plot humans
 ###############################################
 
-# Summarize data
-dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars="Round")
-head(dfc_DLIndex)
+archivo <- "humans_only_absent.csv"
+df = read.csv(archivo)
+theta <- c(0.056, 0.038, 0.01, 0.001, 499, 499, 2, 497, 499, 0.946)
+p <- plot_behavior(df, theta, model=FALSE)
+df <- find_joint_region(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+df <- get_FRASims(df) # Requires to run df <- find_joint_region(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+regs <- c('ALL', 'DOWN', 'LEFT', 'IN')
+q <- plot_FRA_regs1(df, regs, theta)
+grid.arrange(p, q, heights=c(2/3, 1/3))
 
-# Plot DLIndex with error regions
-g1 <- ggplot(dfc_DLIndex, aes(x=Round, y=DLIndex)) +
-  geom_line(size=0.7) +
-  geom_ribbon(aes(ymin = DLIndex - sd,
-                  ymax = DLIndex + sd), alpha = 0.2) +
-#  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
-  labs(color = "Source") +
-  xlab("Round (unicorn absent)") +
-  ylab("Division of labor") +
-  theme_bw()
+###############################################
+# Plot FRA model
+###############################################
 
-g1
-
-# Density plot
-g2 <- ggplot(df, aes(DLIndex)) +
-  geom_density(size=1) +
-#  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
-#  scale_y_continuous(limits = c(0, 5)) + 
-  labs(color = "Source of data") +
-  theme_bw()
-
-g2
-
-levels(df$Category)
-#df$Category <- lapply(df$Category, function(x) {
-#  if(x=='NOTHING') {
-#    return('NOT')
-#  } else if(x=='DOWN') {
-#    return('DOW')
-#  } else if(x=='LEFT') {
-#    return('LEF')
-#  } else if(x=='RIGHT') {
-#    return('RIG')
-#  } else {
-#    #    print(x)
-#    return(as.character(x))
-#  }
-#})
-df$Category <- unlist(df$Category)
-df$Category <- as.factor(df$Category)
-#df$Category <- factor(df$Category, levels = c('RS',
-#                                              'ALL', 
-#                                              'NOT', 
-#                                              'DOW', 
-#                                              'UP', 
-#                                              'LEF', 
-#                                              'RIG', 
-#                                              'IN', 
-#                                              'OUT'))
-df$Category <- factor(df$Category, levels = c('RS',
-                                              'ALL', 
-                                              'NOTHING', 
-                                              'DOWN', 
-                                              'UP', 
-                                              'LEFT', 
-                                              'RIGHT', 
-                                              'IN', 
-                                              'OUT'))
-
-
-g3 <- ggplot(df, aes(x=Category)) + 
-  geom_bar(aes(y = ..prop..), stat="count", position="dodge") +
-  geom_text(aes(label = scales::percent(..prop..),
-                   y= ..prop.. ), stat= "count", vjust = -.5) +
-  labs(y = "Percent", fill="Region") +
-#  scale_fill_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
-  xlab("Region") +
-  ylab("Instances (%)") +
-#  labs(fill = TeX('bias$_{focal}$')) +
-#  facet_grid(~Condition) +
-  scale_y_continuous(labels = scales::percent, limits = c(0, 0.6)) +
-  theme_bw() +
-  theme(legend.position="top")
-
-g3
-
-g4 <- ggplot(df, aes(Norm_Score_LAG1, Consistency)) +
-  geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
-  scale_y_continuous(limits = c(0, 1)) + 
-  xlab("Score prev. round") +
-  ylab("Consistency") +
-  geom_smooth(method = lm)
-
-#g4 <- g4 + theme_sjplot()
-
-g4
-
-g5 <- ggplot(df, aes(log(Similarity_LAG1), Consistency)) +
-  geom_point(alpha = 1/8) +
-  scale_colour_manual(values = c("Observed behavior" = "#999999", "WSLS" = "#E69F00", "FRA" = "#56B4E9")) +  
-  xlab("Log of max similarity w.r.t.\nfocal regions prev. round") +
-  ylab("Consistency") +
-  geom_smooth(method = lm)
-
-g5 <- g5 + theme_sjplot()
-
-g5
-
-legend <- get_legend(g3)
-g1 <- g1 + theme(legend.position="none")
-g2 <- g2 + theme(legend.position="none")
-g3 <- g3 + theme(legend.position="none")
-g4 <- g4 + theme(legend.position="none")
-g5 <- g5 + theme(legend.position="none")
-
-grid.arrange(g1, g2, 
-             nrow = 1,
-             bottom=legend)
-
-grid.arrange(g1, g2, g3, g4, g5, 
-             nrow = 3, 
-             layout_matrix = rbind(c(1, 2), c(4, 5), c(3)),
-             bottom=legend)
-
-# ggsave("ModelComparisonFull.eps", width=6.6, height=5, device=cairo_ps, g)
-
+archivo <- "../Python Codes/FRA.csv"
+df = read.csv(archivo)
+theta <- c(0.056, 0.038, 0.01, 0.001, 499, 499, 2, 497, 499, 0.946)
+p <- plot_behavior(df, theta)
+df <- find_joint_region(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+df <- get_FRASims(df) # Requires to run df <- find_joint_region(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+regs <- c('ALL', 'DOWN', 'LEFT', 'IN')
+q <- plot_FRA_regs1(df, regs, theta)
+grid.arrange(p, q, heights=c(2/3, 1/3))

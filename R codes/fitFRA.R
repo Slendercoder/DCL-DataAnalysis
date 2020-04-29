@@ -35,7 +35,10 @@ beep()
 # Plotting...
 ###############################################################
 
-df <- get_FRASims(df)
+df <- find_joint_region(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+df <- get_FRASims(df) # Requires to run df <- find_joint_region(df)
 df$RegionFULL <- unlist(df$RegionFULL)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)
 theta <- f$par
