@@ -134,6 +134,32 @@ class Experiment(object):
 				place = int(floor(uniform(0, Num_Loc * Num_Loc - 1)))
 				Board[place] = 1
 
+            # Include some small random variations in chosen strategy
+			p_change = 0.01
+			strategies_used = []
+			strat = self.strategies[Players[0].strategy]
+			# print("strat")
+			# print(strat)
+			if uniform(0, 1) < p_change:
+			    lista = [x for x in range(Num_Loc * Num_Loc) if x not in strat]
+			    # print("lista")
+			    # print(lista)
+			    if len(lista) > 0:
+			        rt = choice(lista)
+			        strat.append(rt)
+			        rt = choice(lista)
+			        strat.append(rt)
+			strategies_used.append(strat)
+			strat = self.strategies[Players[1].strategy]
+			if uniform(0, 1) < p_change:
+			    lista = [x for x in range(Num_Loc * Num_Loc) if x not in strat]
+			    if len(lista) > 0:
+			        rt = choice(lista)
+			        strat.append(rt)
+			        rt = choice(lista)
+			        strat.append(rt)
+			strategies_used.append(strat)
+
 			# Start searchging for the unicorn
 			for j in range(0, Num_Loc * Num_Loc + 1):
 				# print("\nRunning iteration " + str(j))
@@ -152,8 +178,8 @@ class Experiment(object):
 		#					str(Players[k].strategy))
 		#				print("He is looking on location: " + str(strategies[Players[k].strategy]))
 						# See if the strategy is not over...
-						if j<len(self.strategies[Players[k].strategy]):
-							search_place = self.strategies[Players[k].strategy][j]
+						if j<len(strategies_used[k]):
+							search_place = strategies_used[k][j]
 							Players[k].where.append(search_place)
 							# print("Player " + str(k) + " is searching at " + str(search_place))
 							if Board[search_place] == 1:

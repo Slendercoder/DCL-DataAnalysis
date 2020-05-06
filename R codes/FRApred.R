@@ -607,6 +607,51 @@ FRApred1 <- function(i, iV, s, j, FRASims, theta) {
   
 } # End FRApred1
 
+FRApred2 <- function(i, iV, s, j, FRASims, theta) {
+  
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
+  
+  # First we calculate the prior probabilities
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  imprimir(bias)
+  
+  # Start from 0
+  attractiveness <- rep(0, 9)
+  # Add WinStay
+  index <- which(regiones == i)
+  # adding win stay only to focal regions
+  if (i != 'RS') {
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
+  }
+  #  print('Attractiveness with WS:')
+  #  imprimir(attractiveness)
+  
+  similarities <- sigmoid(unlist(FRASims), epsilon, zeta)
+  similarities <- c(0, unlist(similarities))
+  
+  attractiveness <- attractiveness + similarities
+  
+  attractiveness <- replace(attractiveness,attractiveness<lowerEps2,lowerEps2)
+  attractiveness <- replace(attractiveness,attractiveness>highEps2,highEps2)
+  
+  return (list(attractiveness))
+  
+} # End FRApred2
+
 # A function to get deviance from WSLS and FRA models
 FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   # Input: theta, parameter vector of length 11

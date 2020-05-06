@@ -13,6 +13,8 @@ print('Done!')
 #
 ##########################################################################
 
+# RM.data_for_confusion_matrix()
+
 # Create experiment
 p = 0.5 # probability of there being a unicorn
 pl = 2 # number of players
@@ -29,6 +31,6 @@ modelParameters += modelParameters # Both players equal parameters
 # modelParameters += [0, 0, 0, 0.4, 500, 500, 32, 0, 0, 0] #PL2
 
 
-RM.simulation_with_measures(gameParameters, modelParameters, '4')
+RM.simulation_with_measures(gameParameters, modelParameters, '05')
 # RM.standard_simulation(gameParameters, modelParameters)
 # RM.sample_variation(gameParameters, modelParameters, "FRA", 100)

@@ -2,6 +2,7 @@ import EmergenceDCL as DL
 import Measures as M
 import numpy as np
 import pandas as pd
+from random import uniform
 import os
 
 ##########################################################################
@@ -124,6 +125,131 @@ def simulation_with_measures(gameParameters, modelParameters, medidas):
     print('Data saved to' + archivo)
 
     return E.df
+
+def data_conf_mtrx(gameParameters, modelParameters, model, count):
+
+    print("****************************")
+    print('Starting simulation with model', model)
+    print("****************************")
+    print('--- Model parameters ----')
+    print('--- Player 1 ----')
+    print('wALL: ', modelParameters[0])
+    print('wNOTHING: ', modelParameters[1])
+    print('wLEFT: ', modelParameters[2])
+    print('wIN: ', modelParameters[3])
+    print('alpha: ', modelParameters[4])
+    print('beta: ', modelParameters[5])
+    print('gamma: ', modelParameters[6])
+    print('delta: ', modelParameters[7])
+    print('epsilon: ', modelParameters[8])
+    print('zeta: ', modelParameters[9])
+    print("\n")
+    print('--- Player 2 ----')
+    print('wALL: ', modelParameters[10])
+    print('wNOTHING: ', modelParameters[11])
+    print('wLEFT: ', modelParameters[12])
+    print('wIN: ', modelParameters[13])
+    print('alpha: ', modelParameters[14])
+    print('beta: ', modelParameters[15])
+    print('gamma: ', modelParameters[16])
+    print('delta: ', modelParameters[17])
+    print('epsilon: ', modelParameters[18])
+    print('zeta: ', modelParameters[19])
+    print("\n")
+    print("****************************")
+    print('--- Game parameters ---')
+    print('Probabilit of a unicorn: ', gameParameters[0])
+    print('Number of players: ', gameParameters[1])
+    print('Grid size: ', str(gameParameters[2]) + ' x ' + str(gameParameters[2]))
+    print('Number of rounds: ', gameParameters[3])
+    print('Number of dyads: ', gameParameters[4])
+    print("\n")
+
+    E = DL.Experiment(gameParameters, modelParameters)
+    # Inicializa archivo temporal
+    with open('temp.csv', 'w') as dfile:
+        dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy\n')
+        dfile.close()
+    with open('output_Prev.csv', 'w') as dfile:
+        dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy,Is_there_LEAD,Category,Category1,RegionGo\n')
+        dfile.close()
+    E.run_simulation()
+    E.df = M.get_measures(E.df, '05')
+    archivo = './Confusion/cmtrx_' + str(model) + str(count) + '.csv'
+    while os.path.isfile(archivo):
+        archivo = './Confusion/cmtrx_' + str(model) + str(count) + '.csv'
+    E.df.to_csv(archivo, index=False)
+    print('Data saved to' + archivo)
+    rel_data_sim = [count] + [str(model)] + modelParameters[:10]
+    dfAux = pd.DataFrame([rel_data_sim])
+    with open('./Confusion/sim_data_rel.csv', 'a') as f:
+        dfAux.to_csv(f, header=False, index=False)
+
+    return E.df
+
+def random_pars_Bmodel():
+    mParameters = []
+    mParameters.append(uniform(0, 0.0125)) # appending random wALL
+    mParameters.append(uniform(0, 0.0125)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.0125)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.0125)) # appending random wIN
+    mParameters.append(0) # appending Alpha
+    mParameters.append(0) # appending Beta
+    mParameters.append(0) # appending Gamma
+    mParameters.append(0) # appending Delta
+    mParameters.append(0) # appending Epsilon
+    mParameters.append(0) # appending Zeta
+    mParameters += mParameters
+    return mParameters
+
+def random_pars_WSLSmodel():
+    mParameters = []
+    mParameters.append(uniform(0, 0.0125)) # appending random wALL
+    mParameters.append(uniform(0, 0.0125)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.0125)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.0125)) # appending random wIN
+    mParameters.append(uniform(0, 500)) # appending random Alpha
+    mParameters.append(500) # appending Beta
+    mParameters.append(uniform(0, 32)) # appending random Gamma
+    mParameters.append(0) # appending Delta
+    mParameters.append(0) # appending Epsilon
+    mParameters.append(0) # appending Zeta
+    mParameters += mParameters
+    return mParameters
+
+def random_pars_FRAmodel():
+    mParameters = []
+    mParameters.append(uniform(0, 0.0125)) # appending random wALL
+    mParameters.append(uniform(0, 0.0125)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.0125)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.0125)) # appending random wIN
+    mParameters.append(uniform(0, 500)) # appending random Alpha
+    mParameters.append(500) # appending Beta
+    mParameters.append(uniform(0, 32)) # appending random Gamma
+    mParameters.append(uniform(0, 500)) # appending random Delta
+    mParameters.append(500) # appending Epsilon
+    mParameters.append(uniform(0, 2)) # appending random Zeta
+    mParameters += mParameters
+    return mParameters
+
+def data_for_confusion_matrix(N = 10):
+
+    p = 0.5 # probability of there being a unicorn
+    pl = 2 # number of players
+    n = 8 # number of rows/columns in grid
+    rounds = 60 # number of rounds
+    dyads = 50 # number of dyads
+    gameParameters = [p, pl, n, rounds, dyads]
+
+    for n in range(N):
+        modelParameters = random_pars_Bmodel()
+        data_conf_mtrx(gameParameters, modelParameters, 'B', n)
+        modelParameters = random_pars_WSLSmodel()
+        data_conf_mtrx(gameParameters, modelParameters, 'WSLS', n)
+        modelParameters = random_pars_FRAmodel()
+        data_conf_mtrx(gameParameters, modelParameters, 'FRA', n)
+
+    print("Done!")
 
 def sample_variation(gameParameters, modelParameters, model, n_samples = 100):
 

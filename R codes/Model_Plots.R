@@ -677,16 +677,15 @@ plot_FRA_regs1 <- function(df, regs, theta) {
   
 }
 
-plot_behavior <- function(df2, theta, model=TRUE) {
+plot_behavior <- function(df2) {
   
   # Plots the behavior of data in terms of:
   # Top left -- Scatter plot: Consistency(n) ~ Score(n-1)
   # Top middle -- Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
   # Top right -- Scatter plot: Consistency(n) ~ log max similarity to focal region
   # Center left -- DLindex vs. round
-  # Center middle -- Kernel Density Estimate of DLindex
-  # Center right -- WSLS
-  
+  # Center right -- Kernel Density Estimate of DLindex
+
   min_score <- 0
   max_score <- 33
 
@@ -743,24 +742,10 @@ plot_behavior <- function(df2, theta, model=TRUE) {
     xlab("Division of labor") +
     theme_bw()
   
-  # 6...
-  # Center right -- WSLS
-  df2 <- getRelFreq_Rows(df2)
-  p6 <- plot_FocalTransitions(df2)
-
-  if (model==TRUE) {
-    p6 <- plot_ModelTransitions_Focal(theta, p6,"#999999")
-    parametros <- para_visualizar(theta)
-    parametros <- paste("Parameters:", parametros)
-  } else {
-    parametros <- ""
-  }
-  
   top <- grid.arrange(p1, p2, p3, nrow=1)
-  center <- grid.arrange(p4, p5, p6, nrow=1)
+  center <- grid.arrange(p4, p5, nrow=1)
   gB <- grid.arrange(top, center, 
-                     nrow=2,
-                     bottom=parametros)
+                     nrow=2)
   
   return(gB)
   
