@@ -642,7 +642,8 @@ FRApred2 <- function(i, iV, s, j, FRASims, theta) {
   
   similarities <- sigmoid(unlist(FRASims), epsilon, zeta)
   similarities <- c(0, unlist(similarities))
-  
+  similarities <- rep(1, 9) + similarities
+  similarities <- bias * similarities
   attractiveness <- attractiveness + similarities
   
   attractiveness <- replace(attractiveness,attractiveness<lowerEps2,lowerEps2)
@@ -670,7 +671,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   #  print('Calculating probabilities')
   args <- args %>%
     dplyr::group_by(RegionFULL, Score, RJcode) %>%
-    dplyr::mutate(probs = FRApred1(Region, 
+    dplyr::mutate(probs = FRApred2(Region, 
                                   RegionFULL,
                                   Score, 
                                   RJcode,

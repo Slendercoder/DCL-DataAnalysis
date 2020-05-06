@@ -691,7 +691,7 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		similsPrint = ["%.3f" % v for v in simils]
 		print('FRA similarity\n', similsPrint)
 
-	forBiases1 = [[1] * 9
+	forBiases1 = [1] * 9
 	simils = np.add(forBiases1, simils)
 	simils = np.multiply(bias, simils)
 	attractiveness = np.add(attractiveness, simils1)

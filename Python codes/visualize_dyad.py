@@ -24,7 +24,7 @@ print(Dyads)
 # dyad = input("Dyad to visualize:")
 # dyad = int(dyad)
 # assert(dyad in Dyads), "Error: dyad not in possible Dyads"
-dyad = Dyads[3]
+dyad = Dyads[1]
 
 grp = data.groupby(['Dyad']).get_group(dyad)
 Players = grp.Player.unique()

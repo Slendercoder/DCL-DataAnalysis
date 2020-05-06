@@ -35,15 +35,32 @@ p <- plot_behavior(df)
 # Plot FRA model
 archivo <- "../Python Codes/FRA.csv"
 df = read.csv(archivo)
+p <- plot_behavior(df)
 
-p5 <- ggplot(df, aes(Size_visited)) +
+
+###############################################
+archivo <- "humans_only_absent.csv"
+df = read.csv(archivo)
+df$Region <- df$Category
+
+archivo <- "../Python Codes/FRA.csv"
+df1 = read.csv(archivo)
+
+p1 <- ggplot(df, aes(Size_visited)) +
   geom_density(size=1) +
   #  scale_y_continuous(limits = c(0, 5)) + 
+  ggtitle("Humans") +
   xlab("Number of tiles uncovered") +
   theme_bw()
 
+p2 <- ggplot(df1, aes(Size_visited)) +
+  geom_density(size=1) +
+  #  scale_y_continuous(limits = c(0, 5)) + 
+  ggtitle("Model") +
+  xlab("Number of tiles uncovered") +
+  theme_bw()
 
-p <- plot_behavior(df)
+grid.arrange(p1, p2, nrow=1)
 
 model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df)
 summary(model3h)
