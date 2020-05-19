@@ -8,6 +8,7 @@ fitModels2Data <- function(archivo) {
   
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
+  df$Region <- df$Category
   df <- find_joint_region(df)
   df$RegionFULL <- unlist(df$RegionFULL)
   df$RegionGo <- factor(df$RegionGo, levels = regiones)
