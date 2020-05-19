@@ -32,21 +32,21 @@ f <- searchBestFit(args, N=5, module="nmkb")
 beep()
 
 ###############################################################
-# Plotting...
+# Plotting Parameter fit
 ###############################################################
 
-#df <- find_joint_region(df)
-#df$RegionFULL <- unlist(df$RegionFULL)
-#df$RegionGo <- factor(df$RegionGo, levels = regiones)
-#df <- get_FRASims(df) # Requires to run df <- find_joint_region(df)
-#df$RegionFULL <- unlist(df$RegionFULL)
-#df$RegionGo <- factor(df$RegionGo, levels = regiones)
-#theta <- f$par
-#lista_regs <- list(c('DOWN', 'UP'), c('LEFT', 'RIGHT'), c('IN', 'OUT'))
-#for (regs in lista_regs) {
-##  print(regs)
-#  p <- plot_FRA_regs(df, regs)
-#  r <- paste(regs, collapse="-")
-#  grafico <- paste('PlotFRA-', r, '.pdf',sep="")
-#  ggsave(grafico, p)
-#}
+df <- find_joint_region(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+df <- get_FRASims(df) # Requires to run df <- find_joint_region(df)
+df$RegionFULL <- unlist(df$RegionFULL)
+df$RegionGo <- factor(df$RegionGo, levels = regiones)
+theta <- f$par
+lista_regs <- list(c('DOWN', 'UP'), c('LEFT', 'RIGHT'), c('IN', 'OUT'))
+for (regs in lista_regs) {
+  #  print(regs)
+  p <- plot_FRA_regs(df, regs)
+  r <- paste(regs, collapse="-")
+  grafico <- paste('PlotFRA-', r, '.pdf',sep="")
+  ggsave(grafico, p)
+}

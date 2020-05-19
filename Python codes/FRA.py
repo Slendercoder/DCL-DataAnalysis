@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from random import choice, uniform, random, sample, randint
 
 ###########################################################
 # GLOBAL VARIABLES
@@ -13,7 +14,7 @@ IMPR = False
 
 regionsCoded = ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:', # ALL
                   '', # NOTHING
-                  'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # DOWN
+                  'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # BOTTOM
                   'abcdefghijklmnopqrstuvwxyzABCDEF', # TOP
                   'abcdijklqrstyzABGHIJOPQRWXYZ4567', # LEFT
                   'efghmnopuvwxCDEFKLMNSTUV012389;:', # RIGHT
@@ -24,7 +25,7 @@ regionsCoded = ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;
 regions = ['RS', \
            'ALL', \
            'NOTHING', \
-           'DOWN', \
+           'BOTTOM', \
            'TOP', \
            'LEFT', \
            'RIGHT', \
@@ -40,15 +41,15 @@ def new_random_strategy(Num_Loc):
     # The size of this new strategy is determined by
     # a normal distribution with mean = m and s.d. = sd
 
-    # sd = 4
-    # m = 48
-    m = 32
-    sd = 8
-    n = int(np.random.normal(m, sd))
-    while n < 2 or n > 62:
-        n = int(np.random.normal(m, sd))
+    # m = 32
+    # sd = 8
+    # n = int(np.random.normal(m, sd))
+    # while n < 2 or n > 62:
+    #     n = int(np.random.normal(m, sd))
 
-    return list(np.random.choice(Num_Loc * Num_Loc, n))
+    # return list(np.random.choice(Num_Loc * Num_Loc, n))
+    n = randint(2,Num_Loc * Num_Loc - 2)
+    return list(np.random.choice(Num_Loc * Num_Loc, n)) # Probando absolutamente random
 
 def imprime_region(r):
 
@@ -69,7 +70,7 @@ def nameRegion(r):
 	elif r == 2:
 		return 'NOTHING'
 	elif r == 3:
-		return 'DOWN'
+		return 'BOTTOM'
 	elif r == 4:
 		return 'TOP'
 	elif r == 5:
@@ -88,7 +89,7 @@ def numberRegion(r):
 		return 1
 	elif r == 'NOTHING':
 		return 2
-	elif r == 'DOWN':
+	elif r == 'BOTTOM':
 		return 3
 	elif r == 'TOP':
 		return 4
@@ -133,10 +134,10 @@ def create_regions_and_strategies(Num_Loc):
 	# print('ALL ', all)
 	# print('NOTHING ', nothing)
 
-	# TOP and DOWN
+	# TOP and BOTTOM
 	up = [1] * half_size + [0] * half_size
-	down = [1 - i for i in up]
-	# print('DOWN ', down)
+	bottom = [1 - i for i in up]
+	# print('BOTTOM ', bottom)
 	# print('TOP ', up)
 
 	# LEFT and RIGHT
@@ -164,7 +165,7 @@ def create_regions_and_strategies(Num_Loc):
 
 	# Define the strategies
 	TOP = []
-	DOWN = []
+	BOTTOM = []
 	LEFT = []
 	RIGHT = []
 	IN = []
@@ -175,8 +176,8 @@ def create_regions_and_strategies(Num_Loc):
 	for i in range(int(Num_Loc * Num_Loc)):
 		if up[i] == 1:
 			TOP.append(i)
-		if down[i] == 1:
-			DOWN.append(i)
+		if bottom[i] == 1:
+			BOTTOM.append(i)
 		if left[i] == 1:
 			LEFT.append(i)
 		if right[i] == 1:
@@ -198,7 +199,7 @@ def create_regions_and_strategies(Num_Loc):
 
 	strategies[1] = ALL
 	strategies[2] = NOTHING
-	strategies[3] = DOWN
+	strategies[3] = BOTTOM
 	strategies[4] = TOP
 	strategies[5] = LEFT
 	strategies[6] = RIGHT
@@ -208,7 +209,7 @@ def create_regions_and_strategies(Num_Loc):
 	while len(strategies[9]) < 2 or len(strategies[9]) > 62:
 	       strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
 
-	return [all, nothing, down, up, left, right, In, out], strategies
+	return [all, nothing, bottom, up, left, right, In, out], strategies
 
 def dibuja_region(reg, Num_Loc):
 
@@ -421,8 +422,10 @@ def FRASim(r, joint, focal, Num_Loc):
     # finding similarity between Joint and Complement to focal
 	# first check whether focal is ALL (should not add similarity to complement here)
     aux = [x for x in focal if x == 0]
-    if (len(aux) == 0) or (len(aux) == Num_Loc*Num_Loc):
+    # if (len(aux) == 0) or (len(aux) == Num_Loc*Num_Loc):
     	# print('Ignore focal regions ALL and NOTHING for similarity to complement')
+    if (len(aux) == 0):
+    	# print('Ignore focal region ALL for similarity to complement')
     	sss2 = 0
     else:
     	kComp = [1 - x for x in focal]
@@ -456,12 +459,12 @@ def maxFRASim(r, joint, Num_Loc):
     valor = np.max(np.array(similarities))
     return(valor)
 
-def probabilities_previo(iV, i, score, j, pl, modelParameters, Num_Loc):
+def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 
 	if pl == 0:
 		wALL = float(modelParameters[0])
 		wNOTHING = float(modelParameters[1])
-		wDOWN = float(modelParameters[2])
+		wBOTTOM = float(modelParameters[2])
 		wTOP = float(modelParameters[2])
 		wLEFT = float(modelParameters[2])
 		wRIGHT = float(modelParameters[2])
@@ -476,7 +479,7 @@ def probabilities_previo(iV, i, score, j, pl, modelParameters, Num_Loc):
 	else:
 		wALL = float(modelParameters[10])
 		wNOTHING = float(modelParameters[11])
-		wDOWN = float(modelParameters[12])
+		wBOTTOM = float(modelParameters[12])
 		wTOP = float(modelParameters[12])
 		wLEFT = float(modelParameters[12])
 		wRIGHT = float(modelParameters[12])
@@ -489,11 +492,11 @@ def probabilities_previo(iV, i, score, j, pl, modelParameters, Num_Loc):
 		epsilon = float(modelParameters[18]) # amplitude of the FRA sigmoid function
 		zeta = float(modelParameters[19]) # position of the FRA sigmoid function
 
-	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]]
+	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]]
 	# print('bias: ', biasPrint)
-	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]))
+	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]))
 	assert(wRS > 0), "Incorrect biases!"
-	bias = [wRS, wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]
+	bias = [wRS, wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]
 	# biasPrint = ["%.3f" % v for v in bias]
 	# print('bias: ', biasPrint)
 
@@ -580,12 +583,12 @@ def probabilities_previo(iV, i, score, j, pl, modelParameters, Num_Loc):
 
 	return probs
 
-def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
+def probabilities_biasFRA(iV, i, score, j, pl, modelParameters, Num_Loc):
 
 	if pl == 0:
 		wALL = float(modelParameters[0])
 		wNOTHING = float(modelParameters[1])
-		wDOWN = float(modelParameters[2])
+		wBOTTOM = float(modelParameters[2])
 		wTOP = float(modelParameters[2])
 		wLEFT = float(modelParameters[2])
 		wRIGHT = float(modelParameters[2])
@@ -600,7 +603,7 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 	else:
 		wALL = float(modelParameters[10])
 		wNOTHING = float(modelParameters[11])
-		wDOWN = float(modelParameters[12])
+		wBOTTOM = float(modelParameters[12])
 		wTOP = float(modelParameters[12])
 		wLEFT = float(modelParameters[12])
 		wRIGHT = float(modelParameters[12])
@@ -613,11 +616,11 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		epsilon = float(modelParameters[18]) # amplitude of the FRA sigmoid function
 		zeta = float(modelParameters[19]) # position of the FRA sigmoid function
 
-	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]]
+	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]]
 	# print('bias: ', biasPrint)
-	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]))
+	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]))
 	assert(wRS > 0), "Incorrect biases!"
-	bias = [wRS, wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]
+	bias = [wRS, wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]
 	# biasPrint = ["%.3f" % v for v in bias]
 	# print('bias: ', biasPrint)
 
@@ -795,7 +798,7 @@ def probabilitiesPREVIOUS(iV, i, score, j, pl):
 		wRS = float(modelParameters[0])
 		wALL = float(modelParameters[1])
 		wNOTHING = float(modelParameters[2])
-		wDOWN = float(modelParameters[3])
+		wBOTTOM = float(modelParameters[3])
 		wTOP = float(modelParameters[3])
 		wLEFT = float(modelParameters[3])
 		wRIGHT = float(modelParameters[3])
@@ -813,7 +816,7 @@ def probabilitiesPREVIOUS(iV, i, score, j, pl):
 		wRS = float(modelParameters[13])
 		wALL = float(modelParameters[14])
 		wNOTHING = float(modelParameters[15])
-		wDOWN = float(modelParameters[16])
+		wBOTTOM = float(modelParameters[16])
 		wTOP = float(modelParameters[16])
 		wLEFT = float(modelParameters[16])
 		wRIGHT = float(modelParameters[16])
@@ -828,7 +831,7 @@ def probabilitiesPREVIOUS(iV, i, score, j, pl):
 		eta = float(modelParameters[24]) # for the steepness of the similarity to focal region
 		iota = float(modelParameters[25]) # for how much the winner takes all
 
-	bias = [wRS, wALL, wNOTHING, wDOWN, wTOP, wLEFT, wRIGHT, wIN, wOUT]
+	bias = [wRS, wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]
 	# biasPrint = ["%.3f" % v for v in bias]
 	# print('bias: ', biasPrint)
 

@@ -20,6 +20,8 @@ CONTINUO = False
 CONTADOR = 1
 TOLERANCIA = 1
 
+p_change = 0 # Include some random variation in region picked for the round
+
 #################################
 # Define some functions
 # to obtain measures
@@ -135,7 +137,6 @@ class Experiment(object):
 				Board[place] = 1
 
             # Include some small random variations in chosen strategy
-			p_change = 0.01
 			strategies_used = []
 			strat = self.strategies[Players[0].strategy]
 			# print("strat")

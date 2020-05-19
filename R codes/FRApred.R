@@ -292,7 +292,8 @@ FRAsim <- function(i, iV, j, k) {
   
   simil <- sim_consist(code2Vector(iV), kV)
   
-  if (k!='ALL' && k!='NOTHING') {
+#  if (k!='ALL' && k!='NOTHING') {
+  if (k!='ALL') {
     kVComp <- 1 - code2Vector(kCoded)
     simil2 <- sim_consist(code2Vector(j), kVComp)
     simil <- simil + simil2

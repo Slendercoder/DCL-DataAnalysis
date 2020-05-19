@@ -36,6 +36,13 @@ p <- plot_behavior(df)
 archivo <- "../Python Codes/FRA.csv"
 df = read.csv(archivo)
 p <- plot_behavior(df)
+p2 <- ggplot(df, aes(Size_visited)) +
+  geom_density(size=1) +
+  #  scale_y_continuous(limits = c(0, 5)) + 
+  ggtitle("Model") +
+  xlab("Number of tiles uncovered") +
+  theme_bw()
+p2
 
 
 ###############################################

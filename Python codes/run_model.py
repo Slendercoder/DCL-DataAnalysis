@@ -117,10 +117,10 @@ def simulation_with_measures(gameParameters, modelParameters, medidas):
     E.run_simulation()
     E.df = M.get_measures(E.df, medidas)
     count = 0
-    archivo = './output' + str(count) + '.csv'
+    archivo = '../Data/output' + str(count) + '.csv'
     while os.path.isfile(archivo):
         count += 1
-        archivo = './output' + str(count) + '.csv'
+        archivo = '../Data/output' + str(count) + '.csv'
     E.df.to_csv(archivo, index=False)
     print('Data saved to' + archivo)
 
