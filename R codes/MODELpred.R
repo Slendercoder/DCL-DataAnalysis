@@ -22,19 +22,15 @@ regiones <- c('RS',
 
 regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:', # ALL
                   '', # NOTHING
-                  'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # DOWN
-                  'abcdefghijklmnopqrstuvwxyzABCDEF', # UP
+                  'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # BOTTOM
+                  'abcdefghijklmnopqrstuvwxyzABCDEF', # TOP
                   'abcdijklqrstyzABGHIJOPQRWXYZ4567', # LEFT
                   'efghmnopuvwxCDEFKLMNSTUV012389;:', # RIGHT
                   'jklmnorstuvwzABCDEHIJKLMPQRSTUXYZ012', # IN
                   'abcdefghipqxyFGNOVW3456789;:') # OUT
 
-
 lowerEps2=.00001
 highEps2 =.99999
-
-#lower_limits=c(0,0,0,0,0,0,0,0,0,0)
-#upper_limits=c(0.1,0.1,0.1,0.1,500,1000,32,500,1000,2)
 
 lower_limits=c(0,0,0,0,0,499,0,0,499,0)
 upper_limits=c(0.1,0.1,0.1,0.1,500,500,32,500,500,2)
@@ -228,8 +224,9 @@ regNoCod <- function(x) {
   index1 <- which(df$RegionFULL == x)
   b <- unique(df$Region[index1])
   if (length(b) > 1) {
-    msg <- paste('Oops!', l, index1)
+    msg <- paste('Oops, region is ambiguous!', "b", b, "\nindex1", index1)
     print(msg)
+    return(b[1])
   }
   return(b)
 }
@@ -260,6 +257,66 @@ getFreqFRA <- function(df, theta) {
   
   return (dfA[c('Region', 'RegionFULL', 'Score', 'RJcode', 'freqs')])
 } 
+
+random_params <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) {
+  
+  x1 <- unlist(x1)
+  x1 <- c(1, x1)
+  #  print(x1)
+  a1 <- do.call(runif, as.list(x1))
+  
+  x2 <- unlist(x2)
+  x2 <- c(1, x2)
+  #  print(x2)
+  a2 <- do.call(runif, as.list(x2))
+  
+  x3 <- unlist(x3)
+  x3 <- c(1, x3)
+  #  print(x3)
+  a3 <- do.call(runif, as.list(x3))
+  
+  x4 <- unlist(x4)
+  x4 <- c(1, x4)
+  #  print(x4)
+  a4 <- do.call(runif, as.list(x4))
+  
+  x5 <- unlist(x5)
+  x5 <- c(1, x5)
+  #  print(x5)
+  a5 <- do.call(runif, as.list(x5))
+  
+  x6 <- unlist(x6)
+  x6 <- c(1, x6)
+  #  print(x6)
+  a6 <- do.call(runif, as.list(x6))
+  
+  x7 <- unlist(x7)
+  x7 <- c(1, x7)
+  #  print(x7)
+  a7 <- do.call(runif, as.list(x7))
+  
+  x8 <- unlist(x8)
+  x8 <- c(1, x8)
+  #  print(x8)
+  a8 <- do.call(runif, as.list(x8))
+  
+  x9 <- unlist(x9)
+  x9 <- c(1, x9)
+  #  print(x9)
+  a9 <- do.call(runif, as.list(x9))
+  
+  x10 <- unlist(x10)
+  x10 <- c(1, x10)
+  #  print(x10)
+  a10 <- do.call(runif, as.list(x10))
+  
+  return(c(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10))
+  
+} # end random_params
+
+############################
+# FRA related functions
+############################
 
 sim_consist <- function(v1, v2){
   # Returns the similarity based on consistency
@@ -315,12 +372,12 @@ get_FRASims <- function(df) {
                          df$RegionFULL,
                          df$RJcode)
 
-  df$FRASimDOWN <- mapply(function(i, iv, j) FRAsim(i, iv, j,'DOWN'),
+  df$FRASimBOTTOM <- mapply(function(i, iv, j) FRAsim(i, iv, j,'BOTTOM'),
                          df$Region,
                          df$RegionFULL,
                          df$RJcode)
 
-  df$FRASimUP <- mapply(function(i, iv, j) FRAsim(i, iv, j,'UP'),
+  df$FRASimTOP <- mapply(function(i, iv, j) FRAsim(i, iv, j,'TOP'),
                          df$Region,
                          df$RegionFULL,
                          df$RJcode)
@@ -356,8 +413,8 @@ get_FRASims_list <- function(df) {
   aux$FRASims <- mapply(function(x1,x2,x3,x4,x5,x6,x7,x8) as.list(data.frame(c(x1,x2,x3,x4,x5,x6,x7,x8))),
                         aux$FRASimALL, 
                         aux$FRASimNOTHING, 
-                        aux$FRASimDOWN, 
-                        aux$FRASimUP, 
+                        aux$FRASimBOTTOM, 
+                        aux$FRASimTOP, 
                         aux$FRASimLEFT, 
                         aux$FRASimRIGHT, 
                         aux$FRASimIN, 
@@ -368,8 +425,8 @@ get_FRASims_list <- function(df) {
 #  aux <- aux %>% 
 #    dplyr::mutate(FRASims = as.list(data.frame(c(FRASimALL, 
 #                                                 FRASimNOTHING, 
-#                                                 FRASimDOWN, 
-#                                                 FRASimUP, 
+#                                                 FRASimBOTTOM, 
+#                                                 FRASimTOP, 
 #                                                 FRASimLEFT, 
 #                                                 FRASimRIGHT, 
 #                                                 FRASimIN, 
@@ -417,37 +474,37 @@ getFreq_based_on_FRASim <- function(df, k) {
     
   } # end k='NOTHING'
   
-  if (k == 'DOWN') {
+  if (k == 'BOTTOM') {
     df <- df[complete.cases(df$RegionGo), ]
     df <- df[df$RegionGo != "", ]
-    df <- df %>% select('Region', 'FRASimDOWN', 'RegionGo')
+    df <- df %>% select('Region', 'FRASimBOTTOM', 'RegionGo')
     df <- df %>%
-      dplyr::group_by(Region, FRASimDOWN, RegionGo) %>%
+      dplyr::group_by(Region, FRASimBOTTOM, RegionGo) %>%
       dplyr::summarize(n = n()) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by(Region, FRASimDOWN) %>%
+      dplyr::group_by(Region, FRASimBOTTOM) %>%
       dplyr::mutate(n1 = sum(n),
                     Freqs = n/n1)  
     
-    df$FRASim <- df$FRASimDOWN
+    df$FRASim <- df$FRASimBOTTOM
     
-  } # end k='DOWN'
+  } # end k='BOTTOM'
 
-  if (k == 'UP') {
+  if (k == 'TOP') {
     df <- df[complete.cases(df$RegionGo), ]
     df <- df[df$RegionGo != "", ]
-    df <- df %>% select('Region', 'FRASimUP', 'RegionGo')
+    df <- df %>% select('Region', 'FRASimTOP', 'RegionGo')
     df <- df %>%
-      dplyr::group_by(Region, FRASimUP, RegionGo) %>%
+      dplyr::group_by(Region, FRASimTOP, RegionGo) %>%
       dplyr::summarize(n = n()) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by(Region, FRASimUP) %>%
+      dplyr::group_by(Region, FRASimTOP) %>%
       dplyr::mutate(n1 = sum(n),
                     Freqs = n/n1)  
     
-    df$FRASim <- df$FRASimUP
+    df$FRASim <- df$FRASimTOP
     
-  } # end k='UP'
+  } # end k='TOP'
 
   if (k == 'LEFT') {
     df <- df[complete.cases(df$RegionGo), ]
@@ -654,7 +711,7 @@ FRApred2 <- function(i, iV, s, j, FRASims, theta) {
   
 } # End FRApred2
 
-# A function to get deviance from WSLS and FRA models
+# A function to get deviance from FRA model
 FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
@@ -668,7 +725,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
     return(10000)
   }
   
-  # Calculate the probabilities based on FRAWSpred
+  # Calculate the probabilities based on FRApred
   #  print('Calculating probabilities')
   args <- args %>%
     dplyr::group_by(RegionFULL, Score, RJcode) %>%
@@ -705,63 +762,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
 
 } # end FRAutil
 
-random_params <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) {
-  
-  x1 <- unlist(x1)
-  x1 <- c(1, x1)
-  #  print(x1)
-  a1 <- do.call(runif, as.list(x1))
-  
-  x2 <- unlist(x2)
-  x2 <- c(1, x2)
-  #  print(x2)
-  a2 <- do.call(runif, as.list(x2))
-  
-  x3 <- unlist(x3)
-  x3 <- c(1, x3)
-  #  print(x3)
-  a3 <- do.call(runif, as.list(x3))
-  
-  x4 <- unlist(x4)
-  x4 <- c(1, x4)
-  #  print(x4)
-  a4 <- do.call(runif, as.list(x4))
-  
-  x5 <- unlist(x5)
-  x5 <- c(1, x5)
-  #  print(x5)
-  a5 <- do.call(runif, as.list(x5))
-  
-  x6 <- unlist(x6)
-  x6 <- c(1, x6)
-  #  print(x6)
-  a6 <- do.call(runif, as.list(x6))
-  
-  x7 <- unlist(x7)
-  x7 <- c(1, x7)
-  #  print(x7)
-  a7 <- do.call(runif, as.list(x7))
-  
-  x8 <- unlist(x8)
-  x8 <- c(1, x8)
-  #  print(x8)
-  a8 <- do.call(runif, as.list(x8))
-
-  x9 <- unlist(x9)
-  x9 <- c(1, x9)
-  #  print(x9)
-  a9 <- do.call(runif, as.list(x9))
-
-  x10 <- unlist(x10)
-  x10 <- c(1, x10)
-  #  print(x10)
-  a10 <- do.call(runif, as.list(x10))
-  
-  return(c(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10))
-  
-} # end random_params
-
-searchFitMLE2 <- function(params, args, max_iter=5) {
+searchFit_FRA_MLE2 <- function(params, args, max_iter=5) {
 
   contador <- 1
   
@@ -798,9 +799,9 @@ searchFitMLE2 <- function(params, args, max_iter=5) {
 
   return(fitresFRA)  
   
-} # end searchFitMLE2
+} # end searchFit_FRA_MLE2
 
-searchFit <- function(params, args, max_iter=10) {
+searchFit_FRA_NMKB <- function(params, args, max_iter=10) {
   
   contador <- 1
   
@@ -837,9 +838,9 @@ searchFit <- function(params, args, max_iter=10) {
   
   return(fitresFRA)  
   
-} # end searchFit
+} # end searchFit_FRA_NMKB
 
-searchBestFit <- function(args, N=1, module="nmkb") {
+searchBestFit_FRA <- function(args, N=1, module="nmkb") {
   
   best <- 100000
   fitFRA <- NA
@@ -858,12 +859,12 @@ searchBestFit <- function(args, N=1, module="nmkb") {
     
     # imprimir(params)
     if (module=="nmkb"){
-      bestFit <- searchFit(params, args)
+      bestFit <- searchFit_FRA_NMKB(params, args)
     } else if (module=="mle2") {
-      bestFit <- searchFitMLE2(params, args)
+      bestFit <- searchFit_FRA_MLE2(params, args)
     } else {
       print("Invalid module!")
-      print("Try with either \'optim\' or \'mle2\'")
+      print("Try with either \'nmkb\' or \'mle2\'")
       return(NA)
     }
     
@@ -886,7 +887,7 @@ searchBestFit <- function(args, N=1, module="nmkb") {
             print(fitFRA$message)
             print(paste("Dev:", fitFRA$value))
             imprimir(fitFRA$par)
-            archivo <- paste("Parameter_fit_", module, ".csv", sep = "")
+            archivo <- paste("FRA_Parameter_fit_", module, ".csv", sep = "")
             df <- data.frame(fitFRA)
             # print(head(df))
             write.csv(df, archivo, row.names = FALSE)
@@ -899,8 +900,7 @@ searchBestFit <- function(args, N=1, module="nmkb") {
     
   return(fitFRA)
   
-} # end searchBestFit
-
+} # end searchBestFit_FRA
 
 ModelProb <- function(regionFrom, regionGo, s, k, theta){
   
@@ -963,3 +963,397 @@ ModelProb <- function(regionFrom, regionGo, s, k, theta){
   
   return(probab)
 } # end ModelProb
+
+searchFit_FRA_NMKB <- function(params, args, max_iter=10) {
+  
+  contador <- 1
+  
+  while (contador < max_iter + 1) {
+    
+    print(paste("Trying nmkb...", contador))
+    
+    fitresFRA <- tryCatch({
+      f <- nmkb(par=params, 
+                fn = function(t) FRAutil(t[1], 
+                                         t[2],
+                                         t[3],
+                                         t[4],
+                                         t[5],
+                                         t[6], 
+                                         t[7], 
+                                         t[8], 
+                                         t[9], 
+                                         t[10]),
+                lower=lower_limits,
+                upper=upper_limits,
+                control=list(trace=0))
+      contador <- max_iter + 2
+      return(f)
+    }, error = function(e) {
+      print(paste("Error:", e))
+      print(paste("New attempt...(", contador, "/", max_iter, ")", sep=""))
+      contador <- contador - 1
+      return (NA)
+    }
+    )
+    contador <- contador + 1
+  }
+  
+  return(fitresFRA)  
+  
+} # end searchFit_FRA_NMKB
+
+############################
+# WSLS related functions
+############################
+
+WSLSpred <- function(i, s, theta){
+  
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  #  aux <- rep(w, 8)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    print('Oops, incorrect biases')
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  print("bias")
+  #  imprimir(bias)
+  
+  # Find the attractivenes:
+  attractiveness <- bias # Start from bias
+  
+  # Add attractiveness to current region according to score
+  if (i != 'RS') {
+    index <- which(regiones == i)
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
+  }
+  
+  probs <- attractiveness / sum(attractiveness)
+  probs <- replace(probs,probs<lowerEps2,lowerEps2)
+  probs <- replace(probs,probs>highEps2,highEps2)
+  
+  return(list(probs))
+
+} # end WSLSpred
+
+# A function to get deviance from WSLS and FRA models
+WSLSutil <- function(x1, x2, x3, x4, x5, x6, x7){
+  # Input: theta, parameter vector of length 5
+  #        args, the dataframe with frequencies
+  # Output: Deviance of WSLSpred
+  
+  theta <- c(x1, x2, x3, x4, x5, x6, x7)
+  
+  if (any(is.na(theta))) {
+    print('Incorrect parameters: ')
+    print(theta)
+    return(10000)
+  }
+  
+  # Calculate the probabilities based on WSLSpred
+  #  print('Calculating probabilities')
+  args <- args %>%
+    dplyr::group_by(RegionFULL, Score, RJcode) %>%
+    dplyr::mutate(probs = WSLSpred(Region, 
+                                   Score, 
+                                   theta)
+    )
+  
+  # Calculate deviance
+  #  print('Calculating deviances')
+  args$dev <- mapply(function(x,y) dmultinom(x, prob = y), args$freqs, args$probs)
+  #  print(args$dev)
+  
+  if (any(is.infinite(args$dev) | is.na(args$dev))) {
+    #    print('Incorrect dev: ')
+    #    new_DF <- args[is.infinite(args$dev), ]
+    #    print(new_DF)
+    #    print(theta)
+    #    print(head(args$probs))
+    #    print(head(args$freq))
+    #    print(head(args$dev))
+    return(10000)
+  }
+  
+  a <- -sum(log(args$dev))
+  
+  if (a == Inf) {
+    a <- 10000
+  }
+  # print(paste("Dev:", a))
+  return(a)
+
+} # end WSLSutil
+
+searchFit_WSLS_NMKB <- function(params, args, max_iter=10) {
+  
+  contador <- 1
+  
+  while (contador < max_iter + 1) {
+    
+    print(paste("Trying nmkb...", contador))
+    
+    fitresWSLS <- tryCatch({
+      f <- nmkb(par=params, 
+                fn = function(t) WSLSutil(t[1], 
+                                          t[2],
+                                          t[3],
+                                          t[4],
+                                          t[5],
+                                          t[6],
+                                          t[7]),
+                lower=lower_limits[1:7],
+                upper=upper_limits[1:7],
+                control=list(trace=0))
+      contador <- max_iter + 2
+      return(f)
+    }, error = function(e) {
+      print(paste("Error:", e))
+      print(paste("New attempt...(", contador, "/", max_iter, ")", sep=""))
+      contador <- contador - 1
+      return (NA)
+    }
+    )
+    contador <- contador + 1
+  }
+  
+  return(fitresWSLS)  
+  
+} # end searchFit_WSLS_NMKB
+
+searchBestFit_WSLS <- function(args, N=1, module="nmkb") {
+  
+  best <- 100000
+  fitresWSLS <- NA
+  
+  for (n in rep(0, N)) {
+    params <- random_params(list(lower_limits[1], upper_limits[1]), 
+                            list(lower_limits[2], upper_limits[2]), 
+                            list(lower_limits[3], upper_limits[3]), 
+                            list(lower_limits[4], upper_limits[4]), 
+                            list(lower_limits[5], upper_limits[5]), 
+                            list(lower_limits[6], upper_limits[6]), 
+                            list(lower_limits[7], upper_limits[7]), 
+                            list(lower_limits[8], upper_limits[8]), 
+                            list(lower_limits[9], upper_limits[9]), 
+                            list(lower_limits[10], upper_limits[10]))
+    params <- params[1:7]
+    # imprimir(params)
+    if (module=="nmkb"){
+      bestFit <- searchFit_WSLS_NMKB(params, args)
+    } else if (module=="mle2") {
+      # bestFit <- searchFit_WSLS_MLE2(params, args)
+      print("Module not implemented, sorry!")
+    } else {
+      print("Invalid module!")
+      print("Try with either \'nmkb\' or \'mle2\'")
+      return(NA)
+    }
+    
+    b <- tryCatch({
+      bestFit$value
+    }, error = function(e){
+      print(paste("Oops, optimizer didn\'t work this time!"))
+      return(1000000) 
+    })
+    
+    if (b < best) {
+      fitresWSLS <- bestFit
+      best <- bestFit$value
+    }
+    
+    print(paste("Best value so far:", best))
+  }
+  
+  b <- tryCatch({
+    print(fitresWSLS$message)
+    print(paste("Dev:", fitresWSLS$value))
+    imprimir(fitresWSLS$par)
+    archivo <- paste("WSLS_Parameter_fit_", module, ".csv", sep = "")
+    df <- data.frame(fitresWSLS)
+    # print(head(df))
+    write.csv(df, archivo, row.names = FALSE)
+    print(paste("Data saved to", archivo))
+    return(fitresWSLS)
+  }, error = function(e){
+    print("Optimizer", module, "didn\'t work at all :(")
+    return(NA) 
+  })
+  
+  return(fitresWSLS)
+  
+} # end searchBestFit_WSLS
+
+############################
+# MBiases related functions
+############################
+
+MBIASESpred <- function(theta){
+  
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  #  aux <- rep(w, 8)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    print('Oops, incorrect biases')
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  return(list(bias))
+  
+} # end MBIASESpred
+
+# A function to get deviance from FRA model
+MBIASESutil <- function(x1, x2, x3, x4){
+  # Input: theta, parameter vector of length 11
+  #        data, the dataframe from which frequencies are obtained
+  # Output: Deviance of WSLSpred for all regions and scores
+  
+  theta <- c(x1, x2, x3, x4)
+  
+  if (any(is.na(theta))) {
+    print('Incorrect parameters: ')
+    print(theta)
+    return(10000)
+  }
+  
+  # Calculate the probabilities based on MBIASESpred
+  #  print('Calculating probabilities')
+  args <- args %>%
+    dplyr::group_by(RegionFULL, Score, RJcode) %>%
+    dplyr::mutate(probs = MBIASESpred(theta)
+    )
+  
+  # Calculate deviance
+  #  print('Calculating deviances')
+  args$dev <- mapply(function(x,y) dmultinom(x, prob = y), args$freqs, args$probs)
+  
+  if (any(is.infinite(args$dev) | is.na(args$dev))) {
+    print('Incorrect dev: ')
+    #    new_DF <- args[is.infinite(args$dev), ]
+    #    print(new_DF)
+    #    print(theta)
+    #    print(head(args$probs))
+    #    print(head(args$freq))
+    #    print(head(args$dev))
+    return(10000)
+  }
+  
+  a <- -sum(log(args$dev))
+  
+  if (a == Inf) {
+    a <- 10000
+  }
+  # print(paste("Dev:", a))
+  return(a)
+  
+} # end MBIASESutil
+
+searchFit_MBiases_NMKB <- function(params, args, max_iter=10) {
+  
+  contador <- 1
+  
+  while (contador < max_iter + 1) {
+    
+    print(paste("Trying nmkb...", contador))
+    
+    fitresMBiases <- tryCatch({
+      f <- nmkb(par=params, 
+                fn = function(t) MBIASESutil(t[1], 
+                                         t[2],
+                                         t[3],
+                                         t[4]),
+                lower=lower_limits[1:4],
+                upper=upper_limits[1:4],
+                control=list(trace=0))
+      contador <- max_iter + 2
+      return(f)
+    }, error = function(e) {
+      print(paste("Error:", e))
+      print(paste("New attempt...(", contador, "/", max_iter, ")", sep=""))
+      contador <- contador - 1
+      return (NA)
+    }
+    )
+    contador <- contador + 1
+  }
+  
+  return(fitresMBiases)  
+  
+} # end searchFit_MBiases_NMKB
+
+searchBestFit_MBiases <- function(args, N=1, module="nmkb") {
+  
+  best <- 100000
+  fitresMBiases <- NA
+  
+  for (n in rep(0, N)) {
+    params <- random_params(list(lower_limits[1], upper_limits[1]), 
+                            list(lower_limits[2], upper_limits[2]), 
+                            list(lower_limits[3], upper_limits[3]), 
+                            list(lower_limits[4], upper_limits[4]), 
+                            list(lower_limits[5], upper_limits[5]), 
+                            list(lower_limits[6], upper_limits[6]), 
+                            list(lower_limits[7], upper_limits[7]), 
+                            list(lower_limits[8], upper_limits[8]), 
+                            list(lower_limits[9], upper_limits[9]), 
+                            list(lower_limits[10], upper_limits[10]))
+    params <- params[1:4]
+    # imprimir(params)
+    if (module=="nmkb"){
+      bestFit <- searchFit_MBiases_NMKB(params, args)
+    } else if (module=="mle2") {
+      # bestFit <- searchFit_FRA_MLE2(params, args)
+      print("Module not implemented, sorry!")
+    } else {
+      print("Invalid module!")
+      print("Try with either \'nmkb\' or \'mle2\'")
+      return(NA)
+    }
+    
+    b <- tryCatch({
+      bestFit$value
+    }, error = function(e){
+      print(paste("Oops, optimizer didn\'t work this time!"))
+      return(1000000) 
+    })
+    
+    if (b < best) {
+      fitresMBiases <- bestFit
+      best <- bestFit$value
+    }
+    
+    print(paste("Best value so far:", best))
+  }
+  
+  b <- tryCatch({
+    print(fitresMBiases$message)
+    print(paste("Dev:", fitresMBiases$value))
+    imprimir(fitresMBiases$par)
+    archivo <- paste("MBiases_Parameter_fit_", module, ".csv", sep = "")
+    df <- data.frame(fitresMBiases)
+    # print(head(df))
+    write.csv(df, archivo, row.names = FALSE)
+    print(paste("Data saved to", archivo))
+    return(fitresMBiases)
+  }, error = function(e){
+    print("Optimizer", module, "didn\'t work at all :(")
+    return(NA) 
+  })
+  
+  return(fitresMBiases)
+  
+} # end searchBestFit_MBiases

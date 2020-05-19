@@ -101,10 +101,6 @@ plot_FocalTransitions <- function(df) {
   
   df <- df[df$Region != 'RS', ]
   
-  regiones <- c('ALL', 'NOTHING', 
-                'DOWN', 'UP', 'LEFT', 'RIGHT',
-                'IN', 'OUT')
-  
   min_score <- 0
   max_score <- 33
   
@@ -117,9 +113,10 @@ plot_FocalTransitions <- function(df) {
     ggtitle("Staying at same focal region") +
     theme_bw()
   
+  regiones <- c('ALL', 'NOTHING', 
+                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'IN', 'OUT')
   
-  #other <- 'RIGHT'
-  #other <- 'LEFT'
   for (other in regiones) {
     df_Focal <- df[df$Region == other, ]
     df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
@@ -156,6 +153,62 @@ plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
   }
   
   return(pl)
+}
+
+plot_FocalTransitions_3models <- function(df1, df2, df3) {
+  
+  labeldf1 <- "MBiases"
+  labeldf2 <- "WSLS"
+  labeldf3 <- "FRA"
+  colordf1 <- cbPalette[4]
+  colordf2 <- cbPalette[5]
+  colordf3 <- cbPalette[7]
+  
+  df1 <- getRelFreq_Rows(df1)
+  df1 <- df1[df1$Region != 'RS', ]
+  df1$Exp <- as.character("MBiases")
+  
+  df2 <- getRelFreq_Rows(df2)
+  df2 <- df2[df2$Region != 'RS', ]
+  df2$Exp <- as.character("WSLS")
+  
+  df3 <- getRelFreq_Rows(df3)
+  df3 <- df3[df3$Region != 'RS', ]
+  df3$Exp <- as.character("FRA")
+  
+  df <- rbind(df1, df2, df3)
+
+  min_score <- 0
+  max_score <- 33
+  
+  gOTHER2OTHER <- ggplot() +
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("Score") +
+    #  ylab("") +
+    ylab("Relative Freq.") +
+    ggtitle("Stubbornness") +
+    theme_bw()
+  
+  regiones <- c('ALL', 'NOTHING', 
+                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'IN', 'OUT')
+  
+  for (other in regiones) {
+    df_Focal <- df[df$Region == other, ]
+    df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
+    gOTHER2OTHER <- gOTHER2OTHER +
+      geom_point(aes(x = Score, y = Freqs, color=Exp), 
+                 data = df_Focal, 
+                 alpha = alpha, 
+                 size=1.5) +
+      scale_colour_manual(values = c(colordf1,colordf2,colordf3)) +  
+      theme_bw() +
+      theme(legend.position="none")
+  }
+  
+  return (gOTHER2OTHER)
+  
 }
 
 plot_6panels <- function(archivo) {
@@ -849,11 +902,11 @@ plot_3set_comparison_WSLS <- function(df1, df2, df3) {
   g1 <- ggplot(df, aes(x=Category,  group=Exp, fill=Exp)) + 
     geom_bar(aes(y = ..prop..*100), stat="count", position="dodge") +
     xlab("Region") +
-    ylab("Trials on which region\n was uncovered (%)") +
+    ylab("% of trials region\n was uncovered") +
     scale_fill_manual(name = "Model",
                       values = c(colordf1,colordf2,colordf3)) +  
     theme_bw() +
-    theme(legend.position="bottom")
+    theme(legend.position="right")
   
   # 2...
   # Consistency(n) ~ Score(n-1)
@@ -943,9 +996,14 @@ plot_3set_comparison_WSLS <- function(df1, df2, df3) {
   g7 <- g7 + theme(legend.position="none")
   g8 <- g8 + theme(legend.position="none")
   
-  p <- grid.arrange(g1, g2, g3, g4, g5, g6, g7, g8,
-                    nrow=3,
-                    bottom=legend)
+  p <- grid.arrange(g1, g2, g3, g7, g8,legend,
+                    nrow=2)
+  q <- grid.arrange(g4, g5, g6,
+                    nrow=1)
+  
+  r <- grid.arrange(p, q, 
+                    nrow=2,
+                    heights=c(2/3, 1/3))
   
 }
 
