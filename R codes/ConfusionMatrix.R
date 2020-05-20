@@ -38,7 +38,8 @@ matriz <- data.frame(model)
 # Loading and preparing data...
 ###############################################################
 
-archivo <- "../Data/MBiases.csv"
+
+archivo <- paste("../Data/Confusion/MB", contador, ".csv", sep="")
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
 df$Region <- df$Category
