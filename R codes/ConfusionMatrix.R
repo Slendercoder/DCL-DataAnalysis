@@ -13,7 +13,6 @@ fitModels2Data <- function(args) {
   f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
   f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
-  beep()
   print(cat("MBiases dev: ",f_MBi$value))
   imprimir(f_MBi$par)
   cm[1] <- f_MBi$value
@@ -52,6 +51,8 @@ args <- get_FRASims_list(args)
 print(head(args))
 M1 <- fitModels2Data(args)
 matriz <- cbind(matriz, data.frame(M1))
+
+write.csv(matriz, "confusion_matrix.csv", row.names = FALSE)
 
 archivo <- "../Data/WSLS.csv"
 print(paste("Loading and preparing data", archivo, "..."))
