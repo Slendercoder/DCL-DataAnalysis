@@ -23,7 +23,7 @@ rounds = 60 # number of rounds
 dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
-RM.data_for_confusion_matrix(gameParameters, 1)
+RM.data_for_confusion_matrix(gameParameters, 9)
 
 # # Model Parameters BIAS
 # modelParameters = [0.05, 0.05, 0.05, 0.05, 0, 0, 0, 0, 0, 0] #PL1

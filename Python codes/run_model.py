@@ -234,11 +234,11 @@ def data_for_confusion_matrix(gameParameters, N = 10):
 
     for n in range(N):
         modelParameters = random_pars_Bmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'MB', n)
+        data_conf_mtrx(gameParameters, modelParameters, 'MB', n+1)
         modelParameters = random_pars_WSLSmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'WS', n)
+        data_conf_mtrx(gameParameters, modelParameters, 'WS', n+1)
         modelParameters = random_pars_FRAmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'FR', n)
+        data_conf_mtrx(gameParameters, modelParameters, 'FR', n+1)
 
     print("Done!")
 
