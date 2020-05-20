@@ -51,7 +51,8 @@ for (contador in a) {
   args <- getFreqFRA(df, theta)
   args <- get_FRASims_list(args)
   print(head(args))
-  MB <- fitModels2Data(args, contador)
+  rotulo <- paste('MB', contador, sep="")
+  MB <- fitModels2Data(args, rotulo)
   matriz <- cbind(matriz, data.frame(MB))
   
   archivo <- paste("../Data/Confusion/WS", contador, ".csv", sep="")
@@ -65,7 +66,8 @@ for (contador in a) {
   args <- getFreqFRA(df, theta)
   args <- get_FRASims_list(args)
   print(head(args))
-  WS <- fitModels2Data(args, contador)
+  rotulo <- paste('WS', contador, sep="")
+  WS <- fitModels2Data(args, rotulo)
   matriz <- cbind(matriz, data.frame(WS))
   
   archivo <- paste("../Data/Confusion/FR", contador, ".csv", sep="")
@@ -79,7 +81,8 @@ for (contador in a) {
   args <- getFreqFRA(df, theta)
   args <- get_FRASims_list(args)
   print(head(args))
-  FR <- fitModels2Data(args, contador)
+  rotulo <- paste('FR', contador, sep="")
+  FR <- fitModels2Data(args, rotulo)
   matriz <- cbind(matriz, data.frame(FR))
 }
 

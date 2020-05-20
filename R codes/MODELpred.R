@@ -887,7 +887,7 @@ searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0) {
             print(fitFRA$message)
             print(paste("Dev:", fitFRA$value))
             imprimir(fitFRA$par)
-            archivo <- paste("FRA_Parameter_fit_", module, "-", contador, ".csv", sep = "")
+            archivo <- paste("FRA_Parameter_fit_", module, "_", contador, ".csv", sep = "")
             df <- data.frame(fitFRA)
             # print(head(df))
             write.csv(df, archivo, row.names = FALSE)

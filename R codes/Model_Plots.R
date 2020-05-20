@@ -1012,3 +1012,133 @@ savePlot <- function(file, myPlot) {
   print(myPlot)
   dev.off()
 }
+
+########################################
+# Plot Parameter Recovery 
+########################################
+plot_Parameter_Recovery_Biases <- function(data, titulo) {
+  wALL_Real <- data$wALL[data$Exp == 'Real']
+  wALL_Fitted <- data$wALL[data$Exp == 'Fitted']
+  Rmax <- max(wALL_Real)
+  Fmax <- max(wALL_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(wALL_Real, wALL_Fitted)
+  g3 <- ggplot(df, aes(x = wALL_Real, y = wALL_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g3
+  wNOTHING_Real <- data$wNOTHING[data$Exp == 'Real']
+  wNOTHING_Fitted <- data$wNOTHING[data$Exp == 'Fitted']
+  Rmax <- max(wNOTHING_Real)
+  Fmax <- max(wNOTHING_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(wNOTHING_Real, wNOTHING_Fitted)
+  g2 <- ggplot(df, aes(x = wNOTHING_Real, y = wNOTHING_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g2
+  wLEFT_Real <- data$wLEFT[data$Exp == 'Real']
+  wLEFT_Fitted <- data$wLEFT[data$Exp == 'Fitted']
+  Rmax <- max(wLEFT_Real)
+  Fmax <- max(wLEFT_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(wLEFT_Real, wLEFT_Fitted)
+  g1 <- ggplot(df, aes(x = wLEFT_Real, y = wLEFT_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g1
+  wIN_Real <- data$wIN[data$Exp == 'Real']
+  wIN_Fitted <- data$wIN[data$Exp == 'Fitted']
+  Rmax <- max(wIN_Real)
+  Fmax <- max(wIN_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(wIN_Real, wIN_Fitted)
+  g0 <- ggplot(df, aes(x = wIN_Real, y = wIN_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g0
+  
+  pFR <- grid.arrange(g3, g2, g1, g0, nrow=1, top=titulo)
+}
+
+plot_Parameter_Recovery_WSLS <- function(data, titulo) {
+  Alpha_Real <- data$Alpha[data$Exp == 'Real']
+  Alpha_Fitted <- data$Alpha[data$Exp == 'Fitted']
+  Rmax <- max(Alpha_Real)
+  Fmax <- max(Alpha_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(Alpha_Real, Alpha_Fitted)
+  g1 <- ggplot(df, aes(x = Alpha_Real, y = Alpha_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g1
+  Gamma_Real <- data$Gamma[data$Exp == 'Real']
+  Gamma_Fitted <- data$Gamma[data$Exp == 'Fitted']
+  Rmax <- max(Gamma_Real)
+  Fmax <- max(Gamma_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(Gamma_Real, Gamma_Fitted)
+  g2 <- ggplot(df, aes(x = Gamma_Real, y = Gamma_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g2
+  
+  pFR <- grid.arrange(g1, g2, nrow=1, top=titulo)
+}
+
+plot_Parameter_Recovery_FRA <- function(data, titulo) {
+  Zeta_Real <- data$Zeta[data$Exp == 'Real']
+  Zeta_Fitted <- data$Zeta[data$Exp == 'Fitted']
+  Rmax <- max(Zeta_Real)
+  Fmax <- max(Zeta_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(Zeta_Real, Zeta_Fitted)
+  g3 <- ggplot(df, aes(x = Zeta_Real, y = Zeta_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g3
+  Delta_Real <- data$Delta[data$Exp == 'Real']
+  Delta_Fitted <- data$Delta[data$Exp == 'Fitted']
+  Rmax <- max(Delta_Real)
+  Fmax <- max(Delta_Fitted)
+  m <- max(Rmax,Fmax)
+  df <- data.frame(Delta_Real, Delta_Fitted)
+  g1 <- ggplot(df, aes(x = Delta_Real, y = Delta_Fitted)) +
+    geom_point(color="gray")+
+    xlim(c(0,m)) +
+    ylim(c(0,m)) +
+    theme_bw() + 
+    geom_abline(intercept = 0, slope = 1, color="black", 
+                linetype="dashed", size=0.5)
+  g1
+  
+  pFR <- grid.arrange(g1, g3, nrow=1, top=titulo)
+}
