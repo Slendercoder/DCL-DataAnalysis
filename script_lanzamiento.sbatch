@@ -6,7 +6,7 @@
 #SBATCH -o slurm.%N.%j.out      # STDOUT
 #SBATCH -e slurm.%N.%j.err      # STDERR
 
-cd DCL-DataAnalysis/Python\ codes/
+cd Python\ codes/
 module load python3.6/3.6.6
 
-python main.py
+python3.6 main.py
