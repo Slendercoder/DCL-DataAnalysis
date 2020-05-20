@@ -23,17 +23,19 @@ rounds = 60 # number of rounds
 dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
-# Model Parameters BIAS
-modelParameters = [0.05, 0.05, 0.05, 0.05, 0, 0, 0, 0, 0, 0] #PL1
-modelParameters += modelParameters # Both players have equal parameters
-RM.simulation_with_measures(gameParameters, modelParameters, '5')
+RM.data_for_confusion_matrix(gameParameters, 1)
 
-# Model Parameters WSLS
-modelParameters = [0.05, 0.05, 0.05, 0.05, 500, 500, 31.5, 0, 0, 0] #PL1
-modelParameters += modelParameters # Both players have equal parameters
-RM.simulation_with_measures(gameParameters, modelParameters, '5')
-
-# Model Parameters FRA
-modelParameters = [0.05, 0.05, 0.05, 0.05, 500, 500, 31.5, 500, 500, 0.8] #PL1
-modelParameters += modelParameters # Both players have equal parameters
-RM.simulation_with_measures(gameParameters, modelParameters, '5')
+# # Model Parameters BIAS
+# modelParameters = [0.05, 0.05, 0.05, 0.05, 0, 0, 0, 0, 0, 0] #PL1
+# modelParameters += modelParameters # Both players have equal parameters
+# RM.simulation_with_measures(gameParameters, modelParameters, '5')
+#
+# # Model Parameters WSLS
+# modelParameters = [0.05, 0.05, 0.05, 0.05, 500, 500, 31.5, 0, 0, 0] #PL1
+# modelParameters += modelParameters # Both players have equal parameters
+# RM.simulation_with_measures(gameParameters, modelParameters, '5')
+#
+# # Model Parameters FRA
+# modelParameters = [0.05, 0.05, 0.05, 0.05, 500, 500, 31.5, 500, 500, 0.8] #PL1
+# modelParameters += modelParameters # Both players have equal parameters
+# RM.simulation_with_measures(gameParameters, modelParameters, '5')

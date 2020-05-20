@@ -49,10 +49,8 @@ print(head(df))
 args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
-M1 <- fitModels2Data(args)
-matriz <- cbind(matriz, data.frame(M1))
-
-write.csv(matriz, "confusion_matrix.csv", row.names = FALSE)
+MB1 <- fitModels2Data(args)
+matriz <- cbind(matriz, data.frame(MB1))
 
 archivo <- "../Data/WSLS.csv"
 print(paste("Loading and preparing data", archivo, "..."))
@@ -65,8 +63,8 @@ print(head(df))
 args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
-M2 <- fitModels2Data(archivo)
-matriz <- cbind(matriz, data.frame(M2))
+WS1 <- fitModels2Data(archivo)
+matriz <- cbind(matriz, data.frame(WS1))
 
 archivo <- "../Data/FRA.csv"
 print(paste("Loading and preparing data", archivo, "..."))
@@ -79,7 +77,7 @@ print(head(df))
 args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
-M3 <- fitModels2Data(archivo)
-matriz <- cbind(matriz, data.frame(M3))
+FR1 <- fitModels2Data(archivo)
+matriz <- cbind(matriz, data.frame(FR1))
 
 write.csv(matriz, "confusion_matrix.csv", row.names = FALSE)

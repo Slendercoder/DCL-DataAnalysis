@@ -174,15 +174,13 @@ def data_conf_mtrx(gameParameters, modelParameters, model, count):
         dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy,Is_there_LEAD,Category,Category1,RegionGo\n')
         dfile.close()
     E.run_simulation()
-    E.df = M.get_measures(E.df, '05')
-    archivo = './Confusion/cmtrx_' + str(model) + str(count) + '.csv'
-    while os.path.isfile(archivo):
-        archivo = './Confusion/cmtrx_' + str(model) + str(count) + '.csv'
+    E.df = M.get_measures(E.df, '5')
+    archivo = '../Data/Confusion/' + str(model) + str(count) + '.csv'
     E.df.to_csv(archivo, index=False)
     print('Data saved to' + archivo)
     rel_data_sim = [count] + [str(model)] + modelParameters[:10]
     dfAux = pd.DataFrame([rel_data_sim])
-    with open('./Confusion/sim_data_rel.csv', 'a') as f:
+    with open('../Data/Confusion/sim_data_rel.csv', 'a') as f:
         dfAux.to_csv(f, header=False, index=False)
 
     return E.df
@@ -228,26 +226,19 @@ def random_pars_FRAmodel():
     mParameters.append(uniform(0, 32)) # appending random Gamma
     mParameters.append(uniform(0, 500)) # appending random Delta
     mParameters.append(500) # appending Epsilon
-    mParameters.append(uniform(0, 2)) # appending random Zeta
+    mParameters.append(uniform(0, 1)) # appending random Zeta
     mParameters += mParameters
     return mParameters
 
-def data_for_confusion_matrix(N = 10):
-
-    p = 0.5 # probability of there being a unicorn
-    pl = 2 # number of players
-    n = 8 # number of rows/columns in grid
-    rounds = 60 # number of rounds
-    dyads = 50 # number of dyads
-    gameParameters = [p, pl, n, rounds, dyads]
+def data_for_confusion_matrix(gameParameters, N = 10):
 
     for n in range(N):
         modelParameters = random_pars_Bmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'B', n)
+        data_conf_mtrx(gameParameters, modelParameters, 'MB', n)
         modelParameters = random_pars_WSLSmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'WSLS', n)
+        data_conf_mtrx(gameParameters, modelParameters, 'WS', n)
         modelParameters = random_pars_FRAmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'FRA', n)
+        data_conf_mtrx(gameParameters, modelParameters, 'FR', n)
 
     print("Done!")
 
