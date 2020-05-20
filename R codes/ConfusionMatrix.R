@@ -4,15 +4,15 @@ source("MODELpred.R")
 # Parameter recovery function
 ###############################################################
 
-fitModels2Data <- function(args) {
+fitModels2Data <- function(args, contador=0) {
   
   Trials <- 5
   
   cm <- c(1000000, 1000000, 1000000)
   
-  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
-  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
-  f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
+  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador)
+  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador)
+  f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb", contador)
   print(cat("MBiases dev: ",f_MBi$value))
   imprimir(f_MBi$par)
   cm[1] <- f_MBi$value
@@ -51,10 +51,10 @@ for (contador in a) {
   args <- getFreqFRA(df, theta)
   args <- get_FRASims_list(args)
   print(head(args))
-  MB <- fitModels2Data(args)
+  MB <- fitModels2Data(args, contador)
   matriz <- cbind(matriz, data.frame(MB))
   
-  archivo <- "../Data/WSLS.csv"
+  archivo <- paste("../Data/Confusion/WS", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
   df$Region <- df$Category
@@ -65,10 +65,10 @@ for (contador in a) {
   args <- getFreqFRA(df, theta)
   args <- get_FRASims_list(args)
   print(head(args))
-  WS <- fitModels2Data(archivo)
+  WS <- fitModels2Data(args, contador)
   matriz <- cbind(matriz, data.frame(WS))
   
-  archivo <- "../Data/FRA.csv"
+  archivo <- paste("../Data/Confusion/FR", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
   df$Region <- df$Category
@@ -79,7 +79,7 @@ for (contador in a) {
   args <- getFreqFRA(df, theta)
   args <- get_FRASims_list(args)
   print(head(args))
-  FR <- fitModels2Data(archivo)
+  FR <- fitModels2Data(args, contador)
   matriz <- cbind(matriz, data.frame(FR))
 }
 
