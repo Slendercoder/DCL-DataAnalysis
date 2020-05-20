@@ -38,47 +38,49 @@ matriz <- data.frame(model)
 # Loading and preparing data...
 ###############################################################
 
-
-archivo <- paste("../Data/Confusion/MB", contador, ".csv", sep="")
-print(paste("Loading and preparing data", archivo, "..."))
-df = read.csv(archivo)
-df$Region <- df$Category
-df <- find_joint_region(df)
-df$RegionFULL <- unlist(df$RegionFULL)
-df$RegionGo <- factor(df$RegionGo, levels = regiones)
-print(head(df))
-args <- getFreqFRA(df, theta)
-args <- get_FRASims_list(args)
-print(head(args))
-MB1 <- fitModels2Data(args)
-matriz <- cbind(matriz, data.frame(MB1))
-
-archivo <- "../Data/WSLS.csv"
-print(paste("Loading and preparing data", archivo, "..."))
-df = read.csv(archivo)
-df$Region <- df$Category
-df <- find_joint_region(df)
-df$RegionFULL <- unlist(df$RegionFULL)
-df$RegionGo <- factor(df$RegionGo, levels = regiones)
-print(head(df))
-args <- getFreqFRA(df, theta)
-args <- get_FRASims_list(args)
-print(head(args))
-WS1 <- fitModels2Data(archivo)
-matriz <- cbind(matriz, data.frame(WS1))
-
-archivo <- "../Data/FRA.csv"
-print(paste("Loading and preparing data", archivo, "..."))
-df = read.csv(archivo)
-df$Region <- df$Category
-df <- find_joint_region(df)
-df$RegionFULL <- unlist(df$RegionFULL)
-df$RegionGo <- factor(df$RegionGo, levels = regiones)
-print(head(df))
-args <- getFreqFRA(df, theta)
-args <- get_FRASims_list(args)
-print(head(args))
-FR1 <- fitModels2Data(archivo)
-matriz <- cbind(matriz, data.frame(FR1))
+a <- seq(0, 9)
+for (contador in a) {
+  archivo <- paste("../Data/Confusion/MB", contador, ".csv", sep="")
+  print(paste("Loading and preparing data", archivo, "..."))
+  df = read.csv(archivo)
+  df$Region <- df$Category
+  df <- find_joint_region(df)
+  df$RegionFULL <- unlist(df$RegionFULL)
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
+  print(head(df))
+  args <- getFreqFRA(df, theta)
+  args <- get_FRASims_list(args)
+  print(head(args))
+  MB <- fitModels2Data(args)
+  matriz <- cbind(matriz, data.frame(MB))
+  
+  archivo <- "../Data/WSLS.csv"
+  print(paste("Loading and preparing data", archivo, "..."))
+  df = read.csv(archivo)
+  df$Region <- df$Category
+  df <- find_joint_region(df)
+  df$RegionFULL <- unlist(df$RegionFULL)
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
+  print(head(df))
+  args <- getFreqFRA(df, theta)
+  args <- get_FRASims_list(args)
+  print(head(args))
+  WS <- fitModels2Data(archivo)
+  matriz <- cbind(matriz, data.frame(WS))
+  
+  archivo <- "../Data/FRA.csv"
+  print(paste("Loading and preparing data", archivo, "..."))
+  df = read.csv(archivo)
+  df$Region <- df$Category
+  df <- find_joint_region(df)
+  df$RegionFULL <- unlist(df$RegionFULL)
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
+  print(head(df))
+  args <- getFreqFRA(df, theta)
+  args <- get_FRASims_list(args)
+  print(head(args))
+  FR <- fitModels2Data(archivo)
+  matriz <- cbind(matriz, data.frame(FR))
+}
 
 write.csv(matriz, "confusion_matrix.csv", row.names = FALSE)
