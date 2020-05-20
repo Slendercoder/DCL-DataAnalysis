@@ -840,7 +840,7 @@ searchFit_FRA_NMKB <- function(params, args, max_iter=10) {
   
 } # end searchFit_FRA_NMKB
 
-searchBestFit_FRA <- function(args, N=1, module="nmkb") {
+searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0) {
   
   best <- 100000
   fitFRA <- NA
@@ -887,7 +887,7 @@ searchBestFit_FRA <- function(args, N=1, module="nmkb") {
             print(fitFRA$message)
             print(paste("Dev:", fitFRA$value))
             imprimir(fitFRA$par)
-            archivo <- paste("FRA_Parameter_fit_", module, ".csv", sep = "")
+            archivo <- paste("FRA_Parameter_fit_", module, "-", contador, ".csv", sep = "")
             df <- data.frame(fitFRA)
             # print(head(df))
             write.csv(df, archivo, row.names = FALSE)
@@ -963,45 +963,6 @@ ModelProb <- function(regionFrom, regionGo, s, k, theta){
   
   return(probab)
 } # end ModelProb
-
-searchFit_FRA_NMKB <- function(params, args, max_iter=10) {
-  
-  contador <- 1
-  
-  while (contador < max_iter + 1) {
-    
-    print(paste("Trying nmkb...", contador))
-    
-    fitresFRA <- tryCatch({
-      f <- nmkb(par=params, 
-                fn = function(t) FRAutil(t[1], 
-                                         t[2],
-                                         t[3],
-                                         t[4],
-                                         t[5],
-                                         t[6], 
-                                         t[7], 
-                                         t[8], 
-                                         t[9], 
-                                         t[10]),
-                lower=lower_limits,
-                upper=upper_limits,
-                control=list(trace=0))
-      contador <- max_iter + 2
-      return(f)
-    }, error = function(e) {
-      print(paste("Error:", e))
-      print(paste("New attempt...(", contador, "/", max_iter, ")", sep=""))
-      contador <- contador - 1
-      return (NA)
-    }
-    )
-    contador <- contador + 1
-  }
-  
-  return(fitresFRA)  
-  
-} # end searchFit_FRA_NMKB
 
 ############################
 # WSLS related functions
@@ -1130,7 +1091,7 @@ searchFit_WSLS_NMKB <- function(params, args, max_iter=10) {
   
 } # end searchFit_WSLS_NMKB
 
-searchBestFit_WSLS <- function(args, N=1, module="nmkb") {
+searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0) {
   
   best <- 100000
   fitresWSLS <- NA
@@ -1178,7 +1139,7 @@ searchBestFit_WSLS <- function(args, N=1, module="nmkb") {
     print(fitresWSLS$message)
     print(paste("Dev:", fitresWSLS$value))
     imprimir(fitresWSLS$par)
-    archivo <- paste("WSLS_Parameter_fit_", module, ".csv", sep = "")
+    archivo <- paste("WSLS_Parameter_fit_", module, "_", contador, ".csv", sep = "")
     df <- data.frame(fitresWSLS)
     # print(head(df))
     write.csv(df, archivo, row.names = FALSE)
@@ -1295,7 +1256,7 @@ searchFit_MBiases_NMKB <- function(params, args, max_iter=10) {
   
 } # end searchFit_MBiases_NMKB
 
-searchBestFit_MBiases <- function(args, N=1, module="nmkb") {
+searchBestFit_MBiases <- function(args, N=1, module="nmkb", contador=0) {
   
   best <- 100000
   fitresMBiases <- NA
@@ -1343,7 +1304,7 @@ searchBestFit_MBiases <- function(args, N=1, module="nmkb") {
     print(fitresMBiases$message)
     print(paste("Dev:", fitresMBiases$value))
     imprimir(fitresMBiases$par)
-    archivo <- paste("MBiases_Parameter_fit_", module, ".csv", sep = "")
+    archivo <- paste("MBiases_Parameter_fit_", module, "_", contador, ".csv", sep = "")
     df <- data.frame(fitresMBiases)
     # print(head(df))
     write.csv(df, archivo, row.names = FALSE)
