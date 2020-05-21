@@ -187,10 +187,10 @@ def data_conf_mtrx(gameParameters, modelParameters, model, count):
 
 def random_pars_Bmodel():
     mParameters = []
-    mParameters.append(uniform(0, 0.0125)) # appending random wALL
-    mParameters.append(uniform(0, 0.0125)) # appending random wNOTHING
-    mParameters.append(uniform(0, 0.0125)) # appending random wLEFT
-    mParameters.append(uniform(0, 0.0125)) # appending random wIN
+    mParameters.append(uniform(0, 0.1)) # appending random wALL
+    mParameters.append(uniform(0, 0.1)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.1)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.1)) # appending random wIN
     mParameters.append(0) # appending Alpha
     mParameters.append(0) # appending Beta
     mParameters.append(0) # appending Gamma
@@ -202,10 +202,10 @@ def random_pars_Bmodel():
 
 def random_pars_WSLSmodel():
     mParameters = []
-    mParameters.append(uniform(0, 0.0125)) # appending random wALL
-    mParameters.append(uniform(0, 0.0125)) # appending random wNOTHING
-    mParameters.append(uniform(0, 0.0125)) # appending random wLEFT
-    mParameters.append(uniform(0, 0.0125)) # appending random wIN
+    mParameters.append(uniform(0, 0.1)) # appending random wALL
+    mParameters.append(uniform(0, 0.1)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.1)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.1)) # appending random wIN
     mParameters.append(uniform(0, 500)) # appending random Alpha
     mParameters.append(500) # appending Beta
     mParameters.append(uniform(0, 32)) # appending random Gamma
@@ -217,10 +217,10 @@ def random_pars_WSLSmodel():
 
 def random_pars_FRAmodel():
     mParameters = []
-    mParameters.append(uniform(0, 0.0125)) # appending random wALL
-    mParameters.append(uniform(0, 0.0125)) # appending random wNOTHING
-    mParameters.append(uniform(0, 0.0125)) # appending random wLEFT
-    mParameters.append(uniform(0, 0.0125)) # appending random wIN
+    mParameters.append(uniform(0, 0.1)) # appending random wALL
+    mParameters.append(uniform(0, 0.1)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.1)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.1)) # appending random wIN
     mParameters.append(uniform(0, 500)) # appending random Alpha
     mParameters.append(500) # appending Beta
     mParameters.append(uniform(0, 32)) # appending random Gamma
@@ -234,11 +234,11 @@ def data_for_confusion_matrix(gameParameters, N = 10):
 
     for n in range(N):
         modelParameters = random_pars_Bmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'MB', n+1)
+        data_conf_mtrx(gameParameters, modelParameters, 'MB', n)
         modelParameters = random_pars_WSLSmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'WS', n+1)
+        data_conf_mtrx(gameParameters, modelParameters, 'WS', n)
         modelParameters = random_pars_FRAmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'FR', n+1)
+        data_conf_mtrx(gameParameters, modelParameters, 'FR', n)
 
     print("Done!")
 
