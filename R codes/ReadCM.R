@@ -1,3 +1,4 @@
+source("Model_Plots.R")
 library(janitor)
 library(dplyr)
 library(ggplot2)
@@ -9,13 +10,14 @@ Columns <- c('Model', 'Num',
              'wALL', 'wNOTHING', 'wLEFT', 'wIN', 
              'Alpha', 'Beta', 'Gamma', 
              'Delta', 'Epsilon', 'Zeta', 'Dev')
-fittedPars <- data.frame(t(c('MB', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
+fittedPars <- data.frame(t(c('MB', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
 colnames(fittedPars) <- Columns
 fittedPars <- fittedPars[-1, ]
-a <- seq(0, 3)
+a <- seq(0, 9)
 for (contador in a) {
   pars <- c('MB', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-  archivo <- paste("MBiases_Parameter_fit_nmkb_", contador, ".csv", sep="")
+  rotulo <- paste('MB', contador, sep="")
+  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$par <- as.double(df$par)
   aux <- df$par
@@ -27,7 +29,8 @@ for (contador in a) {
 }
 for (contador in a) {
   pars <- c('WS', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-  archivo <- paste("WSLS_Parameter_fit_nmkb_", contador, ".csv", sep="")
+  rotulo <- paste('WS', contador, sep="")
+  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$par <- as.double(df$par)
   aux <- df$par
@@ -39,7 +42,8 @@ for (contador in a) {
 }
 for (contador in a) {
   pars <- c('FR', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-  archivo <- paste("FRA_Parameter_fit_nmkb_", contador, ".csv", sep="")
+  rotulo <- paste('FR', contador, sep="")
+  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$par <- as.double(df$par)
   aux <- df$par
@@ -51,18 +55,13 @@ for (contador in a) {
 }
 fittedPars$Exp <- as.character("Fitted")
 head(fittedPars)
-dfDevs <- fittedPars %>%
-  select('Num', 'Model', 'Dev')
-fittedPars <- fittedPars %>%
-  select('Model', 'Num', 
-         'wALL', 'wNOTHING', 'wLEFT', 'wIN', 
-         'Alpha', 'Beta', 'Gamma', 
-         'Delta', 'Epsilon', 'Zeta')
+#dfDevs <- fittedPars %>%
+#  select('Num', 'Model', 'Dev')
 
 archivo <- '../Data/Confusion/sim_data_rel.csv'
 realPars = read.csv(archivo)
 realPars$Exp <- as.character("Real")
-realPars <- realPars[realPars$Num < 4, ]
+head(realPars)
 df <- rbind(realPars, fittedPars)
 head(df)
 data <- df
@@ -83,22 +82,147 @@ data_MB <- data[data$Model == 'MB', ]
 data_WS <- data[data$Model == 'WS', ]
 data_FR <- data[data$Model == 'FR', ]
 
-# Drawing biases parameters fit
-p1 <- plot_Parameter_Recovery_Biases(data_MB, "MBiases")
-p2 <- plot_Parameter_Recovery_Biases(data_WS, "WSLS")
-p3 <- plot_Parameter_Recovery_Biases(data_FR, "FRA")
-pBiases <- grid.arrange(p1, p2, p3, nrow=3)
+# Drawing parameter fit MBiases
+pMBiases <- plot_Parameter_Recovery_Biases(data_MB, "MBiases")
 
-# Drawing WSLS parameters fit
-p2 <- plot_Parameter_Recovery_WSLS(data_WS, "WSLS")
-p3 <- plot_Parameter_Recovery_WSLS(data_FR, "FRA")
-pWSLS <- grid.arrange(p2, p3, nrow=2)
+# Drawing parameter fit WSLS
+p1 <- plot_Parameter_Recovery_Biases(data_WS, "WSLS")
+p2 <- plot_Parameter_Recovery_WSLS(data_WS, "")
+pWSLS <- grid.arrange(p1, p2, nrow=2)
 
-# Drawing FRA parameters fit
-pFRA <- plot_Parameter_Recovery_FRA(data_FR, "FRA")
+# Drawing parameter fit FRA
+p1 <- plot_Parameter_Recovery_Biases(data_FR, "FRA")
+p2 <- plot_Parameter_Recovery_WSLS(data_FR, "")
+p3 <- plot_Parameter_Recovery_FRA(data_FR, "")
+q <- grid.arrange(p2, p3, nrow=1)
+pFRA <- grid.arrange(p1, q, nrow=2)
 
 #################################
 # Confusion matrix
 #################################
 
-dfDevs
+Columns <- c('ModelReal', 'Num', 'ModelFitted', 'Dev')
+fittedDev <- data.frame(t(c('MB', 0, 'MB', 0)))
+colnames(fittedDev) <- Columns
+fittedDev <- fittedDev[-1, ]
+a <- seq(0, 9)
+for (contador in a) {
+  
+  pars <- c('MB', contador, 'MB', 0)
+  rotulo <- paste('MB', contador, sep="")
+  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+
+  pars <- c('MB', contador, 'WS', 0)
+  rotulo <- paste('WS', contador, sep="")
+  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+  
+  pars <- c('MB', contador, 'FR', 0)
+  rotulo <- paste('FR', contador, sep="")
+  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+
+  pars <- c('WS', contador, 'MB', 0)
+  rotulo <- paste('MB', contador, sep="")
+  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+  
+  pars <- c('WS', contador, 'WS', 0)
+  rotulo <- paste('WS', contador, sep="")
+  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+  
+  pars <- c('WS', contador, 'FR', 0)
+  rotulo <- paste('FR', contador, sep="")
+  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+  
+  pars <- c('FR', contador, 'MB', 0)
+  rotulo <- paste('MB', contador, sep="")
+  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+  
+  pars <- c('FR', contador, 'WS', 0)
+  rotulo <- paste('WS', contador, sep="")
+  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+  
+  pars <- c('FR', contador, 'FR', 0)
+  rotulo <- paste('FR', contador, sep="")
+  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  df = read.csv(archivo)
+  df$value <- as.double(df$value)
+  pars[4] <- unique(df$value)
+  aux <- data.frame(t(pars))
+  colnames(aux) <- Columns
+  fittedDev <- rbind(fittedDev, aux)
+  
+}
+head(fittedDev)
+aux <- fittedDev
+fittedDev <- aux
+fittedDev$Num <- type.convert(fittedDev$Num)
+fittedDev$Dev <- type.convert(fittedDev$Dev)
+fittedDev$Simulated_Model <- factor(fittedDev$ModelReal, 
+                                   levels=c('MB', 'WS', 'FR'))
+fittedDev$ModelFitted <- factor(fittedDev$ModelFitted, 
+                                    levels=c('MB', 'WS', 'FR'))
+fittedDev <- fittedDev %>%
+  dplyr::group_by(Num, Simulated_Model) %>%
+  dplyr::summarize(Fit_Model = which(Dev == min(Dev)))
+
+fittedDev$Fit_Model <- lapply(fittedDev$Fit_Model, function(x) {
+  if(x==1) {
+    return('MB')
+  } else if(x==2) {
+    return('WS')
+  } else if(x==3) {
+    return('FR')
+  }
+})
+fittedDev$Fit_Model <- unlist(fittedDev$Fit_Model)
+fittedDev$Fit_Model <- factor(fittedDev$Fit_Model, 
+                        levels=c('MB', 'WS', 'FR'))
+head(fittedDev)
+table(fittedDev[2:3])
