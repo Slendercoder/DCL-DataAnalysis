@@ -13,7 +13,7 @@ Columns <- c('Model', 'Num',
 fittedPars <- data.frame(t(c('MB', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
 colnames(fittedPars) <- Columns
 fittedPars <- fittedPars[-1, ]
-a <- seq(0, 9)
+a <- seq(10, 100)
 for (contador in a) {
   pars <- c('MB', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   rotulo <- paste('MB', contador, sep="")
@@ -54,12 +54,12 @@ for (contador in a) {
   fittedPars <- rbind(fittedPars, aux)
 }
 fittedPars$Exp <- as.character("Fitted")
-head(fittedPars)
 fittedPars <- fittedPars %>%
   select('Num', 'Model', 
          'wALL', 'wNOTHING', 'wLEFT', 'wIN', 
          'Alpha', 'Beta', 'Gamma', 
          'Delta', 'Epsilon', 'Zeta', 'Exp')
+head(fittedPars)
 
 archivo <- '../Data/Confusion/sim_data_rel.csv'
 realPars = read.csv(archivo)
