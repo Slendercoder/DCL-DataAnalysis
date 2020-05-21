@@ -1,4 +1,5 @@
 source("MODELpred.R")
+source("Model_plots.R")
 
 ###############################################################
 # Parameter recovery function
@@ -46,3 +47,8 @@ args <- get_FRASims_list(args)
 print(head(args))
 parametros <- fitModels2Data(args)
 
+####################################################
+# Plotting...
+####################################################
+
+p <- plot_RSTransitions(df)

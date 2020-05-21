@@ -55,13 +55,19 @@ for (contador in a) {
 }
 fittedPars$Exp <- as.character("Fitted")
 head(fittedPars)
-#dfDevs <- fittedPars %>%
-#  select('Num', 'Model', 'Dev')
+fittedPars <- fittedPars %>%
+  select('Num', 'Model', 
+         'wALL', 'wNOTHING', 'wLEFT', 'wIN', 
+         'Alpha', 'Beta', 'Gamma', 
+         'Delta', 'Epsilon', 'Zeta', 'Exp')
 
 archivo <- '../Data/Confusion/sim_data_rel.csv'
 realPars = read.csv(archivo)
 realPars$Exp <- as.character("Real")
 head(realPars)
+
+dim(fittedPars)
+dim(realPars)
 df <- rbind(realPars, fittedPars)
 head(df)
 data <- df

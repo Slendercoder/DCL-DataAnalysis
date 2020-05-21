@@ -11,7 +11,8 @@ library(beepr)
 #####################################################
 
 # True parameters: 
-thetaTRUE <- c(0.05, 0.05, 0.05, 0.05, 500, 500, 32)
+thetaTRUE <- c(0.0003188711883553644,0.010299533842124295,0.006652270050406081,0.003911378007830106,
+               499.51419259640335,500,3.430524866216885)
 
 min_score = 0
 
@@ -27,18 +28,20 @@ legend2 <- get_legend_from_dummy(True_model_color, Recovered_model_color)
 #df1 = read.csv("../Python Codes/Model_recovery/M5_full.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/Data_correction/Only_absent/M5_OnlyA.csv", na.strings=c("","NA"))
 #df1 = read.csv("../Python Codes/Data_correction/Score_correction/M5_ScoreC.csv")
-df1 = read.csv("../Python Codes/Data_correction/Block_estimation/M5_Estimated.csv")
+df1 = read.csv("../Data/Confusion/WS0.csv")
 #head(df1)
 
 ###############################################################################
 # Obtaining estimated values...
 ###############################################################################
 
-args <- getFreq(df1)
-fitresWSLS <- searchBestFit(args, 50)
-theta <- fitresWSLS$par
-imprimir(theta)
-beep()
+#args <- getFreq(df1)
+#fitresWSLS <- searchBestFit(args, 50)
+#theta <- fitresWSLS$par
+#imprimir(theta)
+#beep()
+theta <- c(0.000208340533387852, 0.00824876924135664, 0.00650159269113997, 0.00660437614396095,
+           19.9911912034854, 500, 3.20606590207864)
 
 ###############################################################################
 # Obtaining frequencies...

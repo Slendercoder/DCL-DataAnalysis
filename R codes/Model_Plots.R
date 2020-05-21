@@ -1016,7 +1016,9 @@ savePlot <- function(file, myPlot) {
 ########################################
 # Plot Parameter Recovery 
 ########################################
+
 plot_Parameter_Recovery_Biases <- function(data, titulo) {
+
   wALL_Real <- data$wALL[data$Exp == 'Real']
   wALL_Fitted <- data$wALL[data$Exp == 'Fitted']
   Rmax <- max(wALL_Real)

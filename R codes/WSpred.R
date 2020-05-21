@@ -53,7 +53,7 @@ obtainFreqVector <- function(x) {
   
 }
 
-getFreq <- function(df, theta) {
+getFreq <- function(df) {
   
   df <- df[complete.cases(df), ]
   df$Region <- df$Category
