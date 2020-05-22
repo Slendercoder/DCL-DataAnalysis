@@ -133,7 +133,7 @@ plot_FocalTransitions <- function(df) {
     xlab("Score") +
     #  ylab("") +
     ylab("Rel. Freq./Probability") +
-    ggtitle("Staying at same focal region") +
+    ggtitle("Re-select focal") +
     theme_bw()
   
   regiones <- c('ALL', 'NOTHING', 
@@ -714,20 +714,22 @@ plot_FRA_regs <- function(df, regs, theta) {
   n <- length(regs)
   k <- regs[1]
   df1 <- getFreq_based_on_FRASim(df, k)
-  q <- plot_FRASim_k_RS2RS(df1, k)
-  print(paste('Plotting from RS to', k))
+  # q <- plot_FRASim_k_RS2RS(df1, k)
+  # print(paste('Plotting from RS to', k))
   p <- plot_ModelTransition_k_FRA(df1, theta, k)
-  pl <- grid.arrange(q, p, nrow=1)
+  # pl <- grid.arrange(q, p, nrow=1)
+  pl <- grid.arrange(p)
   
   if (n > 1) {
     contador <- 2
     for (k in regs[2:n]) {
-      print(paste('Plotting from RS to', k))
+      # print(paste('Plotting from RS to', k))
       df1 <- getFreq_based_on_FRASim(df, k)
-      q <- plot_FRASim_k_RS2RS(df1, k)
+      # q <- plot_FRASim_k_RS2RS(df1, k)
       p <- plot_ModelTransition_k_FRA(df1, theta, k)
-      pl1 <- grid.arrange(q, p, nrow=1)
-      pl <- grid.arrange(pl, pl1, nrow=2, heights=c((contador - 1)/contador, 1/contador))
+      # pl1 <- grid.arrange(q, p, nrow=1)
+      # pl <- grid.arrange(pl, pl1, nrow=2, heights=c((contador - 1)/contador, 1/contador))
+      pl <- grid.arrange(pl, p, nrow=1, widths=c((contador - 1)/contador, 1/contador))
       contador <- contador + 1
     }
   }
