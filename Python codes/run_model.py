@@ -175,12 +175,12 @@ def data_conf_mtrx(gameParameters, modelParameters, model, count):
         dfile.close()
     E.run_simulation()
     E.df = M.get_measures(E.df, '5')
-    archivo = '../Data/Confusion/' + str(model) + str(count) + '.csv'
+    archivo = '../Data/Confusion/Simulations/' + str(model) + str(count) + '.csv'
     E.df.to_csv(archivo, index=False)
     print('Data saved to' + archivo)
     rel_data_sim = [count] + [str(model)] + modelParameters[:10]
     dfAux = pd.DataFrame([rel_data_sim])
-    with open('../Data/Confusion/sim_data_rel.csv', 'a') as f:
+    with open('../Data/Confusion/Simulations/sim_data_rel.csv', 'a') as f:
         dfAux.to_csv(f, header=False, index=False)
 
     return E.df
