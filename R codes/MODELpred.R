@@ -894,7 +894,7 @@ searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0) {
             print(paste("Data saved to", archivo))
             return(fitFRA)
          }, error = function(e){
-           print("Optimizer", module, "didn\'t work at all :(")
+           print(paste("Optimizer", module, "didn\'t work at all :("))
           return(NA) 
          })
     
@@ -1147,7 +1147,7 @@ searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0) {
     print(paste("Data saved to", archivo))
     return(fitresWSLS)
   }, error = function(e){
-    print("Optimizer", module, "didn\'t work at all :(")
+    print(paste("Optimizer", module, "didn\'t work at all :("))
     return(NA) 
   })
   
@@ -1312,7 +1312,7 @@ searchBestFit_MBiases <- function(args, N=1, module="nmkb", contador=0) {
     print(paste("Data saved to", archivo))
     return(fitresMBiases)
   }, error = function(e){
-    print("Optimizer", module, "didn\'t work at all :(")
+    print(paste("Optimizer", module, "didn\'t work at all :("))
     return(NA) 
   })
   
