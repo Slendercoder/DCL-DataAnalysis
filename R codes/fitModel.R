@@ -1,5 +1,5 @@
 source("MODELpred.R")
-#source("Model_Plots.R")
+source("Model_Plots.R")
 
 ###############################################################
 # Parameter recovery function
@@ -62,23 +62,54 @@ print("-------------------")
 # Plotting...
 ####################################################
 
-# df <- getRelFreq_Rows(df1)
-# WS_color <- cbPalette[5]
-# FR_color <- cbPalette[7]
-# min_score = 0
-# legend2 <- get_legend_from_dummy1(WS_color, FR_color)
-# #theta <- c(0.1, 0.083, 0.05, 0.006, 0, 0, 0, 0, 0, 0)
-# thetaWS <- c(0.086, 0.043, 0.011, 0.002, 6.596, 499.806, 27, 0, 0, 0)
-# #thetaWS <- c(0.086, 0.043, 0.011, 0.002, 6.596, 499.806, 4.564, 0, 0, 0)
-# thetaFR <- c(0.080, 0.041, 0.010, 0.002, 496.038, 499.921, 4.407, 469.507, 499.574, 0.758)
-# 
-# d1 <- plot_RSTransitions(df)
-# d1 <- plot_ModelTransitions_RS(thetaFR, d1, FR_color)
-# d1 <- plot_ModelTransitions_RS(thetaWS, d1, WS_color)
-# 
-# d2 <- plot_FocalTransitions(df)
-# d2 <- plot_ModelTransitions_Focal(thetaWS, d2, WS_color)
-# d2 <- plot_ModelTransitions_Focal(thetaFR, d2, FR_color)
-# 
-# grid.arrange(d1, d2, bottom=legend2, nrow = 1)
-# 
+WS_color <- cbPalette[5]
+FR_color <- cbPalette[7]
+min_score = 0
+legend2 <- get_legend_from_dummy1(WS_color, FR_color)
+#theta <- c(0.1, 0.083, 0.05, 0.006, 0, 0, 0, 0, 0, 0)
+thetaWS <- c(0.086, 0.043, 0.011, 0.002, 6.596, 499.806, 27, 0, 0, 0)
+#thetaWS <- c(0.086, 0.043, 0.011, 0.002, 6.596, 499.806, 4.564, 0, 0, 0)
+thetaFR <- c(0.080, 0.041, 0.010, 0.002, 496.038, 499.921, 4.407, 469.507, 499.574, 0.758)
+
+# PLOT WSLS AT INDIVIDUAL LEVEL
+df <- getRelFreq_Rows(df1)
+d1 <- plot_RSTransitions(df)
+d1 <- plot_ModelTransitions_RS(thetaFR, d1, FR_color)
+d1 <- plot_ModelTransitions_RS(thetaWS, d1, WS_color)
+
+d2 <- plot_FocalTransitions(df)
+d2 <- plot_ModelTransitions_Focal(thetaWS, d2, WS_color)
+d2 <- plot_ModelTransitions_Focal(thetaFR, d2, FR_color)
+
+grid.arrange(d1, d2, bottom=legend2, nrow = 1)
+
+# PLOT FRA AT INDIVIDUAL LEVEL
+df <- find_joint_region(df)
+df <- get_FRASims(df)
+regs <- c('ALL', 'LEFT')
+p <- plot_FRA_regs(df, regs, thetaFR) 
+
+# PLOT AT DYADIC LEVEL
+
+archivo <- "../Data/humans_only_absent.csv"
+print(paste("Loading and preparing data", archivo, "..."))
+df1 = read.csv(archivo)
+df1$Region <- df1$Category
+df1$Exp <- as.character("Humans")
+archivo <- "../Data/FittedMBiases.csv"
+print(paste("Loading and preparing data", archivo, "..."))
+df2 = read.csv(archivo)
+df2$Region <- df2$Category
+df2$Exp <- as.character("MBiases")
+archivo <- "../Data/FittedWSLS.csv"
+print(paste("Loading and preparing data", archivo, "..."))
+df3 = read.csv(archivo)
+df3$Region <- df3$Category
+df3$Exp <- as.character("WSLS")
+archivo <- "../Data/FittedFRA.csv"
+print(paste("Loading and preparing data", archivo, "..."))
+df4 = read.csv(archivo)
+df4$Region <- df4$Category
+df4$Exp <- as.character("FRA")
+
+q <- plot_behavioral_data_fit(df1, df2, df3, df4)
