@@ -1,5 +1,5 @@
 source("MODELpred.R")
-source("Model_plots.R")
+#source("Model_Plots.R")
 
 ###############################################################
 # Parameter recovery function
@@ -46,16 +46,17 @@ args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
 #parametros <- fitModels2Data(args)
+print("-------------------")
 params <- c(0.15, 0.1, 0.08, 0.001, 600, 499.5, 27)
 f <- searchFit_WSLS_NMKB(params, args)
-print(paste("WSLS-Dev:",f$value))
-print(paste("WSLS-pars:",f$par))
-imprimir(f_MBi$par)
+print(cat("WSLS dev: ",f$value))
+imprimir(f$par)
+print("-------------------")
 params <- c(0.15, 0.1, 0.08, 0.001, 600, 499.5, 27, 600, 499.5, 0.7)
 f <- searchFit_FRA_NMKB(params, args)
-print(paste("FRA-Dev:",f$value))
-print(paste("FRA-pars:",f$par))
-imprimir(f_MBi$par)
+print(cat("FRA dev: ",f$value))
+imprimir(f$par)
+print("-------------------")
 
 ####################################################
 # Plotting...
