@@ -103,6 +103,7 @@ plot_RSTransitions <- function(df) {
   df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
   df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
   df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+  print(dim(df_RS))
   head(df_RS)
   
   gRS2RS <- ggplot() +
@@ -142,6 +143,7 @@ plot_FocalTransitions <- function(df) {
   for (other in regiones) {
     df_Focal <- df[df$Region == other, ]
     df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
+    print(dim(df_Focal))
     gOTHER2OTHER <- gOTHER2OTHER +
       geom_point(aes(x = Score, y = Freqs), df_Focal, alpha = alpha, size=1.5)
   }
@@ -600,6 +602,7 @@ plot_RSTransitions_FRA <- function(df, k) {
   df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
   df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
   df_RS <- df_RS[df_RS$RegionGo != 'OUT', ]
+  print(dim(df_RS))
   head(df_RS)
   
   rotulo_x <- paste("FRASim", k, sep="")
@@ -631,7 +634,8 @@ plot_FRASim_k_RS2RS <- function(df1, k) {
   # Plot RS to RS
   df_Focal <- df1[df1$Region == 'RS', ]
   df_Focal <- df_Focal[df_Focal$RegionGo == 'RS', ]
-  color_a_usar <- cbPalette[which(regiones == 'RS')]
+  print(dim(df_Focal))
+  color_a_usar <- cbPalette[1]
   g1 <- ggplot() +
     geom_point(aes(x = FRASim, y = Freqs, shape=RegionGo, color=RegionGo, group=RegionGo),
                data = df_Focal, 
@@ -647,13 +651,13 @@ plot_FRASim_k_RS2RS <- function(df1, k) {
     theme_bw() +
     theme(legend.position="none")
 
-  color_a_usar <- cbPalette[which(regiones == 'RS')]
+  color_a_usar <- cbPalette[7]
   
   xs <- seq(0,2,length.out=200)
   fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo='RS', k=k, theta=theta)
   dfB <- data.frame(xs, fitFocal)
   g1 <- g1 +
-    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=0.8)
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=0.7)
   
   return(g1)
 
@@ -669,7 +673,7 @@ plot_Transitions_FRASim_k <- function(df1, k) {
   # Plot RS to k
   df_Focal <- df1[df1$Region == 'RS', ]
   df_Focal <- df_Focal[df_Focal$RegionGo == k, ]
-  color_a_usar <- cbPalette[which(regiones == k)]
+  color_a_usar <- cbPalette[1]
   g2 <- ggplot() +
     geom_point(aes(x = FRASim, y = Freqs, shape=RegionGo, color=RegionGo, group=RegionGo),
                data = df_Focal, 
@@ -693,13 +697,13 @@ plot_ModelTransition_k_FRA <- function(df1, theta, k) {
   
   pl <- plot_Transitions_FRASim_k(df1, k)
 
-  color_a_usar <- cbPalette[which(regiones == k)]
+  color_a_usar <- cbPalette[7]
 
   xs <- seq(0,2,length.out=200)
   fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo=k, k=k, theta=theta)
   dfB <- data.frame(xs, fitFocal)
   pl <- pl +
-    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=0.8)
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=color_a_usar, size=0.7)
 
   return(pl)
 
@@ -1283,7 +1287,7 @@ plot_behavioral_data_fit <- function(df1, df2, df3, df4) {
     geom_bar(aes(y = ..prop..*100), stat="count", position="dodge") +
     xlab("Region") +
     ylab("% of trials region\n was uncovered") +
-    scale_fill_manual(name = "Model",
+    scale_fill_manual(name = "Source of data",
                       values = c(colordf1,colordf2,colordf3,colordf4)) +  
     theme_bw() +
     theme(legend.position="right")

@@ -1,6 +1,7 @@
 source("WSpred.R")
 
-df1 = read.csv("../Python Codes/Model_recovery/M0_full.csv", na.strings=c("","NA"))
+archivo <- "../Data/humans_only_absent.csv"
+df1 = read.csv(archivo, na.strings=c("","NA"))
 head(df1)
 
 args <- getFreq(df1)

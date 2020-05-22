@@ -32,8 +32,8 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.00001
 highEps2 =.99999
 
-lower_limits=c(0,0,0,0,0,499,0,0,499,0)
-upper_limits=c(0.1,0.1,0.1,0.1,1000,500,32,1000,500,1)
+lower_limits=c(0,0,0,0,0,0,0,0,0,0)
+upper_limits=c(0.1,0.1,0.1,0.1,1000,1000,32,1000,1000,1)
 
 ###########################
 # Define functions
@@ -654,7 +654,7 @@ FRApred1 <- function(i, iV, s, j, FRASims, theta) {
   #  print('Attractiveness with WS:')
   #  imprimir(attractiveness)
   
-  similarities <- sigmoid(unlist(FRASims), epsilon, zeta)
+  similarities <- delta * sigmoid(unlist(FRASims), epsilon, zeta)
   similarities <- c(0, unlist(similarities))
   attractiveness <- attractiveness + similarities
   
@@ -698,7 +698,7 @@ FRApred2 <- function(i, iV, s, j, FRASims, theta) {
   #  print('Attractiveness with WS:')
   #  imprimir(attractiveness)
   
-  similarities <- sigmoid(unlist(FRASims), epsilon, zeta)
+  similarities <- delta * sigmoid(unlist(FRASims), epsilon, zeta)
   similarities <- c(0, unlist(similarities))
   similarities <- rep(1, 9) + similarities
   similarities <- bias * similarities
@@ -729,7 +729,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   #  print('Calculating probabilities')
   args <- args %>%
     dplyr::group_by(RegionFULL, Score, RJcode) %>%
-    dplyr::mutate(probs = FRApred2(Region, 
+    dplyr::mutate(probs = FRApred1(Region, 
                                   RegionFULL,
                                   Score, 
                                   RJcode,
@@ -1006,7 +1006,8 @@ WSLSpred <- function(i, s, theta){
 
 } # end WSLSpred
 
-# A function to get deviance from WSLS and FRA models
+
+# A function to get deviance from WSLS 
 WSLSutil <- function(x1, x2, x3, x4, x5, x6, x7){
   # Input: theta, parameter vector of length 5
   #        args, the dataframe with frequencies

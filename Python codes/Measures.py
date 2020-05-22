@@ -22,7 +22,7 @@ for j in range(1, Num_Loc + 1) \
 
 regionsCod = ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:', # ALL
                   '', # NOTHING
-                  'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # DOWN
+                  'GHIJKLMNOPQRSTUVWXYZ0123456789;:', # BOTTOM
                   'abcdefghijklmnopqrstuvwxyzABCDEF', # TOP
                   'abcdijklqrstyzABGHIJOPQRWXYZ4567', # LEFT
                   'efghmnopuvwxCDEFKLMNSTUV012389;:', # RIGHT

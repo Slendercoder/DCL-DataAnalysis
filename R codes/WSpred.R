@@ -159,7 +159,7 @@ WSpred <- function(i, s, theta){
   return(probs)
 }
 
-# A function to get deviance from WSLS and FRA models
+# A function to get deviance from WSLS
 WSutil <- function(theta, args){
   # Input: theta, parameter vector of length 7
   #        args, the dataframe with frequencies

@@ -3,11 +3,8 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-#df1 = read.csv("../Python Codes/Dyads/output-356-137.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/Dyads/output-379-897.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/Dyads/output-435-261.csv", na.strings=c("","NA"))
-#df1 = read.csv("../Python Codes/Dyads/output-140-615.csv", na.strings=c("","NA"))
-df1 = read.csv("../Python Codes/humans.csv", na.strings=c("","NA"))
+archivo <- "../Data/humans_only_absent.csv"
+df1 = read.csv(archivo, na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
