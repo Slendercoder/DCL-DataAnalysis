@@ -225,7 +225,7 @@ def random_pars_FRAmodel():
     mParameters.append(1000) # appending Beta
     mParameters.append(uniform(0, 32)) # appending random Gamma
     mParameters.append(uniform(0, 1000)) # appending random Delta
-    mParameters.append(500) # appending Epsilon
+    mParameters.append(1000) # appending Epsilon
     mParameters.append(uniform(0, 1)) # appending random Zeta
     mParameters += mParameters
     return mParameters
