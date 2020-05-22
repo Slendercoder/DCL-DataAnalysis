@@ -13,7 +13,7 @@ Columns <- c('Model', 'Num',
 fittedPars <- data.frame(t(c('MB', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
 colnames(fittedPars) <- Columns
 fittedPars <- fittedPars[-1, ]
-a <- seq(10, 100)
+a <- seq(0, 13)
 for (contador in a) {
   pars <- c('MB', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   rotulo <- paste('MB', contador, sep="")
@@ -68,6 +68,7 @@ head(realPars)
 
 dim(fittedPars)
 dim(realPars)
+realPars <- realPars[1:42, ]
 df <- rbind(realPars, fittedPars)
 head(df)
 data <- df
