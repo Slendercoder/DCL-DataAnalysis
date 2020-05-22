@@ -45,10 +45,39 @@ print(head(df))
 args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
-parametros <- fitModels2Data(args)
+#parametros <- fitModels2Data(args)
+params <- c(0.15, 0.1, 0.08, 0.001, 600, 499.5, 27)
+f <- searchFit_WSLS_NMKB(params, args)
+print(paste("WSLS-Dev:",f$value))
+print(paste("WSLS-pars:",f$par))
+imprimir(f_MBi$par)
+params <- c(0.15, 0.1, 0.08, 0.001, 600, 499.5, 27, 600, 499.5, 0.7)
+f <- searchFit_FRA_NMKB(params, args)
+print(paste("FRA-Dev:",f$value))
+print(paste("FRA-pars:",f$par))
+imprimir(f_MBi$par)
 
 ####################################################
 # Plotting...
 ####################################################
 
-p <- plot_RSTransitions(df)
+# df <- getRelFreq_Rows(df1)
+# WS_color <- cbPalette[5]
+# FR_color <- cbPalette[7]
+# min_score = 0
+# legend2 <- get_legend_from_dummy1(WS_color, FR_color)
+# #theta <- c(0.1, 0.083, 0.05, 0.006, 0, 0, 0, 0, 0, 0)
+# thetaWS <- c(0.086, 0.043, 0.011, 0.002, 6.596, 499.806, 27, 0, 0, 0)
+# #thetaWS <- c(0.086, 0.043, 0.011, 0.002, 6.596, 499.806, 4.564, 0, 0, 0)
+# thetaFR <- c(0.080, 0.041, 0.010, 0.002, 496.038, 499.921, 4.407, 469.507, 499.574, 0.758)
+# 
+# d1 <- plot_RSTransitions(df)
+# d1 <- plot_ModelTransitions_RS(thetaFR, d1, FR_color)
+# d1 <- plot_ModelTransitions_RS(thetaWS, d1, WS_color)
+# 
+# d2 <- plot_FocalTransitions(df)
+# d2 <- plot_ModelTransitions_Focal(thetaWS, d2, WS_color)
+# d2 <- plot_ModelTransitions_Focal(thetaFR, d2, FR_color)
+# 
+# grid.arrange(d1, d2, bottom=legend2, nrow = 1)
+# 

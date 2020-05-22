@@ -68,6 +68,28 @@ get_legend_from_dummy <- function(True_model_color, Recovered_model_color) {
   
 }
 
+get_legend_from_dummy1 <- function(True_model_color, Recovered_model_color) {
+  
+  min_score <- 0
+  max_score <- 33
+  xs <- seq(min_score,32,length.out=(32-min_score + 1)*1000)
+  dummyplot <- ggplot() +
+    geom_line(aes(x = xs, y = xs, color = "WSLS"), size = 1.5) + 
+    geom_line(aes(x = xs, y = xs, color = "FRA"), size = 1.5) + 
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    scale_color_manual(values=c("WSLS"=True_model_color,
+                                "FRA"=Recovered_model_color),
+                       name="")  +
+    theme_bw() +
+    theme(legend.position="bottom")
+  
+  legend2 <- get_legend(dummyplot)
+  
+  return(legend2)
+  
+}
+
 plot_RSTransitions <- function(df) {
   
   min_score <- 0
@@ -134,7 +156,7 @@ plot_ModelTransitions_RS <- function(theta, pl, plColor) {
   fitRS <- sapply(xs, WSprob, i='RS', k='RS', theta=theta)
   dfB <- data.frame(xs, fitRS)
   pl <- pl +
-    geom_line(aes(x = xs, y = fitRS), dfB, color=plColor, size=1)
+    geom_line(aes(x = xs, y = fitRS), dfB, color=plColor, size=0.7)
   
   return(pl)
 }
@@ -149,7 +171,7 @@ plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
     fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=theta)
     dfB <- data.frame(xs, fitFocal)
     pl <- pl +
-      geom_line(aes(x = xs, y = fitFocal), dfB, color=plColor, size=1)
+      geom_line(aes(x = xs, y = fitFocal), dfB, color=plColor, size=0.7)
   }
   
   return(pl)
@@ -1027,11 +1049,13 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wALL_Real, wALL_Fitted)
   g3 <- ggplot(df, aes(x = wALL_Real, y = wALL_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
                 linetype="dashed", size=0.5)
+                     
   g3
   wNOTHING_Real <- data$wNOTHING[data$Exp == 'Real']
   wNOTHING_Fitted <- data$wNOTHING[data$Exp == 'Fitted']
@@ -1041,7 +1065,8 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wNOTHING_Real, wNOTHING_Fitted)
   g2 <- ggplot(df, aes(x = wNOTHING_Real, y = wNOTHING_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
@@ -1055,7 +1080,8 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wLEFT_Real, wLEFT_Fitted)
   g1 <- ggplot(df, aes(x = wLEFT_Real, y = wLEFT_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
@@ -1069,7 +1095,8 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wIN_Real, wIN_Fitted)
   g0 <- ggplot(df, aes(x = wIN_Real, y = wIN_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
@@ -1088,7 +1115,8 @@ plot_Parameter_Recovery_WSLS <- function(data, titulo) {
   df <- data.frame(Alpha_Real, Alpha_Fitted)
   g1 <- ggplot(df, aes(x = Alpha_Real, y = Alpha_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
@@ -1102,7 +1130,8 @@ plot_Parameter_Recovery_WSLS <- function(data, titulo) {
   df <- data.frame(Gamma_Real, Gamma_Fitted)
   g2 <- ggplot(df, aes(x = Gamma_Real, y = Gamma_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
@@ -1121,7 +1150,8 @@ plot_Parameter_Recovery_FRA <- function(data, titulo) {
   df <- data.frame(Zeta_Real, Zeta_Fitted)
   g3 <- ggplot(df, aes(x = Zeta_Real, y = Zeta_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
@@ -1135,12 +1165,13 @@ plot_Parameter_Recovery_FRA <- function(data, titulo) {
   df <- data.frame(Delta_Real, Delta_Fitted)
   g1 <- ggplot(df, aes(x = Delta_Real, y = Delta_Fitted)) +
     geom_point(color="gray")+
-    xlim(c(0,m)) +
+    scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
+#    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
     geom_abline(intercept = 0, slope = 1, color="black", 
                 linetype="dashed", size=0.5)
   g1
   
-  pFR <- grid.arrange(g1, g3, nrow=1, top=titulo)
+  pFR <- grid.arrange(g1, g3, nrow=2, top=titulo)
 }

@@ -88,20 +88,19 @@ data_MB <- data[data$Model == 'MB', ]
 data_WS <- data[data$Model == 'WS', ]
 data_FR <- data[data$Model == 'FR', ]
 
-# Drawing parameter fit MBiases
-pMBiases <- plot_Parameter_Recovery_Biases(data_MB, "MBiases")
+# Drawing parameter fit biases
+p1 <- plot_Parameter_Recovery_Biases(data_MB, "MBiases")
+p2 <- plot_Parameter_Recovery_Biases(data_WS, "WSLS")
+p3 <- plot_Parameter_Recovery_Biases(data_FR, "FRA")
+pMBiases <- grid.arrange(p1, p2, p3, nrow=3)
 
 # Drawing parameter fit WSLS
-p1 <- plot_Parameter_Recovery_Biases(data_WS, "WSLS")
-p2 <- plot_Parameter_Recovery_WSLS(data_WS, "")
+p1 <- plot_Parameter_Recovery_WSLS(data_WS, "WSLS")
+p2 <- plot_Parameter_Recovery_WSLS(data_FR, "FRA")
 pWSLS <- grid.arrange(p1, p2, nrow=2)
 
 # Drawing parameter fit FRA
-p1 <- plot_Parameter_Recovery_Biases(data_FR, "FRA")
-p2 <- plot_Parameter_Recovery_WSLS(data_FR, "")
-p3 <- plot_Parameter_Recovery_FRA(data_FR, "")
-q <- grid.arrange(p2, p3, nrow=1)
-pFRA <- grid.arrange(p1, q, nrow=2)
+pFRA <- plot_Parameter_Recovery_FRA(data_FR, "FRA")
 
 #################################
 # Confusion matrix

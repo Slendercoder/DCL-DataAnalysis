@@ -206,7 +206,7 @@ def random_pars_WSLSmodel():
     mParameters.append(uniform(0, 0.1)) # appending random wNOTHING
     mParameters.append(uniform(0, 0.1)) # appending random wLEFT
     mParameters.append(uniform(0, 0.1)) # appending random wIN
-    mParameters.append(uniform(0, 500)) # appending random Alpha
+    mParameters.append(uniform(0, 1000)) # appending random Alpha
     mParameters.append(500) # appending Beta
     mParameters.append(uniform(0, 32)) # appending random Gamma
     mParameters.append(0) # appending Delta
@@ -221,10 +221,10 @@ def random_pars_FRAmodel():
     mParameters.append(uniform(0, 0.1)) # appending random wNOTHING
     mParameters.append(uniform(0, 0.1)) # appending random wLEFT
     mParameters.append(uniform(0, 0.1)) # appending random wIN
-    mParameters.append(uniform(0, 500)) # appending random Alpha
+    mParameters.append(uniform(0, 1000)) # appending random Alpha
     mParameters.append(500) # appending Beta
     mParameters.append(uniform(0, 32)) # appending random Gamma
-    mParameters.append(uniform(0, 500)) # appending random Delta
+    mParameters.append(uniform(0, 1000)) # appending random Delta
     mParameters.append(500) # appending Epsilon
     mParameters.append(uniform(0, 1)) # appending random Zeta
     mParameters += mParameters
