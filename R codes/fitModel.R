@@ -13,8 +13,11 @@ fitModels2Data <- function(args) {
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
   
+  print("Fitting MBiases...")
   f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
+  print("Fitting WSLS...")
   f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
+  print("Fitting FRA...")
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
   print(cat("MBiases dev: ",f_MBi$value))
   imprimir(f_MBi$par)
@@ -45,6 +48,7 @@ print(head(df))
 args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
+print("Data prepared!")
 parametros <- fitModels2Data(args)
 
 ###########################################
