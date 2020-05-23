@@ -23,7 +23,7 @@ rounds = 60 # number of rounds
 dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
-modelParameters = [0, 0.1, 0.1, 0.1, 0.1, 500, 1000, 31.5, 0, 0, 0] #PL1
+modelParameters = [0, 0.1, 0.1, 0.1, 0.1, 10, 1000, 31.5, 0, 0, 0] #PL1
 modelParameters += modelParameters # Both players have equal parameters
 RM.parameter_sweep_softmax(gameParameters, modelParameters)
 

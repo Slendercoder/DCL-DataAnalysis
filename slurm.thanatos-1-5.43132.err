@@ -1,0 +1,2 @@
+/home/edgar.andrade/DCL-DataAnalysis/Python codes/FRA.py:286: RuntimeWarning: overflow encountered in exp
+  return 1. / (1 + np.exp(-beta * (x - gamma)))
