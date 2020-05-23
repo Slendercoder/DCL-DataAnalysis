@@ -7,7 +7,7 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args) {
   
-  Trials <- 5
+  Trials <- 1
   
   pars <- c(list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
@@ -19,18 +19,27 @@ fitModels2Data <- function(args) {
   f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
   print("Fitting FRA...")
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
-  print(cat("MBiases dev: ",f_MBi$value))
-  imprimir(f_MBi$par)
-  # pars[1] <- f_MBi$par
+  tryCatch({
+    print(cat("MBiases dev: ",f_MBi$value))
+    imprimir(f_MBi$par)
+  }, error = function(e) {
+    print("Optimizer didn't work for MBiases")
+  })
   print("--------------")
-  print(cat("WSLS dev: ",f_WSLS$value))
-  imprimir(f_WSLS$par)
-  # pars[2] <- f_WSLS$par
+  tryCatch({
+    print(cat("WSLS dev: ",f_WSLS$value))
+    imprimir(f_WSLS$par)
+  }, error = function(e) {
+    print("Optimizer didn't work for WSLS")
+  })
   print("--------------")
-  print(cat("FRA dev: ",f_FRA$value))
-  imprimir(f_FRA$par)
-  # pars[3] <- f_FRA$par
-  
+  tryCatch({
+    print(cat("FRA dev: ",f_FRA$value))
+    imprimir(f_FRA$par)
+  }, error = function(e) {
+    print("Optimizer didn't work for FRA")
+  })
+
   return(pars)
   
 } # end fitModels2Data
@@ -38,6 +47,7 @@ fitModels2Data <- function(args) {
 ####################################################
 
 archivo <- "../Data/humans_only_absent.csv"
+# archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
 df$Region <- df$Category
@@ -49,7 +59,28 @@ args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
 print("Data prepared!")
-parametros <- fitModels2Data(args)
+# parametros <- fitModels2Data(args)
+
+source("MODELpred.R")
+
+params <- c(4, 0.01, 0.01, 0.01, 0.01, 10, 1000, 10)
+MBIASESpred(params)
+WSLSpred("LEFT", 11, params)
+FRApred("LEFT", regionsCoded[5], 11, "", 0, params)
+
+
+MBIASESutil(1, 0.01, 0.04, 0.008, 0.001)
+WSLSutil(1, 0.01, 0.04, 0.008, 0.001, 1000, 10)
+FRAutil(4, 0.12, 0.12, 0.12, 0.12, 100, 1000, 32, 0, 0, 0)
+
+f <- searchFit_MBiases_NMKB(params, args)
+f <- searchFit_WSLS_NMKB(params, args)
+
+warnings()
+
+f <- searchBestFit_MBiases(args)
+f <- searchBestFit_WSLS(args, 10)
+
 
 ###########################################
 # print("-------------------")
@@ -67,10 +98,6 @@ parametros <- fitModels2Data(args)
 # print(cat("FRA dev: ",f$value))
 # imprimir(f$par)
 # print("-------------------")
-
-# WSLS dev:  498.97NULL
-# > imprimir(f$par)
-# [1]  0.058  0.037  0.008  0.002 11.690  0.039 31.999
 
 ####################################################
 # Plotting...

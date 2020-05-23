@@ -32,8 +32,8 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.0001
 highEps2 =.9999
 
-lower_limits=c(0.1,0,0,0,0,0,999,0,0, 999,0)
-upper_limits=c(4,0.12,0.12,0.12,0.12,100,1000,32,100,1000,1)
+lower_limits=c(0,0,0,0,0,999,0,0,999,0)
+upper_limits=c(0.12,0.12,0.12,0.12,1000,1000,32,1.5,1000,1)
 
 ###########################
 # Define functions
@@ -574,19 +574,18 @@ getFreq_based_on_FRASim <- function(df, k) {
     
 } # End get_freq_based_on_FRAsim
 
-FRApred <- function(i, iV, s, j, FRASims, theta) {
+FRApred <- function(i, iV, s, j, theta) {
   
-  eta <- theta[1]
-  wAll <- theta[2]
-  wNoth <- theta[3]
-  wLef <- theta[4]
-  wIn <- theta[5]
-  alpha <- theta[6]
-  beta <- theta[7]
-  gamma <- theta[8]
-  delta <- theta[9]
-  epsilon <- theta[10]
-  zeta <- theta[11]
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
   
   # First we calculate the prior probabilities
   aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
@@ -595,8 +594,7 @@ FRApred <- function(i, iV, s, j, FRASims, theta) {
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-  print("Biases")
-  imprimir(bias)
+  #  imprimir(bias)
   
   # Start from biases
   attractiveness <- bias
@@ -606,17 +604,61 @@ FRApred <- function(i, iV, s, j, FRASims, theta) {
   if (i != 'RS') {
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
   }
-  print('Attractiveness with WS:')
-  imprimir(attractiveness)
+  #  print('Attractiveness with WS:')
+  #  imprimir(attractiveness)
+  
+  similarities <- lapply(regiones[2:9], function(x) {
+    f <- FRAsim(i, iV, j, x) 
+    return(delta * sigmoid(f, epsilon, zeta))
+  })
+  similarities <- c(0, unlist(similarities))
+  attractiveness <- attractiveness + similarities
+  
+  attractiveness <- replace(attractiveness,attractiveness<lowerEps2,lowerEps2)
+  attractiveness <- replace(attractiveness,attractiveness>highEps2,highEps2)
+  
+  return (list(attractiveness))
+  
+} # End FRApred
+
+FRApred1 <- function(i, iV, s, j, FRASims, theta) {
+  
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
+  
+  # First we calculate the prior probabilities
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  imprimir(bias)
+  
+  # Start from biases
+  attractiveness <- bias
+  # Add WinStay
+  index <- which(regiones == i)
+  # adding win stay only to focal regions
+  if (i != 'RS') {
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
+  }
+  #  print('Attractiveness with WS:')
+  #  imprimir(attractiveness)
   
   similarities <- delta * sigmoid(unlist(FRASims), epsilon, zeta)
   similarities <- c(0, unlist(similarities))
   attractiveness <- attractiveness + similarities
-  print('Attractiveness with FRASim:')
-  imprimir(attractiveness)
   
-  # probs <- attractiveness / sum(attractiveness)
-  probs <- exp(eta * attractiveness) / sum(exp(eta * attractiveness))
+  probs <- attractiveness / sum(attractiveness)
   probs <- replace(probs,probs<lowerEps2,lowerEps2)
   probs <- replace(probs,probs>highEps2,highEps2)
   
@@ -627,12 +669,12 @@ FRApred <- function(i, iV, s, j, FRASims, theta) {
 
 
 # A function to get deviance from FRA model
-FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11){
+FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
-  # Output: Deviance of FRApred
+  # Output: Deviance of WSLSpred for all regions and scores
   
-  theta <- c(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11)
+  theta <- c(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
   
   if (any(is.na(theta))) {
     print('Incorrect parameters: ')
@@ -644,7 +686,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11){
   #  print('Calculating probabilities')
   args <- args %>%
     dplyr::group_by(RegionFULL, Score, RJcode) %>%
-    dplyr::mutate(probs = FRApred(Region, 
+    dplyr::mutate(probs = FRApred1(Region, 
                                   RegionFULL,
                                   Score, 
                                   RJcode,
@@ -737,8 +779,7 @@ searchFit_FRA_NMKB <- function(params, args, max_iter=10) {
                                       t[7], 
                                       t[8], 
                                       t[9], 
-                                      t[10],
-                                      t[11]),
+                                      t[10]),
              lower=lower_limits,
              upper=upper_limits,
              control=list(trace=0))
@@ -773,8 +814,7 @@ searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0) {
                             list(lower_limits[7], upper_limits[7]), 
                             list(lower_limits[8], upper_limits[8]), 
                             list(lower_limits[9], upper_limits[9]), 
-                            list(lower_limits[10], upper_limits[10]), 
-                            list(lower_limits[11], upper_limits[11]))
+                            list(lower_limits[10], upper_limits[10]))
     
     # imprimir(params)
     if (module=="nmkb"){
@@ -891,14 +931,14 @@ WSLSpred <- function(i, s, theta){
   
   # print(paste("i:", i, "s:", s))
   
-  eta <- theta[1]
-  wAll <- theta[2]
-  wNoth <- theta[3]
-  wLef <- theta[4]
-  wIn <- theta[5]
-  alpha <- theta[6]
-  beta <- theta[7]
-  gamma <- theta[8]
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  eta <- theta[8]
   
   aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
   #  aux <- rep(w, 8)
@@ -920,8 +960,8 @@ WSLSpred <- function(i, s, theta){
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
   }
   
-  # probs <- attractiveness / sum(attractiveness)
-  probs <- exp(eta * attractiveness) / sum(exp(eta * attractiveness))
+  probs <- attractiveness / sum(attractiveness)
+  # probs <- exp(eta * attractiveness) / sum(exp(eta * attractiveness))
   probs <- replace(probs,probs<lowerEps2,lowerEps2)
   probs <- replace(probs,probs>highEps2,highEps2)
   
@@ -933,7 +973,7 @@ WSLSpred <- function(i, s, theta){
 
 # A function to get deviance from WSLS 
 WSLSutil <- function(x1, x2, x3, x4, x5, x6, x7, x8){
-  # Input: theta, parameter vector of length 8
+  # Input: theta, parameter vector of length 5
   #        args, the dataframe with frequencies
   # Output: Deviance of WSLSpred
   
@@ -1031,8 +1071,7 @@ searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0) {
                             list(lower_limits[8], upper_limits[8]), 
                             list(lower_limits[9], upper_limits[9]), 
                             list(lower_limits[10], upper_limits[10]))
-    params <- params[1:8]
-    # print("Staring parameters:")
+    params <- params[1:7]
     # imprimir(params)
     if (module=="nmkb"){
       bestFit <- searchFit_WSLS_NMKB(params, args)
@@ -1085,11 +1124,10 @@ searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0) {
 
 MBIASESpred <- function(theta){
   
-  eta <- theta[1]
-  wAll <- theta[2]
-  wNoth <- theta[3]
-  wLef <- theta[4]
-  wIn <- theta[5]
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
   
   aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
   #  aux <- rep(w, 8)
@@ -1099,20 +1137,17 @@ MBIASESpred <- function(theta){
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-  
-  probs <- exp(eta * bias) / sum(exp(eta * bias))
-  
-  return(list(probs))
+  return(list(bias))
   
 } # end MBIASESpred
 
 # A function to get deviance from FRA model
-MBIASESutil <- function(x1, x2, x3, x4, x5){
-  # Input: theta, parameter vector of length 5
+MBIASESutil <- function(x1, x2, x3, x4){
+  # Input: theta, parameter vector of length 11
   #        data, the dataframe from which frequencies are obtained
-  # Output: Deviance of MBIASESpred
+  # Output: Deviance of WSLSpred for all regions and scores
   
-  theta <- c(x1, x2, x3, x4, x5)
+  theta <- c(x1, x2, x3, x4)
   
   if (any(is.na(theta))) {
     print('Incorrect parameters: ')
@@ -1165,10 +1200,9 @@ searchFit_MBiases_NMKB <- function(params, args, max_iter=10) {
                 fn = function(t) MBIASESutil(t[1], 
                                          t[2],
                                          t[3],
-                                         t[4],
-                                         t[5]),
-                lower=lower_limits[1:5],
-                upper=upper_limits[1:5],
+                                         t[4]),
+                lower=lower_limits[1:4],
+                upper=upper_limits[1:4],
                 control=list(trace=0))
       contador <- max_iter + 2
       return(f)
@@ -1202,7 +1236,7 @@ searchBestFit_MBiases <- function(args, N=1, module="nmkb", contador=0) {
                             list(lower_limits[8], upper_limits[8]), 
                             list(lower_limits[9], upper_limits[9]), 
                             list(lower_limits[10], upper_limits[10]))
-    params <- params[1:5]
+    params <- params[1:4]
     # imprimir(params)
     if (module=="nmkb"){
       bestFit <- searchFit_MBiases_NMKB(params, args)

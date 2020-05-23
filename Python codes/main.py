@@ -23,7 +23,11 @@ rounds = 60 # number of rounds
 dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
-RM.data_for_confusion_matrix(gameParameters, 10)
+modelParameters = [0, 0.1, 0.1, 0.1, 0.1, 500, 1000, 31.5, 0, 0, 0] #PL1
+modelParameters += modelParameters # Both players have equal parameters
+RM.parameter_sweep_softmax(gameParameters, modelParameters)
+
+# RM.data_for_confusion_matrix(gameParameters, 10)
 
 # # Model Parameters BIAS
 # modelParameters = [0.1, 0.083, 0.05, 0.006, 0, 0, 0, 0, 0, 0] #PL1
