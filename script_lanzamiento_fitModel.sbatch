@@ -9,4 +9,4 @@
 cd R\ codes/
 module load R
 
-Rscript ConfusionMatrix.R
+Rscript fitModel.R
