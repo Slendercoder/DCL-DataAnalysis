@@ -20,10 +20,10 @@ p = 0.5 # probability of there being a unicorn
 pl = 2 # number of players
 n = 8 # number of rows/columns in grid
 rounds = 60 # number of rounds
-dyads = 50 # number of dyads
+dyads = 200 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
-modelParameters = [0, 0.1, 0.1, 0.1, 0.1, 10, 1000, 31.5, 0, 0, 0] #PL1
+modelParameters = [0, 0.05, 0.05, 0.05, 0.05, 100, 1000, 31.5, 0, 0, 0] #PL1
 modelParameters += modelParameters # Both players have equal parameters
 RM.parameter_sweep_softmax(gameParameters, modelParameters)
 
