@@ -152,6 +152,43 @@ plot_FocalTransitions <- function(df) {
   
 }
 
+plot_FocalTransitions1 <- function(df) {
+  
+  df <- df[df$Region != 'RS', ]
+  
+  min_score <- 0
+  max_score <- 33
+  
+  gOTHER2OTHER <- ggplot() +
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("Score") +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Re-select focal") +
+    theme_bw()
+  
+  regiones <- c('ALL', 'NOTHING', 
+                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'IN', 'OUT')
+  
+  x <- 2
+  for (other in regiones) {
+    df_Focal <- df[df$Region == other, ]
+    df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
+    print(dim(df_Focal))
+    gOTHER2OTHER <- gOTHER2OTHER +
+      geom_point(aes(x = Score, 
+                     y = Freqs, 
+                     color=cbPalette[x]), 
+                 df_Focal, alpha = alpha, size=1.5)
+    x <- x + 1
+  }
+  
+  return (gOTHER2OTHER)
+  
+}
+
 plot_ModelTransitions_RS <- function(theta, pl, plColor) {
   
   xs <- seq(-128,32,length.out=161)

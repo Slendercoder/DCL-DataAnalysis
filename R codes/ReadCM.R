@@ -13,7 +13,7 @@ Columns <- c('Model', 'Num',
 fittedPars <- data.frame(t(c('MB', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
 colnames(fittedPars) <- Columns
 fittedPars <- fittedPars[-1, ]
-a <- seq(0, 13)
+a <- seq(0, 9)
 for (contador in a) {
   pars <- c('MB', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   rotulo <- paste('MB', contador, sep="")
