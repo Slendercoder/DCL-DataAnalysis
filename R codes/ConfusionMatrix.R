@@ -8,23 +8,31 @@ fitModels2Data <- function(args, contador=0) {
   
   Trials <- 5
   
-  cm <- c(1000000, 1000000, 1000000)
-  
   f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador)
   f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador)
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb", contador)
-  print(cat("MBiases dev: ",f_MBi$value))
-  imprimir(f_MBi$par)
-  cm[1] <- f_MBi$value
   print("--------------")
-  print(cat("WSLS dev: ",f_WSLS$value))
-  imprimir(f_WSLS$par)
-  cm[2] <- f_WSLS$value
+  tryCatch({
+    print(cat("MBiases dev: ",f_MBi$value))
+    imprimir(f_MBi$par)
+  }, error = function(e) {
+    print("Optimizer didn't work for MBiases")
+  })
   print("--------------")
-  print(cat("FRA dev: ",f_FRA$value))
-  imprimir(f_FRA$par)
-  cm[3] <- f_FRA$value
-  
+  tryCatch({
+    print(cat("WSLS dev: ",f_WSLS$value))
+    imprimir(f_WSLS$par)
+  }, error = function(e) {
+    print("Optimizer didn't work for WSLS")
+  })
+  print("--------------")
+  tryCatch({
+    print(cat("FRA dev: ",f_FRA$value))
+    imprimir(f_FRA$par)
+  }, error = function(e) {
+    print("Optimizer didn't work for FRA")
+  })
+
   return(cm)
   
 } # end fitModels2Data
