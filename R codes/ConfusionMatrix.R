@@ -40,7 +40,7 @@ matriz <- data.frame(model)
 
 a <- seq(0, 9)
 for (contador in a) {
-  archivo <- paste("../Data/Confusion/MB", contador, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Simulations/MB", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
   df$Region <- df$Category
@@ -55,7 +55,7 @@ for (contador in a) {
   MB <- fitModels2Data(args, rotulo)
   matriz <- cbind(matriz, data.frame(MB))
   
-  archivo <- paste("../Data/Confusion/WS", contador, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Simulations/WS", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
   df$Region <- df$Category
@@ -70,7 +70,7 @@ for (contador in a) {
   WS <- fitModels2Data(args, rotulo)
   matriz <- cbind(matriz, data.frame(WS))
   
-  archivo <- paste("../Data/Confusion/FR", contador, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Simulations/FR", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
   df$Region <- df$Category
