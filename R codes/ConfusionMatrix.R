@@ -33,7 +33,7 @@ fitModels2Data <- function(args, contador=0) {
     print("Optimizer didn't work for FRA")
   })
 
-  return(cm)
+  return("Ok")
   
 } # end fitModels2Data
 
@@ -61,8 +61,7 @@ for (contador in a) {
   print(head(args))
   rotulo <- paste('MB', contador, sep="")
   MB <- fitModels2Data(args, rotulo)
-  matriz <- cbind(matriz, data.frame(MB))
-  
+
   archivo <- paste("../Data/Confusion/Simulations/WS", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
@@ -76,8 +75,7 @@ for (contador in a) {
   print(head(args))
   rotulo <- paste('WS', contador, sep="")
   WS <- fitModels2Data(args, rotulo)
-  matriz <- cbind(matriz, data.frame(WS))
-  
+
   archivo <- paste("../Data/Confusion/Simulations/FR", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))
   df = read.csv(archivo)
@@ -91,7 +89,6 @@ for (contador in a) {
   print(head(args))
   rotulo <- paste('FR', contador, sep="")
   FR <- fitModels2Data(args, rotulo)
-  matriz <- cbind(matriz, data.frame(FR))
+
 }
 
-write.csv(matriz, "confusion_matrix.csv", row.names = FALSE)
