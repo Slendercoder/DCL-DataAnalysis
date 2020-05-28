@@ -7,7 +7,7 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args) {
   
-  Trials <- 1
+  Trials <- 10
   
   pars <- c(list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
@@ -22,22 +22,28 @@ fitModels2Data <- function(args) {
   tryCatch({
     print(cat("MBiases dev: ",f_MBi$value))
     imprimir(f_MBi$par)
+    pars <- f_MBi$par
   }, error = function(e) {
     print("Optimizer didn't work for MBiases")
+    pars <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
   print("--------------")
   tryCatch({
     print(cat("WSLS dev: ",f_WSLS$value))
     imprimir(f_WSLS$par)
+    pars <- f_WSLS$par
   }, error = function(e) {
     print("Optimizer didn't work for WSLS")
+    pars <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
   print("--------------")
   tryCatch({
     print(cat("FRA dev: ",f_FRA$value))
     imprimir(f_FRA$par)
+    pars <- f_FRA$par
   }, error = function(e) {
     print("Optimizer didn't work for FRA")
+    pars <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
 
   return(pars)
@@ -59,7 +65,8 @@ args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
 print("Data prepared!")
-# parametros <- fitModels2Data(args)
+parametros <- fitModels2Data(args)
+print(parametros)
 
 #################################################
 # To try individual cases
@@ -97,21 +104,6 @@ print("Data prepared!")
 # warnings()
 # f <- searchBestFit_MBiases(args)
 # f <- searchBestFit_WSLS(args, 10)
-
-###########################################
-print("-------------------")
-f <- searchBestFit_MBiases(args)
-print(cat("WSLS dev: ",f$value))
-imprimir(f$par)
-print("-------------------")
-f <- searchBestFit_WSLS(args)
-print(cat("FRA dev: ",f$value))
-imprimir(f$par)
-print("-------------------")
-f <- searchBestFit_FRA(args)
-print(cat("FRA dev: ",f$value))
-imprimir(f$par)
-print("-------------------")
 
 ####################################################
 # Plotting...
