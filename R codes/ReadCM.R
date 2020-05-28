@@ -17,7 +17,7 @@ a <- seq(0, 9)
 for (contador in a) {
   pars <- c('MB', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   rotulo <- paste('MB', contador, sep="")
-  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$par <- as.double(df$par)
   aux <- df$par
@@ -30,7 +30,7 @@ for (contador in a) {
 for (contador in a) {
   pars <- c('WS', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   rotulo <- paste('WS', contador, sep="")
-  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$par <- as.double(df$par)
   aux <- df$par
@@ -43,7 +43,7 @@ for (contador in a) {
 for (contador in a) {
   pars <- c('FR', contador, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   rotulo <- paste('FR', contador, sep="")
-  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$par <- as.double(df$par)
   aux <- df$par
@@ -61,7 +61,7 @@ fittedPars <- fittedPars %>%
          'Delta', 'Epsilon', 'Zeta', 'Exp')
 head(fittedPars)
 
-archivo <- '../Data/Confusion/sim_data_rel.csv'
+archivo <- '../Data/Confusion/Simulations/sim_data_rel.csv'
 realPars = read.csv(archivo)
 realPars$Exp <- as.character("Real")
 head(realPars)

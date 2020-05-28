@@ -32,8 +32,8 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.0001
 highEps2 =.9999
 
-lower_limits=c(0,0,0,0,0,999,0,0,999,0)
-upper_limits=c(0.12,0.12,0.12,0.12,1000,1000,32,1.5,1000,1)
+lower_limits=c(0,0,0,0,0,299,0,0,999,0)
+upper_limits=c(0.12,0.12,0.12,0.12,600,300,32,1000,1000,1)
 
 ###########################
 # Define functions
@@ -594,7 +594,7 @@ FRApred <- function(i, iV, s, j, theta) {
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-  #  imprimir(bias)
+  imprimir(bias)
   
   # Start from biases
   attractiveness <- bias
@@ -623,6 +623,10 @@ FRApred <- function(i, iV, s, j, theta) {
 
 FRApred1 <- function(i, iV, s, j, FRASims, theta) {
   
+  FRASims <- data.frame(FRASims)[,1]
+  # print('FRASims')
+  # print(FRASims)
+  
   wAll <- theta[1]
   wNoth <- theta[2]
   wLef <- theta[3]
@@ -641,7 +645,8 @@ FRApred1 <- function(i, iV, s, j, FRASims, theta) {
     aux <- aux/sum(aux)
   }
   bias <- c(1 - sum(aux), aux)
-  #  imprimir(bias)
+  # print('bias')
+  # imprimir(bias)
   
   # Start from biases
   attractiveness <- bias
@@ -651,18 +656,21 @@ FRApred1 <- function(i, iV, s, j, FRASims, theta) {
   if (i != 'RS') {
     attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
   }
-  #  print('Attractiveness with WS:')
-  #  imprimir(attractiveness)
+  # print('Attractiveness with WS:')
+  # imprimir(attractiveness)
   
   similarities <- delta * sigmoid(unlist(FRASims), epsilon, zeta)
   similarities <- c(0, unlist(similarities))
   attractiveness <- attractiveness + similarities
+  # print('Attractiveness with FRAsim:')
+  # imprimir(attractiveness)
   
   probs <- attractiveness / sum(attractiveness)
   probs <- replace(probs,probs<lowerEps2,lowerEps2)
   probs <- replace(probs,probs>highEps2,highEps2)
   
-  # print(imprimir(probs))
+  # print('Probabilities:')
+  # imprimir(probs)
   return(list(probs))
 
 } # End FRApred1
@@ -938,8 +946,7 @@ WSLSpred <- function(i, s, theta){
   alpha <- theta[5]
   beta <- theta[6]
   gamma <- theta[7]
-  eta <- theta[8]
-  
+
   aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
   #  aux <- rep(w, 8)
   # The probability of region 'RS' is 1 - the sum of the other probabilities
@@ -961,7 +968,6 @@ WSLSpred <- function(i, s, theta){
   }
   
   probs <- attractiveness / sum(attractiveness)
-  # probs <- exp(eta * attractiveness) / sum(exp(eta * attractiveness))
   probs <- replace(probs,probs<lowerEps2,lowerEps2)
   probs <- replace(probs,probs>highEps2,highEps2)
   
@@ -972,12 +978,12 @@ WSLSpred <- function(i, s, theta){
 
 
 # A function to get deviance from WSLS 
-WSLSutil <- function(x1, x2, x3, x4, x5, x6, x7, x8){
+WSLSutil <- function(x1, x2, x3, x4, x5, x6, x7){
   # Input: theta, parameter vector of length 5
   #        args, the dataframe with frequencies
   # Output: Deviance of WSLSpred
   
-  theta <- c(x1, x2, x3, x4, x5, x6, x7, x8)
+  theta <- c(x1, x2, x3, x4, x5, x6, x7)
   
   if (any(is.na(theta))) {
     print('Incorrect parameters: ')
@@ -1034,10 +1040,9 @@ searchFit_WSLS_NMKB <- function(params, args, max_iter=10) {
                                           t[4],
                                           t[5],
                                           t[6],
-                                          t[7],
-                                          t[8]),
-                lower=lower_limits[1:8],
-                upper=upper_limits[1:8],
+                                          t[7]),
+                lower=lower_limits[1:7],
+                upper=upper_limits[1:7],
                 control=list(trace=0))
       contador <- max_iter + 2
       return(f)

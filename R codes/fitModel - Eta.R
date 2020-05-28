@@ -1,3 +1,4 @@
+source("MODELpred.R")
 # source("Model_Plots.R")
 
 ###############################################################
@@ -60,42 +61,20 @@ print(head(args))
 print("Data prepared!")
 # parametros <- fitModels2Data(args)
 
-n <- 100
-i <- args$Region[n]
-iV <- args$RegionFULL[n] 
-s <- args$Score[n]
-j <- args$RJcode[n]
-Fsims <- args$FRASims[n]
-
-theta <- c(0.001, 0.001, 0.001, 0.001, 0.1, 299.5, 7, 0, 1000, 0.8)
-
-wAll <- theta[1]
-wNoth <- theta[2]
-wLef <- theta[3]
-wIn <- theta[4]
-alpha <- theta[5]
-beta <- theta[6]
-gamma <- theta[7]
-delta <- theta[8]
-epsilon <- theta[9]
-zeta <- theta[10]
-
-params <- theta
-MBIASESpred(params)
-WSLSpred(i, s, params)
-FRApred1(i, iv, s, j, Fsims, params)
-
 source("MODELpred.R")
 
-MBIASESutil(wAll, wNoth, wLef, wIn)
-WSLSutil(wAll, wNoth, wLef, wIn, 
-         alpha, beta, gamma)
-FRAutil(wAll, wNoth, wLef, wIn, 
-        alpha, beta, gamma, 
-        delta, epsilon, zeta)
+params <- c(4, 0.01, 0.01, 0.01, 0.01, 10, 1000, 10)
+MBIASESpred(params)
+WSLSpred("LEFT", 11, params)
+FRApred("LEFT", regionsCoded[5], 11, "", 0, params)
 
-f <- searchFit_MBiases_NMKB(params[1:4], args)
-f <- searchFit_WSLS_NMKB(params[1:7], args)
+
+MBIASESutil(1, 0.01, 0.04, 0.008, 0.001)
+WSLSutil(1, 0.01, 0.04, 0.008, 0.001, 1000, 10)
+FRAutil(4, 0.12, 0.12, 0.12, 0.12, 100, 1000, 32, 0, 0, 0)
+
+f <- searchFit_MBiases_NMKB(params, args)
+f <- searchFit_WSLS_NMKB(params, args)
 
 warnings()
 
