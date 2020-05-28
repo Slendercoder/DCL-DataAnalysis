@@ -1,3 +1,4 @@
+source("MODELpred.R")
 # source("Model_Plots.R")
 
 ###############################################################
@@ -60,65 +61,57 @@ print(head(args))
 print("Data prepared!")
 # parametros <- fitModels2Data(args)
 
-n <- 100
-i <- args$Region[n]
-iV <- args$RegionFULL[n] 
-s <- args$Score[n]
-j <- args$RJcode[n]
-Fsims <- args$FRASims[n]
-
-theta <- c(0.001, 0.001, 0.001, 0.001, 0.1, 299.5, 7, 0, 1000, 0.8)
-
-wAll <- theta[1]
-wNoth <- theta[2]
-wLef <- theta[3]
-wIn <- theta[4]
-alpha <- theta[5]
-beta <- theta[6]
-gamma <- theta[7]
-delta <- theta[8]
-epsilon <- theta[9]
-zeta <- theta[10]
-
-params <- theta
-MBIASESpred(params)
-WSLSpred(i, s, params)
-FRApred1(i, iv, s, j, Fsims, params)
-
-source("MODELpred.R")
-
-MBIASESutil(wAll, wNoth, wLef, wIn)
-WSLSutil(wAll, wNoth, wLef, wIn, 
-         alpha, beta, gamma)
-FRAutil(wAll, wNoth, wLef, wIn, 
-        alpha, beta, gamma, 
-        delta, epsilon, zeta)
-
-f <- searchFit_MBiases_NMKB(params[1:4], args)
-f <- searchFit_WSLS_NMKB(params[1:7], args)
-
-warnings()
-
-f <- searchBestFit_MBiases(args)
-f <- searchBestFit_WSLS(args, 10)
-
+#################################################
+# To try individual cases
+#################################################
+# n <- 100
+# i <- args$Region[n]
+# iV <- args$RegionFULL[n] 
+# s <- args$Score[n]
+# j <- args$RJcode[n]
+# Fsims <- args$FRASims[n]
+# theta <- c(0.001, 0.001, 0.001, 0.001, 0.1, 299.5, 7, 0, 1000, 0.8)
+# wAll <- theta[1]
+# wNoth <- theta[2]
+# wLef <- theta[3]
+# wIn <- theta[4]
+# alpha <- theta[5]
+# beta <- theta[6]
+# gamma <- theta[7]
+# delta <- theta[8]
+# epsilon <- theta[9]
+# zeta <- theta[10]
+# params <- theta
+# MBIASESpred(params)
+# WSLSpred(i, s, params)
+# FRApred1(i, iv, s, j, Fsims, params)
+# MBIASESutil(wAll, wNoth, wLef, wIn)
+# WSLSutil(wAll, wNoth, wLef, wIn, 
+#          alpha, beta, gamma)
+# FRAutil(wAll, wNoth, wLef, wIn, 
+#         alpha, beta, gamma, 
+#         delta, epsilon, zeta)
+# 
+# f <- searchFit_MBiases_NMKB(params[1:4], args)
+# f <- searchFit_WSLS_NMKB(params[1:7], args)
+# warnings()
+# f <- searchBestFit_MBiases(args)
+# f <- searchBestFit_WSLS(args, 10)
 
 ###########################################
-# print("-------------------")
-# params <- c(0.01, 0.01, 0.08, 0.001, 10, 100, 30)
-# f <- searchFit_WSLS_NMKB(params, args)
-# print(cat("WSLS dev: ",f$value))
-# imprimir(f$par)
-# print("-------------------")
-# params <- c(0.01, 0.01, 0.08, 0.001, 10, 10, 30, 10, 10, 0.7)
-# f <- searchFit_FRA_NMKB(params, args)
-# print(cat("FRA dev: ",f$value))
-# imprimir(f$par)
-# print("-------------------")
-# f <- searchBestFit_FRA(args, 5)
-# print(cat("FRA dev: ",f$value))
-# imprimir(f$par)
-# print("-------------------")
+print("-------------------")
+f <- searchBestFit_MBiases(args)
+print(cat("WSLS dev: ",f$value))
+imprimir(f$par)
+print("-------------------")
+f <- searchBestFit_WSLS(args)
+print(cat("FRA dev: ",f$value))
+imprimir(f$par)
+print("-------------------")
+f <- searchBestFit_FRA(args)
+print(cat("FRA dev: ",f$value))
+imprimir(f$par)
+print("-------------------")
 
 ####################################################
 # Plotting...
