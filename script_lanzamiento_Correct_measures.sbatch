@@ -6,7 +6,7 @@
 #SBATCH -o slurm.%N.%j.out      # STDOUT
 #SBATCH -e slurm.%N.%j.err      # STDERR
 
-cd Python\ Codes/
+cd Python\ codes/
 module load python3.6/3.6.6
 
 python3.6 correct_measures.py
