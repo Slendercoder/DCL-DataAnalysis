@@ -191,7 +191,7 @@ plot_FocalTransitions1 <- function(df) {
 
 plot_ModelTransitions_RS <- function(theta, pl, plColor) {
   
-  xs <- seq(-128,32,length.out=161)
+  xs <- seq(0,32,length.out=200)
   fitRS <- sapply(xs, WSprob, i='RS', k='RS', theta=theta)
   dfB <- data.frame(xs, fitRS)
   pl <- pl +
@@ -202,7 +202,7 @@ plot_ModelTransitions_RS <- function(theta, pl, plColor) {
 
 plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
   
-  xs <- seq(-128,32,length.out=161)
+  xs <- seq(0,32,length.out=200)
   regiones <- c('ALL', 'NOTHING', 
                 'DOWN', 'UP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')

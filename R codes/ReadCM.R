@@ -68,7 +68,7 @@ head(realPars)
 
 dim(fittedPars)
 dim(realPars)
-realPars <- realPars[1:42, ]
+# realPars <- realPars[1:16, ]
 df <- rbind(realPars, fittedPars)
 head(df)
 data <- df
@@ -116,7 +116,7 @@ for (contador in a) {
   
   pars <- c('MB', contador, 'MB', 0)
   rotulo <- paste('MB', contador, sep="")
-  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -126,7 +126,7 @@ for (contador in a) {
 
   pars <- c('MB', contador, 'WS', 0)
   rotulo <- paste('WS', contador, sep="")
-  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -136,7 +136,7 @@ for (contador in a) {
   
   pars <- c('MB', contador, 'FR', 0)
   rotulo <- paste('FR', contador, sep="")
-  archivo <- paste("MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/MBiases_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -146,7 +146,7 @@ for (contador in a) {
 
   pars <- c('WS', contador, 'MB', 0)
   rotulo <- paste('MB', contador, sep="")
-  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -156,7 +156,7 @@ for (contador in a) {
   
   pars <- c('WS', contador, 'WS', 0)
   rotulo <- paste('WS', contador, sep="")
-  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -166,7 +166,7 @@ for (contador in a) {
   
   pars <- c('WS', contador, 'FR', 0)
   rotulo <- paste('FR', contador, sep="")
-  archivo <- paste("WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -176,7 +176,7 @@ for (contador in a) {
   
   pars <- c('FR', contador, 'MB', 0)
   rotulo <- paste('MB', contador, sep="")
-  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -186,7 +186,7 @@ for (contador in a) {
   
   pars <- c('FR', contador, 'WS', 0)
   rotulo <- paste('WS', contador, sep="")
-  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -196,7 +196,7 @@ for (contador in a) {
   
   pars <- c('FR', contador, 'FR', 0)
   rotulo <- paste('FR', contador, sep="")
-  archivo <- paste("FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
+  archivo <- paste("../Data/Confusion/Estimations/FRA_Parameter_fit_nmkb_", rotulo, ".csv", sep="")
   df = read.csv(archivo)
   df$value <- as.double(df$value)
   pars[4] <- unique(df$value)
@@ -216,7 +216,7 @@ fittedDev$ModelFitted <- factor(fittedDev$ModelFitted,
                                     levels=c('MB', 'WS', 'FR'))
 fittedDev <- fittedDev %>%
   dplyr::group_by(Num, Simulated_Model) %>%
-  dplyr::summarize(Fit_Model = which(Dev == min(Dev)))
+  dplyr::summarize(Fit_Model = which(Dev == min(Dev))[1])
 
 fittedDev$Fit_Model <- lapply(fittedDev$Fit_Model, function(x) {
   if(x==1) {

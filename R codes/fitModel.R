@@ -1,5 +1,5 @@
 source("MODELpred.R")
-# source("Model_Plots.R")
+source("Model_Plots.R")
 
 ###############################################################
 # Parameter recovery function
@@ -109,41 +109,39 @@ print(parametros)
 # Plotting...
 ####################################################
 
-# WS_color <- cbPalette[5]
-# FR_color <- cbPalette[7]
-# min_score = 0
-# legend2 <- get_legend_from_dummy1(WS_color, FR_color)
-# #theta <- c(0.1, 0.083, 0.05, 0.006, 0, 0, 0, 0, 0, 0)
-# thetaWS <- c(0.086, 0.043, 0.011, 0.002, 6.596, 499.806, 4.564, 0, 0, 0)
-# thetaFR <- c(0.080, 0.041, 0.010, 0.002, 496.038, 499.921, 4.407, 469.507, 499.574, 0.758)
+WS_color <- cbPalette[5]
+FR_color <- cbPalette[7]
+min_score = 0
+legend2 <- get_legend_from_dummy1(WS_color, FR_color)
+#theta <- c(0.1, 0.083, 0.05, 0.006, 0, 0, 0, 0, 0, 0)
+thetaWS <- c(0.085, 0.042, 0.015, 0.002, 6.746, 1000, 4.218, 0, 0, 0)
+thetaFR <- c(0.063, 0.035, 0.006, 0.002, 10.106, 1000, 30, 0.485, 1000, 0.978)
 
-# # PLOT WSLS AT INDIVIDUAL LEVEL
-# archivo <- "../Data/humans_only_absent.csv"
-# print(paste("Loading and preparing data", archivo, "..."))
-# df = read.csv(archivo)
-# df$Region <- df$Category
-# df <- getRelFreq_Rows(df)
+# PLOT WSLS AT INDIVIDUAL LEVEL
+archivo <- "../Data/humans_only_absent.csv"
+print(paste("Loading and preparing data", archivo, "..."))
+df = read.csv(archivo)
+df$Region <- df$Category
+df <- getRelFreq_Rows(df)
 # d1 <- plot_RSTransitions(df)
 # d1 <- plot_ModelTransitions_RS(thetaFR, d1, FR_color)
 # d1 <- plot_ModelTransitions_RS(thetaWS, d1, WS_color)
-# 
-# d2 <- plot_FocalTransitions(df)
-# d2 <- plot_ModelTransitions_Focal(thetaWS, d2, WS_color)
-# d2 <- plot_ModelTransitions_Focal(thetaFR, d2, FR_color)
 
-# grid.arrange(d1, d2, top=legend2, nrow = 1)
-# 
-# # PLOT FRA AT INDIVIDUAL LEVEL
-# archivo <- "../Data/humans_only_absent.csv"
-# print(paste("Loading and preparing data", archivo, "..."))
-# df = read.csv(archivo)
-# df$Region <- df$Category
-# df <- find_joint_region(df)
-# df <- get_FRASims(df)
-# regs <- c('ALL', 'LEFT')
-# p <- plot_FRA_regs(df, regs, thetaFR)
-# 
-# q <- grid.arrange(d2, p, nrow=1, widths=c(1/3, 2/3), bottom=legend2)
+d2 <- plot_FocalTransitions(df)
+d2 <- plot_ModelTransitions_Focal(thetaWS, d2, WS_color)
+d2 <- plot_ModelTransitions_Focal(thetaFR, d2, FR_color)
+
+# PLOT FRA AT INDIVIDUAL LEVEL
+archivo <- "../Data/humans_only_absent.csv"
+print(paste("Loading and preparing data", archivo, "..."))
+df = read.csv(archivo)
+df$Region <- df$Category
+df <- find_joint_region(df)
+df <- get_FRASims(df)
+regs <- c('ALL', 'LEFT')
+p <- plot_FRA_regs(df, regs, thetaFR)
+
+q <- grid.arrange(d2, p, nrow=1, widths=c(1/3, 2/3), bottom=legend2)
 
 # 
 # a <- c(0)

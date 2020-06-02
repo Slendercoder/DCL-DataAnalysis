@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data = pd.read_csv("humans.csv", index_col=False)
+data = pd.read_csv("../Data/humans_only_absent.csv", index_col=False)
 
 fig2, axes2 = plt.subplots()
 
