@@ -1,5 +1,5 @@
-source("MODELpred.R")
 source("Model_Plots.R")
+source("MODELpred.R")
 
 ###############################################################
 # Parameter recovery function
@@ -7,43 +7,43 @@ source("Model_Plots.R")
 
 fitModels2Data <- function(args) {
   
-  Trials <- 10
+  Trials <- 1
   
-  pars <- c(list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
+  pars <- list(list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
   
-  print("Fitting MBiases...")
-  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
+  # print("Fitting MBiases...")
+  # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
   print("Fitting WSLS...")
   f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
-  print("Fitting FRA...")
-  f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
+  # print("Fitting FRA...")
+  # f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
   tryCatch({
     print(cat("MBiases dev: ",f_MBi$value))
     imprimir(f_MBi$par)
-    pars <- f_MBi$par
+    pars[[1]] <- f_MBi$par
   }, error = function(e) {
     print("Optimizer didn't work for MBiases")
-    pars <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    pars[[1]] <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
   print("--------------")
   tryCatch({
     print(cat("WSLS dev: ",f_WSLS$value))
     imprimir(f_WSLS$par)
-    pars <- f_WSLS$par
+    pars[[2]] <- f_WSLS$par
   }, error = function(e) {
     print("Optimizer didn't work for WSLS")
-    pars <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    pars[[2]] <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
   print("--------------")
   tryCatch({
     print(cat("FRA dev: ",f_FRA$value))
     imprimir(f_FRA$par)
-    pars <- f_FRA$par
+    pars[[3]] <- f_FRA$par
   }, error = function(e) {
     print("Optimizer didn't work for FRA")
-    pars <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    pars[[3]] <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
 
   return(pars)
@@ -52,10 +52,20 @@ fitModels2Data <- function(args) {
 
 ####################################################
 
-archivo <- "../Data/humans_only_absent.csv"
+# archivo <- "../Data/Confusion/Simulations/MB7.csv"
+archivo <- "../Data/Confusion/Simulations/WS2.csv"
+# archivo <- "../Data/Confusion/Simulations/FR7.csv"
+# archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
+
+p <- plot_individual_behavior(df)
+p1 <- p[[1]]
+p2 <- p[[2]]
+p3 <- p[[3]]
+pl <- grid.arrange(p1, p2, p3, nrow=1)
+
 df$Region <- df$Category
 df <- find_joint_region(df)
 df$RegionFULL <- unlist(df$RegionFULL)
@@ -65,8 +75,18 @@ args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
 print("Data prepared!")
+
 parametros <- fitModels2Data(args)
 print(parametros)
+
+thetaWS <- parametros[[2]]
+thetaFR <- parametros[[3]]
+
+p <- plot_model_on_top_behavior(thetaWS, thetaFR, p1, p2, p3)
+p1 <- p[[1]]
+p2 <- p[[2]]
+p3 <- p[[3]]
+pl <- grid.arrange(p1, p2, p3, nrow=1)
 
 #################################################
 # To try individual cases
@@ -108,40 +128,6 @@ print(parametros)
 ####################################################
 # Plotting...
 ####################################################
-
-WS_color <- cbPalette[5]
-FR_color <- cbPalette[7]
-min_score = 0
-legend2 <- get_legend_from_dummy1(WS_color, FR_color)
-#theta <- c(0.1, 0.083, 0.05, 0.006, 0, 0, 0, 0, 0, 0)
-thetaWS <- c(0.085, 0.042, 0.015, 0.002, 6.746, 1000, 4.218, 0, 0, 0)
-thetaFR <- c(0.063, 0.035, 0.006, 0.002, 10.106, 1000, 30, 0.485, 1000, 0.978)
-
-# PLOT WSLS AT INDIVIDUAL LEVEL
-archivo <- "../Data/humans_only_absent.csv"
-print(paste("Loading and preparing data", archivo, "..."))
-df = read.csv(archivo)
-df$Region <- df$Category
-df <- getRelFreq_Rows(df)
-# d1 <- plot_RSTransitions(df)
-# d1 <- plot_ModelTransitions_RS(thetaFR, d1, FR_color)
-# d1 <- plot_ModelTransitions_RS(thetaWS, d1, WS_color)
-
-d2 <- plot_FocalTransitions(df)
-d2 <- plot_ModelTransitions_Focal(thetaWS, d2, WS_color)
-d2 <- plot_ModelTransitions_Focal(thetaFR, d2, FR_color)
-
-# PLOT FRA AT INDIVIDUAL LEVEL
-archivo <- "../Data/humans_only_absent.csv"
-print(paste("Loading and preparing data", archivo, "..."))
-df = read.csv(archivo)
-df$Region <- df$Category
-df <- find_joint_region(df)
-df <- get_FRASims(df)
-regs <- c('ALL', 'LEFT')
-p <- plot_FRA_regs(df, regs, thetaFR)
-
-q <- grid.arrange(d2, p, nrow=1, widths=c(1/3, 2/3), bottom=legend2)
 
 # 
 # a <- c(0)

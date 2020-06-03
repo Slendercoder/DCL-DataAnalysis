@@ -32,7 +32,7 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.0001
 highEps2 =.9999
 
-lower_limits=c(0,0,0,0,0,999,0,0,999,0)
+lower_limits=c(0,0,0,0,0,999,0,0,999,0.5)
 upper_limits=c(0.12,0.12,0.12,0.12,600,1000,32,1000,1000,1)
 
 ###########################
@@ -692,16 +692,25 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   
   # Calculate the probabilities based on FRApred
   #  print('Calculating probabilities')
-  args <- args %>%
-    dplyr::group_by(RegionFULL, Score, RJcode) %>%
-    dplyr::mutate(probs = FRApred1(Region, 
-                                  RegionFULL,
-                                  Score, 
-                                  RJcode,
-                                  FRASims,
-                                  theta)
-  ) %>%
-    ungroup()
+  # args <- args %>%
+  #   dplyr::group_by(RegionFULL, Score, RJcode) %>%
+  #   dplyr::mutate(probs = FRApred1(Region, 
+  #                                 RegionFULL,
+  #                                 Score, 
+  #                                 RJcode,
+  #                                 FRASims,
+  #                                 theta)
+  # ) %>%
+  #   ungroup()
+  args$probs <- mapply(function(i,iv,s,j,f) {
+    return(FRApred1(i,iv,s,j,f,theta))
+  },
+  args$Region, 
+  args$RegionFULL, 
+  args$Score,
+  args$RJcode, 
+  args$FRASims
+  )
   
   # Calculate deviance
   #  print('Calculating deviances')
@@ -729,7 +738,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
 
 } # end FRAutil
 
-searchFit_FRA_MLE2 <- function(params, args, max_iter=5) {
+searchFit_FRA_MLE2 <- function(params, args, max_iter=2) {
 
   contador <- 1
   
@@ -768,7 +777,7 @@ searchFit_FRA_MLE2 <- function(params, args, max_iter=5) {
   
 } # end searchFit_FRA_MLE2
 
-searchFit_FRA_NMKB <- function(params, args, max_iter=10) {
+searchFit_FRA_NMKB <- function(params, args, max_iter=2) {
   
   contador <- 1
   
@@ -994,7 +1003,8 @@ WSLSutil <- function(x1, x2, x3, x4, x5, x6, x7){
   # Calculate the probabilities based on WSLSpred
   #  print('Calculating probabilities')
   args$probs <- mapply(function(i,s) {
-    return(list(WSLSpred(i, s, theta)))
+    # return(list(WSLSpred(i, s, theta)))
+    return((WSLSpred(i, s, theta)))
   },
   args$Region, args$Score)
   
@@ -1024,7 +1034,7 @@ WSLSutil <- function(x1, x2, x3, x4, x5, x6, x7){
   
 } # end WSLSutil
 
-searchFit_WSLS_NMKB <- function(params, args, max_iter=10) {
+searchFit_WSLS_NMKB <- function(params, args, max_iter=2) {
   
   contador <- 1
   
@@ -1164,8 +1174,7 @@ MBIASESutil <- function(x1, x2, x3, x4){
   #  print('Calculating probabilities')
   args <- args %>%
     # dplyr::group_by(RegionFULL, Score, RJcode) %>%
-    dplyr::mutate(probs = MBIASESpred(theta)
-    )
+    dplyr::mutate(probs = MBIASESpred(theta))
   
   # Calculate deviance
   #  print('Calculating deviances')
@@ -1192,7 +1201,7 @@ MBIASESutil <- function(x1, x2, x3, x4){
   
 } # end MBIASESutil
 
-searchFit_MBiases_NMKB <- function(params, args, max_iter=10) {
+searchFit_MBiases_NMKB <- function(params, args, max_iter=2) {
   
   contador <- 1
   

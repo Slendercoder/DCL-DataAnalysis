@@ -376,6 +376,7 @@ def get_measures(data, lista):
         data['Score'] = data.apply(deleteScore, axis=1)
         data['ScoreLEAD'] = data.groupby(['Dyad', 'Player'])\
                                     ['Score'].transform('shift', -1)
+        data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))
         print('List of blocks\n', data[['Round', 'Is_there', 'Score', 'ScoreLEAD']][0:20])
 
     # --------------------------------------------------

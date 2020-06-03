@@ -203,11 +203,15 @@ plot_ModelTransitions_RS <- function(theta, pl, plColor) {
 plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
   
   xs <- seq(0,32,length.out=200)
+  print('xs')
+  print(xs)
   regiones <- c('ALL', 'NOTHING', 
                 'DOWN', 'UP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   for (other in regiones) {
     fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=theta)
+    print('fitFocal')
+    print(fitFocal)
     dfB <- data.frame(xs, fitFocal)
     pl <- pl +
       geom_line(aes(x = xs, y = fitFocal), dfB, color=plColor, size=0.7)
@@ -706,6 +710,7 @@ plot_Transitions_FRASim_k <- function(df1, k) {
   max_score <- 1.2
   rotulo_x <- paste("FRASim", k, sep="")
   titulo <- paste("From RS to", k)
+  print(paste("Plotting", titulo))
   
   # Plot RS to k
   df_Focal <- df1[df1$Region == 'RS', ]
@@ -1390,3 +1395,64 @@ plot_behavioral_data_fit <- function(df1, df2, df3, df4) {
                     nrow=2)
 
 }
+
+plot_individual_behavior <- function(df){
+  
+  plots <- list()
+  df$Region <- df$Category
+  print("Finding WS frequencies...")
+  df1 <- getRelFreq_Rows(df)
+  print(head(df1))
+  print("Plotting WS frequencies...")
+  plots[[1]] <- plot_FocalTransitions(df1)
+  # pl <- grid.arrange(pl, p, nrow=1)
+  print("Finding joint region...")
+  df1 <- find_joint_region(df)
+  print("Finding FRAsims...")
+  df1 <- get_FRASims(df1)
+  print("Plotting FRA frequencies...")
+  regs <- c('ALL', 'LEFT')
+  contador <- 2
+  for (k in regs){
+    print("Finding FRA frequencies...")
+    df2 <- getFreq_based_on_FRASim(df1,k)
+    print(head(df2))
+    plots[[contador]] <- plot_Transitions_FRASim_k(df2, k)    
+    # pl <- grid.arrange(pl, p, nrow=1, widths=c((contador - 1)/contador, 1/contador))
+    contador <- contador + 1
+  }
+  return(plots)
+  
+} # end plot_individual_behavior
+
+plot_model_on_top_behavior <- function(thetaWS, thetaFR, p1, p2, p3) {
+  
+  plots <- list()
+  WS_color <- cbPalette[5]
+  FR_color <- cbPalette[7]
+  min_score = 0
+  legend2 <- get_legend_from_dummy1(WS_color, FR_color)
+  
+  p1 <- plot_ModelTransitions_Focal(thetaWS, p1, WS_color)
+  p1 <- plot_ModelTransitions_Focal(thetaFR, p1, FR_color)
+  p1 <- grid.arrange(p1, bottom=legend2)
+  plots[[1]] <- p1
+  
+  xs <- seq(0,2,length.out=200)
+  regs <- c('ALL', 'LEFT')
+  k <- regs[1]
+  print(paste("Plotting FRA model on FRAsim transition", k))
+  fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo=k, k=k, theta=thetaFR)
+  dfB <- data.frame(xs, fitFocal)
+  plots[[2]] <- p2 +
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=FR_color, size=0.7)
+  k <- regs[2]
+  print(paste("Plotting FRA model on FRAsim transition", k))
+  fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo=k, k=k, theta=thetaFR)
+  dfB <- data.frame(xs, fitFocal)
+  plots[[3]] <- p3 +
+    geom_line(aes(x = xs, y = fitFocal), dfB, color=FR_color, size=0.7)
+  
+  return(plots)  
+  
+} # plot_model_on_top_behavior

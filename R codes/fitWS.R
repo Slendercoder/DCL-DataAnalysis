@@ -3,15 +3,16 @@ library(dfoptim)
 library(bbmle)
 library(beepr)
 
-archivo <- "../Data/humans_only_absent.csv"
+archivo <- "../Data/Confusion/Simulations/WS2.csv"
+# archivo <- "../Data/humans_only_absent.csv"
 df1 = read.csv(archivo, na.strings=c("","NA"))
 df1 <- df1[complete.cases(df1), ]
 df1$Region <- df1$Category
 df1 <- df1[c('Dyad', 'Player', 'Region', 'Score', 'RegionGo')]
 head(df1)
 
-args <- getArgs(df1)
-args <- args[order(-args$s, args$i),] 
+args <- getFreq(df1)
+args <- args[order(-args$Score, args$Region),] 
 args <- args[c('pair', 'freq', 'sumFreq')]
 head(args)
 

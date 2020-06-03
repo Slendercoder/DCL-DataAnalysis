@@ -55,8 +55,9 @@ obtainFreqVector <- function(x) {
 
 getFreq <- function(df) {
   
-  df <- df[complete.cases(df), ]
-  df$Region <- df$Category
+  # df <- df[complete.cases(df), ]
+  # df$Region <- df$Category
+  print(head(df))
   df <- df[c('Region', 'Score', 'RegionGo')]
   df$RegionGo <- factor(df$RegionGo, levels = regiones)
   df <- df %>%
