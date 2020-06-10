@@ -20,8 +20,6 @@ cols = ['a' + str(i + 1) + str(j + 1)\
         ]
 ordenRegions = ['RS', 'ALL', 'NOTHING',\
                 'BOTTOM', 'TOP', 'LEFT', 'RIGHT', 'IN', 'OUT']
-colsProbs = ['RS_e', 'A_e', 'N_e', 'B_e', 'T_e', 'L_e', 'R_e', 'I_e', 'O_e']
-colsFreqs = [x + "_o" for x in ordenRegions]
 
 def list_from_row(r, cols):
 
@@ -56,9 +54,11 @@ def trim_data(data, simplificar=False):
 
     if simplificar:
         # Minimal data frame TO BE COMMENTED FOR USE IN FULL DATA
-        parejas = list(data.Dyad.unique())[:2]
-        rondas = list(data.Round.unique())[:2]
+        Num_parejas = 3
+        Num_rondas = 10
+        parejas = list(data.Dyad.unique())[:Num_parejas]
         data = data[data['Dyad'].isin(parejas)]
+        rondas = list(data.Round.unique())[:Num_rondas]
         data = data[data['Round'].isin(rondas)]
 
     # Keeping only relevant columns
@@ -131,6 +131,8 @@ def get_FRAsims(data):
 
 def get_freqs(data):
 
+    global ordenRegions
+
     data['Dummy'] = data['RegionGo'].apply(lambda x: F.numberRegion(x))
     df = pd.pivot_table(data,\
                         index=["Region", "Score"],\
@@ -139,9 +141,9 @@ def get_freqs(data):
                         aggfunc='count',\
                         fill_value=0).reset_index()
     # print(df.head())
-    regiones = [x for x in ordenRegions if x in df.columns]
-    df['Suma'] = df[regiones].apply('sum', axis=1)
-    for c in regiones:
+    ordenRegions = [x for x in ordenRegions if x in df.columns]
+    df['Suma'] = df[ordenRegions].apply('sum', axis=1)
+    for c in ordenRegions:
         df[c+'_o'] = df[c] / df['Suma']
     del df['Suma']
     return df
@@ -158,22 +160,22 @@ def graficar(df):
                 axes.append(fig.add_subplot(spec[0,0]))
                 axes[-1].set_title('ALL')
                 axes[-1].scatter(x=grp['Score'], y=grp['ALL_o'], alpha=alpha)
-                axes[-1].scatter(x=grp['Score'], y=grp['A_e'], alpha=alpha, marker="x")
+                axes[-1].scatter(x=grp['Score'], y=grp['ALL_e'], alpha=alpha, marker="x")
             if c == 'NOTHING':
                 axes.append(fig.add_subplot(spec[0,1]))
                 axes[-1].set_title('NOTHING')
                 axes[-1].scatter(x=grp['Score'], y=grp['NOTHING_o'], alpha=alpha)
-                axes[-1].scatter(x=grp['Score'], y=grp['N_e'], alpha=alpha, marker="x")
+                axes[-1].scatter(x=grp['Score'], y=grp['NOTHING_e'], alpha=alpha, marker="x")
             if c == 'TOP':
                 axes.append(fig.add_subplot(spec[1,0]))
                 axes[-1].set_title('TOP')
                 axes[-1].scatter(x=grp['Score'], y=grp['TOP_o'], alpha=alpha)
-                axes[-1].scatter(x=grp['Score'], y=grp['T_e'], alpha=alpha, marker="x")
+                axes[-1].scatter(x=grp['Score'], y=grp['TOP_e'], alpha=alpha, marker="x")
             if c == 'LEFT':
                 axes.append(fig.add_subplot(spec[1,1]))
                 axes[-1].set_title('LEFT')
                 axes[-1].scatter(x=grp['Score'], y=grp['LEFT_o'], alpha=alpha, label="Observed")
-                axes[-1].scatter(x=grp['Score'], y=grp['L_e'], alpha=alpha, marker="x", label="Estimated")
+                axes[-1].scatter(x=grp['Score'], y=grp['LEFT_e'], alpha=alpha, marker="x", label="Estimated")
 
     handles, labels = axes[-1].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center')
@@ -190,21 +192,21 @@ def insert_WSLS(df, params):
                                             params,\
                                             Num_Loc), axis=1)
     df['RS_e'] = df['Probs'].apply(lambda x: x[0])
-    df['A_e'] = df['Probs'].apply(lambda x: x[1])
-    df['N_e'] = df['Probs'].apply(lambda x: x[2])
-    df['B_e'] = df['Probs'].apply(lambda x: x[3])
-    df['T_e'] = df['Probs'].apply(lambda x: x[4])
-    df['L_e'] = df['Probs'].apply(lambda x: x[5])
-    df['R_e'] = df['Probs'].apply(lambda x: x[6])
-    df['I_e'] = df['Probs'].apply(lambda x: x[7])
-    df['O_e'] = df['Probs'].apply(lambda x: x[8])
+    df['ALL_e'] = df['Probs'].apply(lambda x: x[1])
+    df['NOTHING_e'] = df['Probs'].apply(lambda x: x[2])
+    df['BOTTOM_e'] = df['Probs'].apply(lambda x: x[3])
+    df['TOP_e'] = df['Probs'].apply(lambda x: x[4])
+    df['LEFT_e'] = df['Probs'].apply(lambda x: x[5])
+    df['RIGHT_e'] = df['Probs'].apply(lambda x: x[6])
+    df['IN_e'] = df['Probs'].apply(lambda x: x[7])
+    df['OUT_e'] = df['Probs'].apply(lambda x: x[8])
     del df['Probs']
     return df
 
 def logMultinom(row):
-    probs = [row[c] for c in colsProbs]
+    probs = [row[c+"_e"] for c in ordenRegions]
     # print('probs:', probs)
-    freqs = [row[c] for c in colsFreqs]
+    freqs = [row[c+"_o"] for c in ordenRegions]
     # print('freqs:', freqs)
     n = np.sum(freqs)
     rv = multinomial(n,probs)
@@ -218,7 +220,69 @@ def likelihoodFunction_WSLS(params):
 
     data = insert_WSLS(data, params)
     data['Dev'] = data.apply(lambda x: logMultinom(x), axis=1)
-    return data['Dev'].sum()
+    dev = data['Dev'].sum()
+    # print(dev)
+    return dev
+
+def min_square_dist_WSLS(params):
+
+    global data
+
+    data = insert_WSLS(data, params)
+    suma = 0
+    for c in ordenRegions:
+        suma += ((data[c+"_o"] - data[c+"_e"])**2).sum()
+
+    # print(suma)
+    return suma
+
+def optimizar(parametros):
+
+    x0 = np.array(parametros)
+
+    # res = minimize(likelihoodFunction_WSLS,\
+    #                 x0,\
+    #                 method='nelder-mead',\
+    #                 options={'xatol': 1e-8, 'disp': True}
+    #                 )
+
+    # res = minimize(min_square_dist_WSLS,\
+    #                 x0,\
+    #                 method='nelder-mead',\
+    #                 # method='BFGS',\
+    #                 options={'xatol': 1e-8, 'disp': True}
+    #                 )
+
+    cons = (
+            {
+            'type': 'ineq',
+            'fun': lambda x: np.array([x[0],
+                                        x[1],
+                                        x[2],
+                                        x[3],
+                                        x[4],
+                                        x[5] - 999,
+                                        x[6]
+                                       ]),
+            'fun': lambda x: np.array([0.11 - x[0],
+                                       0.11 - x[1],
+                                       0.11 - x[2],
+                                       0.11 - x[3],
+                                       600 - x[4],
+                                       1000 - x[5],
+                                       1000 - x[6]
+                                       ])
+            }
+        )
+
+    res = minimize(min_square_dist_WSLS,\
+                    x0,\
+                    method='trust-constr',\
+                    constraints=cons,
+                    options={'verbose':1}
+                    )
+
+    return(res.x)
 
 def main():
 
@@ -232,26 +296,15 @@ def main():
     print("Done!")
     print(data.head())
 
-    data = trim_data(data, False)
+    data = trim_data(data, True)
     # data = get_overlap(data)
     # data = get_FRAsims(data)
     # print(data.head())
     data = get_freqs(data)
     print(data.head())
 
-    WSLSParameters = [0.01, 0.01, 0.01, 0.01, 500, 1000, 31.5]
-    dev = likelihoodFunction_WSLS(WSLSParameters)
-    print(dev)
-
-    x0 = np.array(WSLSParameters)
-    res = minimize(likelihoodFunction_WSLS,\
-                    x0,\
-                    method='nelder-mead',\
-                    options={'xatol': 1e-8, 'disp': True}
-                    )
-
+    # WSLSParameters = [0.06, 0.04, 0.11, 0.07, 500, 1000, 22]
+    # pars = optimizar(WSLSParameters)
     # graficar(data)
-
-
 
 main()

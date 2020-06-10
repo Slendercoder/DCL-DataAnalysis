@@ -203,15 +203,15 @@ plot_ModelTransitions_RS <- function(theta, pl, plColor) {
 plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
   
   xs <- seq(0,32,length.out=200)
-  print('xs')
-  print(xs)
+  # print('xs')
+  # print(xs)
   regiones <- c('ALL', 'NOTHING', 
                 'DOWN', 'UP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   for (other in regiones) {
     fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=theta)
-    print('fitFocal')
-    print(fitFocal)
+    # print(paste('fitFocal', other))
+    # print(fitFocal)
     dfB <- data.frame(xs, fitFocal)
     pl <- pl +
       geom_line(aes(x = xs, y = fitFocal), dfB, color=plColor, size=0.7)
@@ -1442,7 +1442,7 @@ plot_model_on_top_behavior <- function(thetaWS, thetaFR, p1, p2, p3) {
   regs <- c('ALL', 'LEFT')
   k <- regs[1]
   print(paste("Plotting FRA model on FRAsim transition", k))
-  fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo=k, k=k, theta=thetaFR)
+  fitFocal <- sapply(xs, ModelProb, regionFrom='RS', regionGo=k, k=k, theta=unlist(thetaFR))
   dfB <- data.frame(xs, fitFocal)
   plots[[2]] <- p2 +
     geom_line(aes(x = xs, y = fitFocal), dfB, color=FR_color, size=0.7)

@@ -7,7 +7,7 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args) {
   
-  Trials <- 1
+  Trials <- 2
   
   pars <- list(list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
@@ -15,10 +15,10 @@ fitModels2Data <- function(args) {
   
   # print("Fitting MBiases...")
   # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
-  print("Fitting WSLS...")
-  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
-  # print("Fitting FRA...")
-  # f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
+  # print("Fitting WSLS...")
+  # f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
+  print("Fitting FRA...")
+  f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
   tryCatch({
     print(cat("MBiases dev: ",f_MBi$value))
     imprimir(f_MBi$par)
@@ -53,8 +53,8 @@ fitModels2Data <- function(args) {
 ####################################################
 
 # archivo <- "../Data/Confusion/Simulations/MB7.csv"
-archivo <- "../Data/Confusion/Simulations/WS2.csv"
-# archivo <- "../Data/Confusion/Simulations/FR7.csv"
+# archivo <- "../Data/Confusion/Simulations/WS2.csv"
+archivo <- "../Data/Confusion/Simulations/FR7.csv"
 # archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
@@ -77,9 +77,13 @@ print(head(args))
 print("Data prepared!")
 
 parametros <- fitModels2Data(args)
-print(parametros)
+rotulos <- c('MBiases', 'WSLS', 'FRA')
+for (i in seq(1,3)) {
+  print(paste('Parameters model', rotulos[i]))
+  imprimir(unlist(parametros[i]))
+}
 
-thetaWS <- parametros[[2]]
+thetaWS <- parametros[[3]]
 thetaFR <- parametros[[3]]
 
 p <- plot_model_on_top_behavior(thetaWS, thetaFR, p1, p2, p3)
