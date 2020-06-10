@@ -1,0 +1,460 @@
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS0.csv ..."
+       Dyad Player Region                   RegionFULL RegionGo   RJcode Score
+1 578967828   5789     RS   degijkosvACFIJMNPQRTXY267;      OUT dgsAQX6;    21
+2 578967828   5789    OUT abcdefghipqxyFGNOVW3456789;:      OUT             32
+3 578967828   5789    OUT abcdefghipqxyFGNOVW3456789;:      OUT             32
+4 578967828   5789    OUT abcdefghipqxyFGNOVW3456789;:      OUT             32
+5 578967828   5789    OUT abcdefghipqxyFGNOVW3456789;:      OUT             32
+6 578967828   5789    OUT abcdefghipqxyFGNOVW3456789;:      OUT             32
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [5]
+  Region  RegionFULL               Score RJcode                FRASims   freqs  
+  <chr>   <chr>                    <int> <chr>                 <named l> <list> 
+1 NOTHING ""                         -64 ""                    <dbl [8]> <int [~
+2 NOTHING ""                          32 ""                    <dbl [8]> <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -96 "GHIJKLMNOPQRSTUVWXY~ <dbl [8]> <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -83 "GHLRT2689:"          <dbl [8]> <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -80 "GHIJOPQRWXYZ4567"    <dbl [8]> <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -80 "JNOSX2356:"          <dbl [8]> <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1656.79887366973"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1656.79887366973"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1656.79887366973"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1655.2540481081"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1655.2540481081"
+[1] "Stagnation in Nelder-Mead"
+[1] "Dev: 1655.2540481081"
+[1]   0.001   0.046   0.066   0.105 979.272 999.001  16.001
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS0.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  1655.254NULL
+[1]   0.001   0.046   0.066   0.105 979.272 999.001  16.001
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS1.csv ..."
+      Dyad Player Region                  RegionFULL RegionGo          RJcode
+1 33943487    339     RS bchjlnopxyABJKQRTVWXY0138;:       RS       jpyBJRW3:
+2 33943487    339     RS abcdfknoswzKNPQRUWXY124567;       RS     abcdfknoswz
+3 33943487    339     RS          dgorwADEIMRU23478;       RS        dgorwADE
+4 33943487    339     RS    bdgjmnoqrtvxDFKLNOV2579:       RS  bdgjmnoqrtvxDF
+5 33943487    339     RS        aefgruvwDFOQUWZ1236;       RS      aefgruvwDF
+6 33943487    339     RS  bhimnorstuvwxzBHIJLVYZ5689      TOP bhimnorstuvwxzB
+  Score
+1    29
+2    27
+3    18
+4    32
+5    22
+6    18
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [6]
+  Region  RegionFULL                  Score RJcode           FRASims     freqs  
+  <chr>   <chr>                       <int> <chr>            <named lis> <list> 
+1 NOTHING ""                            -64 ""               <dbl [8]>   <int [~
+2 NOTHING ""                             32 ""               <dbl [8]>   <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -84 "HLMNQTVX045789~ <dbl [8]>   <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -83 "GHKNRSW6;"      <dbl [8]>   <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -82 "HIJKLMPQRSTUXY~ <dbl [8]>   <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -81 "GHKMQUX0136"    <dbl [8]>   <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1980.37398792871"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1980.37398792871"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1980.37398792871"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1980.37398792871"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1980.1015546831"
+[1] "Successful convergence"
+[1] "Dev: 1980.1015546831"
+[1]   0.064   0.019   0.040   0.073 118.348 999.501   3.007
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS1.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  1980.102NULL
+[1]   0.064   0.019   0.040   0.073 118.348 999.501   3.007
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS2.csv ..."
+       Dyad Player Region                       RegionFULL RegionGo     RJcode
+1 136436625   1364     RS             efghijlmxGHJKLUZ457;       RS   hjlmGHZ;
+2 136436625   1364     RS           aijlotuvwxDEILMQX1678:    RIGHT aijltIQX67
+3 136436625   1364  RIGHT efghmnopuvwxCDEFKLMNSTUV012389;:    RIGHT           
+4 136436625   1364  RIGHT efghmnopuvwxCDEFKLMNSTUV012389;:    RIGHT           
+5 136436625   1364  RIGHT efghmnopuvwxCDEFKLMNSTUV012389;:    RIGHT           
+6 136436625   1364  RIGHT efghmnopuvwxCDEFKLMNSTUV012389;:    RIGHT           
+  Score
+1    27
+2    32
+3    32
+4    32
+5    32
+6    32
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [5]
+  Region  RegionFULL                  Score RJcode           FRASims     freqs  
+  <chr>   <chr>                       <int> <chr>            <named lis> <list> 
+1 NOTHING ""                            -64 ""               <dbl [8]>   <int [~
+2 NOTHING ""                             32 ""               <dbl [8]>   <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -85 "HLNPRU238;"     <dbl [8]>   <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -82 "HIJKLMPQRSTUXY~ <dbl [8]>   <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -80 "GHIJOPQRWXYZ45~ <dbl [8]>   <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -80 "JLMNPQSWYZ0136~ <dbl [8]>   <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1827.69886014172"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1816.28160602318"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1816.28160580981"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1816.28160580981"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1816.28160580981"
+[1] "Successful convergence"
+[1] "Dev: 1816.28160580981"
+[1]   0.078   0.044   0.116   0.069 381.096 999.060  22.847
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS2.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  1816.282NULL
+[1]   0.078   0.044   0.116   0.069 381.096 999.060  22.847
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS3.csv ..."
+      Dyad Player Region                       RegionFULL RegionGo
+1 99167405   7405     RS           behlnopqrstwBHJMUZ234:       RS
+2 99167405   7405     RS       acdgkmoqtvyABCGJKRUVX0478;    RIGHT
+3 99167405   7405  RIGHT efghmnopuvwxCDEFKLMNSTUV012389;:       RS
+4 99167405   7405     RS        djkrtxzACFHIJKLNSWXYZ278:       RS
+5 99167405   7405     RS                   deqrtFGJMSWZ06       RS
+6 99167405   7405     RS     abcfgilnoqrstuyADHJUVXZ01248       RS
+                     RJcode Score
+1                 hlnqrwB23    16
+2             actvyABCGUV07   -65
+3                egmpuwCLM;    16
+4 djkrtxzACFHIJKLNSWXYZ278:    -1
+5                     deqFJ    12
+6              anoquJX01248   -64
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [4]
+  Region  RegionFULL               Score RJcode                FRASims   freqs  
+  <chr>   <chr>                    <int> <chr>                 <named l> <list> 
+1 NOTHING ""                         -64 ""                    <dbl [8]> <int [~
+2 NOTHING ""                          32 ""                    <dbl [8]> <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -96 "GHIJKLMNOPQRSTUVWXY~ <dbl [8]> <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -82 "HIJKLMPQRSTUXYZ012"  <dbl [8]> <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -82 "HILNPQSTVW03489"     <dbl [8]> <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -82 "NOQRTUX18"           <dbl [8]> <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2873.22067335189"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2873.22067335189"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2873.22067331208"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2873.22067331208"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2873.22067331208"
+[1] "Successful convergence"
+[1] "Dev: 2873.22067331208"
+[1]   0.059   0.092   0.040   0.025 260.340 999.214  16.204
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS3.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  2873.221NULL
+[1]   0.059   0.092   0.040   0.025 260.340 999.214  16.204
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS4.csv ..."
+       Dyad Player  Region
+1 306178688   8688      RS
+2 306178688   8688      RS
+3 306178688   8688 NOTHING
+4 306178688   8688      RS
+5 306178688   8688      IN
+6 306178688   8688     ALL
+                                                        RegionFULL RegionGo
+1                                       dfkmnruvwxzADJLOPRTVY24589       RS
+2                                               aegmqtuwBIJKPR178:  NOTHING
+3                                                                        RS
+4                                       fhijlmnpqtuvxABCDSTUVX278;       IN
+5                             jklmnorstuvwzABCDEHIJKLMPQRSTUXYZ012      ALL
+6 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:       RS
+                        RJcode Score
+1                  rADJORTV458   -78
+2                      aegqIJ7    23
+3                                -64
+4                   fhipqxV78;   -78
+5                 lmuABDHIMRX2   -85
+6 abcdefghipqxyFGNOVW3456789;:     4
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [6]
+  Region  RegionFULL               Score RJcode                FRASims   freqs  
+  <chr>   <chr>                    <int> <chr>                 <named l> <list> 
+1 NOTHING ""                         -64 ""                    <dbl [8]> <int [~
+2 NOTHING ""                          32 ""                    <dbl [8]> <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -96 "GHIJKLMNOPQRSTUVWXY~ <dbl [8]> <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -83 "HILPVX04579;:"       <dbl [8]> <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -82 "HIJKLMPQRSTUXYZ012"  <dbl [8]> <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -81 "GPQTVWX012345"       <dbl [8]> <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1614.74007650787"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1614.74007650787"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1614.74007650787"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1614.74007650787"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1614.74007650787"
+[1] "Stagnation in Nelder-Mead"
+[1] "Dev: 1614.74007650787"
+[1]   0.105   0.063   0.024   0.093 513.826 999.934   4.010
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS4.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  1614.74NULL
+[1]   0.105   0.063   0.024   0.093 513.826 999.934   4.010
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS5.csv ..."
+       Dyad Player Region                       RegionFULL RegionGo
+1 584982626   5849     RS      ahlmoprwxyAEFGNRSTUVWXZ169;      TOP
+2 584982626   5849    TOP abcdefghijklmnopqrstuvwxyzABCDEF      TOP
+3 584982626   5849    TOP abcdefghijklmnopqrstuvwxyzABCDEF      TOP
+4 584982626   5849    TOP abcdefghijklmnopqrstuvwxyzABCDEF      TOP
+5 584982626   5849    TOP abcdefghijklmnopqrstuvwxyzABCDEF      TOP
+6 584982626   5849    TOP abcdefghijklmnopqrstuvwxyzABCDEF      TOP
+            RJcode Score
+1         ahlorFX1    19
+2       fgjlrsyACF    31
+3       adgklnwxzE    27
+4 efghmnopuvwxCDEF    16
+5 efghmnopuvwxCDEF    16
+6 efghmnopuvwxCDEF    16
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [6]
+  Region  RegionFULL               Score RJcode                FRASims   freqs  
+  <chr>   <chr>                    <int> <chr>                 <named l> <list> 
+1 NOTHING ""                         -64 ""                    <dbl [8]> <int [~
+2 NOTHING ""                          32 ""                    <dbl [8]> <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -96 "GHIJKLMNOPQRSTUVWXY~ <dbl [8]> <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -85 "MOQVY079:"           <dbl [8]> <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -82 "HIJKLMPQRSTUXYZ012"  <dbl [8]> <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -80 "GHIJOPQRWXYZ4567"    <dbl [8]> <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1380.42122006339"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1380.42122006339"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1380.42122006339"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1380.42122006339"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1380.42122006339"
+[1] "Successful convergence"
+[1] "Dev: 1380.42122006339"
+[1]   0.028   0.051   0.069   0.101 974.172 999.379   3.968
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS5.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  1380.421NULL
+[1]   0.028   0.051   0.069   0.101 974.172 999.379   3.968
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS6.csv ..."
+       Dyad Player  Region                       RegionFULL RegionGo
+1 114537499   7499      RS   acjlqtuxBCDFGHIJKLMSUWX0123589  NOTHING
+2 114537499   7499 NOTHING                                       TOP
+3 114537499   7499     TOP abcdefghijklmnopqrstuvwxyzABCDEF      TOP
+4 114537499   7499     TOP abcdefghijklmnopqrstuvwxyzABCDEF   BOTTOM
+5 114537499   7499  BOTTOM GHIJKLMNOPQRSTUVWXYZ0123456789;:   BOTTOM
+6 114537499   7499  BOTTOM GHIJKLMNOPQRSTUVWXYZ0123456789;:   BOTTOM
+            RJcode Score
+1 clqtuxBCDFJL0138    29
+2                    -64
+3 abcdijklqrstyzAB    16
+4 abcdijklqrstyzAB   -80
+5                     32
+6                     32
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [6]
+  Region  RegionFULL               Score RJcode                FRASims   freqs  
+  <chr>   <chr>                    <int> <chr>                 <named l> <list> 
+1 NOTHING ""                         -64 ""                    <dbl [8]> <int [~
+2 NOTHING ""                          32 ""                    <dbl [8]> <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -96 "GHIJKLMNOPQRSTUVWXY~ <dbl [8]> <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -82 "HIJKLMPQRSTUXYZ012"  <dbl [8]> <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -81 "INOPQWXZ01457:"      <dbl [8]> <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -80 "GHIJOPQRWXYZ4567"    <dbl [8]> <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1153.41227579384"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1153.41227579384"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1153.41227567984"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1153.41227567984"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 1153.41227561269"
+[1] "Successful convergence"
+[1] "Dev: 1153.41227561269"
+[1]    0.087    0.094    0.106    0.064  999.999 1000.000    6.344
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS6.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  1153.412NULL
+[1]    0.087    0.094    0.106    0.064  999.999 1000.000    6.344
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS7.csv ..."
+       Dyad Player Region                       RegionFULL RegionGo
+1 925868868   9258     RS      bdeijlmoqsuvwACDFHNPRUZ25;:      TOP
+2 925868868   9258    TOP abcdefghijklmnopqrstuvwxyzABCDEF       RS
+3 925868868   9258     RS         aeghiklpswxzFJKLMNY02348       RS
+4 925868868   9258     RS  efjlnrstuwzBDEGHPRTVXYZ01236789       RS
+5 925868868   9258     RS           cefgkloruwBGIMNOY1256;       RS
+6 925868868   9258     RS         afghmopquvxzBCDJNYZ012;:       RS
+                            RJcode Score
+1                        dswFPRUZ2    25
+2 abcdefghijklmnopqrstuvwxyzABCDEF    17
+3                          agwxJM8   -67
+4                     jlnrBGVXZ018   -67
+5                                     32
+6                                     32
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [6]
+  Region  RegionFULL               Score RJcode                FRASims   freqs  
+  <chr>   <chr>                    <int> <chr>                 <named l> <list> 
+1 NOTHING ""                         -64 ""                    <dbl [8]> <int [~
+2 NOTHING ""                          32 ""                    <dbl [8]> <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -96 "GHIJKLMNOPQRSTUVWXY~ <dbl [8]> <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -83 "JMPQXY145:"          <dbl [8]> <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -82 "GHIKMPQSTVWZ2379;:"  <dbl [8]> <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01~   -81 "GHOSUWYZ0257;:"      <dbl [8]> <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 4107.48671069323"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 4107.37904305701"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 4107.37904287298"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 4107.37904287298"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 4107.37904287298"
+[1] "Successful convergence"
+[1] "Dev: 4107.37904287298"
+[1]   0.015   0.053   0.043   0.012 706.733 999.957  31.854
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS7.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  4107.379NULL
+[1]   0.015   0.053   0.043   0.012 706.733 999.957  31.854
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS8.csv ..."
+       Dyad Player  Region                      RegionFULL RegionGo
+1 410463265   3265      RS   abciklqstvBGHNPQRSV01245678;:       RS
+2 410463265   3265      RS abdefhlptuwxzCDFGHJRTUXZ1246789  NOTHING
+3 410463265   3265 NOTHING                                  NOTHING
+4 410463265   3265 NOTHING                                  NOTHING
+5 410463265   3265 NOTHING                                  NOTHING
+6 410463265   3265 NOTHING                                  NOTHING
+        RJcode Score
+1 biqsBHNV1568    24
+2                 32
+3                 32
+4                 32
+5                 32
+6                 32
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [5]
+  Region  RegionFULL                  Score RJcode           FRASims     freqs  
+  <chr>   <chr>                       <int> <chr>            <named lis> <list> 
+1 NOTHING ""                            -64 ""               <dbl [8]>   <int [~
+2 NOTHING ""                             32 ""               <dbl [8]>   <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -86 "GHIJLQRSU135"   <dbl [8]>   <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -82 "HIJKLMPQRSTUXY~ <dbl [8]>   <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -82 "HKNTUVWY8;"     <dbl [8]>   <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -80 "GHIJOPQRWXYZ45~ <dbl [8]>   <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2247.49334439574"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2247.49334439574"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2247.49334439574"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2247.49334439574"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2247.49334439574"
+[1] "Successful convergence"
+[1] "Dev: 2247.49334439574"
+[1]   0.120   0.055   0.020   0.030 975.268 999.998  11.216
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS8.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  2247.493NULL
+[1]   0.120   0.055   0.020   0.030 975.268 999.998  11.216
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
+[1] "Loading and preparing data ../Data/Confusion/Simulations/WS9.csv ..."
+        Dyad Player Region                   RegionFULL RegionGo
+1 1177081678  81678     RS adeglqswxABDEILOPQRTUVWXZ49:       RS
+2 1177081678  81678     RS        bcdgnpqrstwABORUVXZ5:       RS
+3 1177081678  81678     RS     aijmnotuvwyCDFGLRTWYZ06;       RS
+4 1177081678  81678     RS     adijnovxyCFHJLOSTW134689       RS
+5 1177081678  81678     RS  aghklmsuwzDEFJLMOSTVWZ0589:       RS
+6 1177081678  81678     RS      adefinpxABDKLQRVY12567;       RS
+                       RJcode Score
+1                  dwxALPQUXZ   -71
+2                  cgswABUVZ5   -88
+3                    ajuvCLRY   -64
+4    adijnovxyCFHJLOSTW134689     9
+5 aghklmsuwzDEFJLMOSTVWZ0589:    12
+6     adefinpxABDKLQRVY12567;    -2
+# A tibble: 6 x 6
+# Groups:   RegionFULL, Score [6]
+  Region  RegionFULL                  Score RJcode           FRASims     freqs  
+  <chr>   <chr>                       <int> <chr>            <named lis> <list> 
+1 NOTHING ""                            -64 ""               <dbl [8]>   <int [~
+2 NOTHING ""                             32 ""               <dbl [8]>   <int [~
+3 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -85 "JKOSUVWXY489"   <dbl [8]>   <int [~
+4 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -82 "HIJKLMPQRSTUXY~ <dbl [8]>   <int [~
+5 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -79 "GIKOTY0258"     <dbl [8]>   <int [~
+6 BOTTOM  "GHIJKLMNOPQRSTUVWXYZ01234~   -78 "GIMNQSZ049:"    <dbl [8]>   <int [~
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2934.40826247598"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2934.40826247598"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2934.40826247598"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2934.40826247598"
+[1] "Trying nmkb... 1"
+[1] "Best value so far: 2934.2236625924"
+[1] "Stagnation in Nelder-Mead"
+[1] "Dev: 2934.2236625924"
+[1]   0.090   0.004   0.008   0.025  37.126 999.970   8.000
+[1] "Data saved to ../Data/Confusion/Estimations/WSLS_Parameter_fit_nmkb_WS9.csv"
+[1] "--------------"
+[1] "Optimizer didn't work for MBiases"
+[1] "--------------"
+WSLS dev:  2934.224NULL
+[1]   0.090   0.004   0.008   0.025  37.126 999.970   8.000
+[1] "--------------"
+[1] "Optimizer didn't work for FRA"
