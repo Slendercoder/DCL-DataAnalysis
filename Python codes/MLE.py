@@ -54,7 +54,7 @@ def trim_data(data, simplificar=False):
 
     if simplificar:
         # Minimal data frame TO BE COMMENTED FOR USE IN FULL DATA
-        Num_parejas = 3
+        Num_parejas = 1
         Num_rondas = 10
         parejas = list(data.Dyad.unique())[:Num_parejas]
         data = data[data['Dyad'].isin(parejas)]
@@ -62,11 +62,11 @@ def trim_data(data, simplificar=False):
         data = data[data['Round'].isin(rondas)]
 
     # Keeping only relevant columns
-    data = data[[#'Dyad',\
-                 #'Round',\
-                 #'Player',\
+    data = data[['Dyad',\
+                 'Round',\
+                 'Player',\
                  'Region',\
-                 #'regionCoded',\
+                 'regionCoded',\
                  'Score',\
                  'RegionGo'\
                  ]]
@@ -116,17 +116,17 @@ def get_overlap(data):
 
 def get_FRAsims(data):
     print("Obtainning FRASims...")
-
+    print(data.head())
     regions, strategies = F.create_regions_and_strategies(Num_Loc)
-    x = 0
-    nombre = "FRASim" + F.nameRegion(x + 1)
-    r = regions[x]
-    data[nombre] = data.apply(lambda x: F.FRASim(F.code2Vector(F.lettercode2Strategy(x['regionCoded'], Num_Loc), Num_Loc), \
-                                x['Overlap'],\
-                                r,\
-                                Num_Loc\
-                                ),\
-                            axis=1)
+    for i in range(9):
+        nombre = "FRASim" + F.nameRegion(i + 1)
+        k = regions[i]
+        data[nombre] = data.apply(lambda x: F.FRASim(F.code2Vector(F.lettercode2Strategy(x['regionCoded'], Num_Loc), Num_Loc), \
+                                    x['Overlap'],\
+                                    k,\
+                                    Num_Loc\
+                                    ),\
+                                axis=1)
     return data
 
 def get_freqs(data):
@@ -233,7 +233,7 @@ def min_square_dist_WSLS(params):
     for c in ordenRegions:
         suma += ((data[c+"_o"] - data[c+"_e"])**2).sum()
 
-    # print(suma)
+    print(suma)
     return suma
 
 def optimizar(parametros):
@@ -268,7 +268,7 @@ def optimizar(parametros):
                                        0.11 - x[1],
                                        0.11 - x[2],
                                        0.11 - x[3],
-                                       600 - x[4],
+                                       1000 - x[4],
                                        1000 - x[5],
                                        1000 - x[6]
                                        ])
@@ -289,22 +289,24 @@ def main():
     global data
 
     # Opens the file with data from DCL experiment into a Pandas DataFrame
-    archivo = "../Data/Confusion/Simulations/WS2.csv"
+    # archivo = "../Data/Confusion/Simulations/WS2.csv"
     # archivo = "../Data/humans_only_absent.csv"
+    archivo = "../Data/high_performing_human_dyads.csv"
     print("Reading data...")
     data = pd.read_csv(archivo, index_col=False)
     print("Done!")
     print(data.head())
 
-    data = trim_data(data, True)
-    # data = get_overlap(data)
-    # data = get_FRAsims(data)
-    # print(data.head())
-    data = get_freqs(data)
+    data = trim_data(data, False)
+    data = get_overlap(data)
+    data = get_FRAsims(data)
     print(data.head())
+    # data = get_freqs(data)
+    # print(data.head())
 
-    # WSLSParameters = [0.06, 0.04, 0.11, 0.07, 500, 1000, 22]
+    # WSLSParameters = [0.1, 0.027, 0.014, 0.009, 500, 1000, 22]
     # pars = optimizar(WSLSParameters)
+    # print(pars)
     # graficar(data)
 
 main()

@@ -209,9 +209,9 @@ plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
                 'DOWN', 'UP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   for (other in regiones) {
-    fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=theta)
-    # print(paste('fitFocal', other))
-    # print(fitFocal)
+    fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=thetaWS)
+    print(paste('fitFocal', other))
+    print(fitFocal)
     dfB <- data.frame(xs, fitFocal)
     pl <- pl +
       geom_line(aes(x = xs, y = fitFocal), dfB, color=plColor, size=0.7)
@@ -1097,7 +1097,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wALL_Real, wALL_Fitted)
   g3 <- ggplot(df, aes(x = wALL_Real, y = wALL_Fitted)) +
     geom_point(color="gray")+
-    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+    scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
@@ -1113,7 +1113,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wNOTHING_Real, wNOTHING_Fitted)
   g2 <- ggplot(df, aes(x = wNOTHING_Real, y = wNOTHING_Fitted)) +
     geom_point(color="gray")+
-    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+    scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
@@ -1128,7 +1128,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wLEFT_Real, wLEFT_Fitted)
   g1 <- ggplot(df, aes(x = wLEFT_Real, y = wLEFT_Fitted)) +
     geom_point(color="gray")+
-    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+    scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 
@@ -1143,7 +1143,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   df <- data.frame(wIN_Real, wIN_Fitted)
   g0 <- ggplot(df, aes(x = wIN_Real, y = wIN_Fitted)) +
     geom_point(color="gray")+
-    scale_x_continuous(breaks=c(0,m), limits=c(0, m)) +
+    scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
     theme_bw() + 

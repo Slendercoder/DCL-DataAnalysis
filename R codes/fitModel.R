@@ -7,16 +7,16 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args) {
   
-  Trials <- 2
+  Trials <- 100
   
   pars <- list(list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
             list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
   
-  # print("Fitting MBiases...")
-  # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
-  # print("Fitting WSLS...")
-  # f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
+  print("Fitting MBiases...")
+  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
+  print("Fitting WSLS...")
+  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
   print("Fitting FRA...")
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
   tryCatch({
@@ -54,17 +54,17 @@ fitModels2Data <- function(args) {
 
 # archivo <- "../Data/Confusion/Simulations/MB7.csv"
 # archivo <- "../Data/Confusion/Simulations/WS2.csv"
-archivo <- "../Data/Confusion/Simulations/FR7.csv"
-# archivo <- "../Data/humans_only_absent.csv"
+# archivo <- "../Data/Confusion/Simulations/FR7.csv"
+archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
 
-p <- plot_individual_behavior(df)
-p1 <- p[[1]]
-p2 <- p[[2]]
-p3 <- p[[3]]
-pl <- grid.arrange(p1, p2, p3, nrow=1)
+# p <- plot_individual_behavior(df)
+# p1 <- p[[1]]
+# p2 <- p[[2]]
+# p3 <- p[[3]]
+# pl <- grid.arrange(p1, p2, p3, nrow=1)
 
 df$Region <- df$Category
 df <- find_joint_region(df)
@@ -76,21 +76,25 @@ args <- get_FRASims_list(args)
 print(head(args))
 print("Data prepared!")
 
+# start_pars <- c(111)
+# parametros <- searchFit_WSLS_NMKB(start_pars, args, 5)
+# thetaWS <- parametros
+# thetaFR <- parametros
+
 parametros <- fitModels2Data(args)
 rotulos <- c('MBiases', 'WSLS', 'FRA')
 for (i in seq(1,3)) {
   print(paste('Parameters model', rotulos[i]))
   imprimir(unlist(parametros[i]))
 }
-
-thetaWS <- parametros[[3]]
-thetaFR <- parametros[[3]]
-
-p <- plot_model_on_top_behavior(thetaWS, thetaFR, p1, p2, p3)
-p1 <- p[[1]]
-p2 <- p[[2]]
-p3 <- p[[3]]
-pl <- grid.arrange(p1, p2, p3, nrow=1)
+# thetaWS <- parametros[[2]]
+# thetaFR <- parametros[[2]]
+# 
+# p <- plot_model_on_top_behavior(thetaWS, thetaFR, p1, p2, p3)
+# p1 <- p[[1]]
+# p2 <- p[[2]]
+# p3 <- p[[3]]
+# pl <- grid.arrange(p1, p2, p3, nrow=1)
 
 #################################################
 # To try individual cases
