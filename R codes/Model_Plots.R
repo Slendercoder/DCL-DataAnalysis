@@ -33,7 +33,7 @@ cbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
 #               "#920000","#924900","#db6d00","#24ff24","#ffff6d")
 #cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-alpha <- 0.5
+alpha <- 1
 
 ####################################################################################
 # Functions
@@ -1089,6 +1089,8 @@ savePlot <- function(file, myPlot) {
 
 plot_Parameter_Recovery_Biases <- function(data, titulo) {
 
+  color_punto <- "red"
+  
   wALL_Real <- data$wALL[data$Exp == 'Real']
   wALL_Fitted <- data$wALL[data$Exp == 'Fitted']
   Rmax <- max(wALL_Real)
@@ -1096,7 +1098,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(wALL_Real, wALL_Fitted)
   g3 <- ggplot(df, aes(x = wALL_Real, y = wALL_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
@@ -1112,7 +1114,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(wNOTHING_Real, wNOTHING_Fitted)
   g2 <- ggplot(df, aes(x = wNOTHING_Real, y = wNOTHING_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
@@ -1127,7 +1129,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(wLEFT_Real, wLEFT_Fitted)
   g1 <- ggplot(df, aes(x = wLEFT_Real, y = wLEFT_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
@@ -1142,7 +1144,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(wIN_Real, wIN_Fitted)
   g0 <- ggplot(df, aes(x = wIN_Real, y = wIN_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
@@ -1155,6 +1157,9 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
 }
 
 plot_Parameter_Recovery_WSLS <- function(data, titulo) {
+
+  color_punto <- "red"
+  
   Alpha_Real <- data$Alpha[data$Exp == 'Real']
   Alpha_Fitted <- data$Alpha[data$Exp == 'Fitted']
   Rmax <- max(Alpha_Real)
@@ -1162,7 +1167,7 @@ plot_Parameter_Recovery_WSLS <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(Alpha_Real, Alpha_Fitted)
   g1 <- ggplot(df, aes(x = Alpha_Real, y = Alpha_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
@@ -1177,7 +1182,7 @@ plot_Parameter_Recovery_WSLS <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(Gamma_Real, Gamma_Fitted)
   g2 <- ggplot(df, aes(x = Gamma_Real, y = Gamma_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
@@ -1190,6 +1195,9 @@ plot_Parameter_Recovery_WSLS <- function(data, titulo) {
 }
 
 plot_Parameter_Recovery_FRA <- function(data, titulo) {
+  
+  color_punto <- "red"
+  
   Zeta_Real <- data$Zeta[data$Exp == 'Real']
   Zeta_Fitted <- data$Zeta[data$Exp == 'Fitted']
   Rmax <- max(Zeta_Real)
@@ -1197,7 +1205,7 @@ plot_Parameter_Recovery_FRA <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(Zeta_Real, Zeta_Fitted)
   g3 <- ggplot(df, aes(x = Zeta_Real, y = Zeta_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +
@@ -1212,7 +1220,7 @@ plot_Parameter_Recovery_FRA <- function(data, titulo) {
   m <- max(Rmax,Fmax)
   df <- data.frame(Delta_Real, Delta_Fitted)
   g1 <- ggplot(df, aes(x = Delta_Real, y = Delta_Fitted)) +
-    geom_point(color="gray")+
+    geom_point(color=color_punto)+
     scale_x_continuous(breaks=seq(0,m,length.out=3), limits=c(0, m)) +
 #    xlim(c(0,m)) +
     ylim(c(0,m)) +

@@ -6,7 +6,7 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args, contador=0) {
   
-  Trials <- 50
+  Trials <- 200
   
   # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador)
   # f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador)
