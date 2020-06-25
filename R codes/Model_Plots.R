@@ -1089,7 +1089,7 @@ savePlot <- function(file, myPlot) {
 
 plot_Parameter_Recovery_Biases <- function(data, titulo) {
 
-  color_punto <- "red"
+  color_punto <- "gray"
   
   wALL_Real <- data$wALL[data$Exp == 'Real']
   wALL_Fitted <- data$wALL[data$Exp == 'Fitted']
@@ -1158,7 +1158,7 @@ plot_Parameter_Recovery_Biases <- function(data, titulo) {
 
 plot_Parameter_Recovery_WSLS <- function(data, titulo) {
 
-  color_punto <- "red"
+  color_punto <- "gray"
   
   Alpha_Real <- data$Alpha[data$Exp == 'Real']
   Alpha_Fitted <- data$Alpha[data$Exp == 'Fitted']
@@ -1196,7 +1196,7 @@ plot_Parameter_Recovery_WSLS <- function(data, titulo) {
 
 plot_Parameter_Recovery_FRA <- function(data, titulo) {
   
-  color_punto <- "red"
+  color_punto <- "gray"
   
   Zeta_Real <- data$Zeta[data$Exp == 'Real']
   Zeta_Fitted <- data$Zeta[data$Exp == 'Fitted']
