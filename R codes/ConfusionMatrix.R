@@ -6,7 +6,7 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args, contador=0) {
   
-  Trials <- 200
+  Trials <- 10
   
   # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador)
   # f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador)
@@ -46,35 +46,35 @@ matriz <- data.frame(model)
 # Loading and preparing data...
 ###############################################################
 
-a <- seq(0, 9)
+a <- seq(0, 0)
 for (contador in a) {
-  # archivo <- paste("../Data/Confusion/Simulations/MB", contador, ".csv", sep="")
-  # print(paste("Loading and preparing data", archivo, "..."))
-  # df = read.csv(archivo)
-  # df$Region <- df$Category
-  # df <- find_joint_region(df)
-  # df$RegionFULL <- unlist(df$RegionFULL)
-  # df$RegionGo <- factor(df$RegionGo, levels = regiones)
-  # print(head(df))
-  # args <- getFreqFRA(df, theta)
-  # args <- get_FRASims_list(args)
-  # print(head(args))
-  # rotulo <- paste('MB', contador, sep="")
-  # MB <- fitModels2Data(args, rotulo)
+  archivo <- paste("../Data/Confusion/Simulations/MB", contador, ".csv", sep="")
+  print(paste("Loading and preparing data", archivo, "..."))
+  df = read.csv(archivo)
+  df$Region <- df$Category
+  df <- find_joint_region(df)
+  df$RegionFULL <- unlist(df$RegionFULL)
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
+  print(head(df))
+  args <- getFreqFRA(df, theta)
+  args <- get_FRASims_list(args)
+  print(head(args))
+  rotulo <- paste('MB', contador, sep="")
+  MB <- fitModels2Data(args, rotulo)
 
-  # archivo <- paste("../Data/Confusion/Simulations/WS", contador, ".csv", sep="")
-  # print(paste("Loading and preparing data", archivo, "..."))
-  # df = read.csv(archivo)
-  # df$Region <- df$Category
-  # df <- find_joint_region(df)
-  # df$RegionFULL <- unlist(df$RegionFULL)
-  # df$RegionGo <- factor(df$RegionGo, levels = regiones)
-  # print(head(df))
-  # args <- getFreqFRA(df, theta)
-  # args <- get_FRASims_list(args)
-  # print(head(args))
-  # rotulo <- paste('WS', contador, sep="")
-  # WS <- fitModels2Data(args, rotulo)
+  archivo <- paste("../Data/Confusion/Simulations/WS", contador, ".csv", sep="")
+  print(paste("Loading and preparing data", archivo, "..."))
+  df = read.csv(archivo)
+  df$Region <- df$Category
+  df <- find_joint_region(df)
+  df$RegionFULL <- unlist(df$RegionFULL)
+  df$RegionGo <- factor(df$RegionGo, levels = regiones)
+  print(head(df))
+  args <- getFreqFRA(df, theta)
+  args <- get_FRASims_list(args)
+  print(head(args))
+  rotulo <- paste('WS', contador, sep="")
+  WS <- fitModels2Data(args, rotulo)
 
   archivo <- paste("../Data/Confusion/Simulations/FR", contador, ".csv", sep="")
   print(paste("Loading and preparing data", archivo, "..."))

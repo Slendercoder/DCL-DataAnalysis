@@ -816,7 +816,7 @@ searchFit_FRA_NMKB <- function(params, args, max_iter=2) {
   
 } # end searchFit_FRA_NMKB
 
-searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0) {
+searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0, escribir=TRUE) {
   
   best <- 100000
   fitFRA <- NA
@@ -859,20 +859,22 @@ searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0) {
     print(paste("Best value so far:", best))
   }
   
-    b <- tryCatch({
-            print(fitFRA$message)
-            print(paste("Dev:", fitFRA$value))
-            imprimir(fitFRA$par)
-            archivo <- paste("../Data/Confusion/Estimations/FRA_Parameter_fit_", module, "_", contador, ".csv", sep = "")
-            df <- data.frame(fitFRA)
-            # print(head(df))
-            write.csv(df, archivo, row.names = FALSE)
-            print(paste("Data saved to", archivo))
-            return(fitFRA)
-         }, error = function(e){
-           print(paste("Optimizer", module, "didn\'t work at all :("))
-          return(NA) 
-         })
+    if (escribir) {
+      b <- tryCatch({
+        print(fitFRA$message)
+        print(paste("Dev:", fitFRA$value))
+        imprimir(fitFRA$par)
+        archivo <- paste("../Data/Confusion/Estimations/FRA_Parameter_fit_", module, "_", contador, ".csv", sep = "")
+        df <- data.frame(fitFRA)
+        # print(head(df))
+        write.csv(df, archivo, row.names = FALSE)
+        print(paste("Data saved to", archivo))
+        return(fitFRA)
+      }, error = function(e){
+        print(paste("Optimizer", module, "didn\'t work at all :("))
+        return(NA) 
+      })
+    }
     
   return(fitFRA)
   
@@ -1070,7 +1072,7 @@ searchFit_WSLS_NMKB <- function(params, args, max_iter=2) {
   
 } # end searchFit_WSLS_NMKB
 
-searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0) {
+searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0, escribir=TRUE) {
   
   best <- 100000
   fitresWSLS <- NA
@@ -1114,20 +1116,22 @@ searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0) {
     print(paste("Best value so far:", best))
   }
   
-  b <- tryCatch({
-    print(fitresWSLS$message)
-    print(paste("Dev:", fitresWSLS$value))
-    imprimir(fitresWSLS$par)
-    archivo <- paste("../Data/Confusion/Estimations/WSLS_Parameter_fit_", module, "_", contador, ".csv", sep = "")
-    df <- data.frame(fitresWSLS)
-    # print(head(df))
-    write.csv(df, archivo, row.names = FALSE)
-    print(paste("Data saved to", archivo))
-    return(fitresWSLS)
-  }, error = function(e){
-    print(paste("Optimizer", module, "didn\'t work at all :("))
-    return(NA) 
-  })
+  if (escribir) {
+    b <- tryCatch({
+      print(fitresWSLS$message)
+      print(paste("Dev:", fitresWSLS$value))
+      imprimir(fitresWSLS$par)
+      archivo <- paste("../Data/Confusion/Estimations/WSLS_Parameter_fit_", module, "_", contador, ".csv", sep = "")
+      df <- data.frame(fitresWSLS)
+      # print(head(df))
+      write.csv(df, archivo, row.names = FALSE)
+      print(paste("Data saved to", archivo))
+      return(fitresWSLS)
+    }, error = function(e){
+      print(paste("Optimizer", module, "didn\'t work at all :("))
+      return(NA) 
+    })
+  }
   
   return(fitresWSLS)
   
@@ -1234,7 +1238,7 @@ searchFit_MBiases_NMKB <- function(params, args, max_iter=2) {
   
 } # end searchFit_MBiases_NMKB
 
-searchBestFit_MBiases <- function(args, N=1, module="nmkb", contador=0) {
+searchBestFit_MBiases <- function(args, N=1, module="nmkb", contador=0, escribir=TRUE) {
   
   best <- 100000
   fitresMBiases <- NA
@@ -1278,20 +1282,22 @@ searchBestFit_MBiases <- function(args, N=1, module="nmkb", contador=0) {
     print(paste("Best value so far:", best))
   }
   
-  b <- tryCatch({
-    print(fitresMBiases$message)
-    print(paste("Dev:", fitresMBiases$value))
-    imprimir(fitresMBiases$par)
-    archivo <- paste("../Data/Confusion/Estimations/MBiases_Parameter_fit_", module, "_", contador, ".csv", sep = "")
-    df <- data.frame(fitresMBiases)
-    # print(head(df))
-    write.csv(df, archivo, row.names = FALSE)
-    print(paste("Data saved to", archivo))
-    return(fitresMBiases)
-  }, error = function(e){
-    print(paste("Optimizer", module, "didn\'t work at all :("))
-    return(NA) 
-  })
+  if (escribir) {
+    b <- tryCatch({
+      print(fitresMBiases$message)
+      print(paste("Dev:", fitresMBiases$value))
+      imprimir(fitresMBiases$par)
+      archivo <- paste("../Data/Confusion/Estimations/MBiases_Parameter_fit_", module, "_", contador, ".csv", sep = "")
+      df <- data.frame(fitresMBiases)
+      # print(head(df))
+      write.csv(df, archivo, row.names = FALSE)
+      print(paste("Data saved to", archivo))
+      return(fitresMBiases)
+    }, error = function(e){
+      print(paste("Optimizer", module, "didn\'t work at all :("))
+      return(NA) 
+    })
+  }
   
   return(fitresMBiases)
   
