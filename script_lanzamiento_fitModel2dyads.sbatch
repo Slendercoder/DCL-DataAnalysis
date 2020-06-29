@@ -9,4 +9,4 @@
 cd R\ codes/
 module load R
 
-Rscript fitModel2dyads.R
+Rscript fitmodel2dyads.R
