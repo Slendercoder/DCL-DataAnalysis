@@ -9,4 +9,4 @@
 cd Python\ codes/
 module load python3.6/3.6.6
 
-python3.6 MLE.py
+python3.6 main.py
