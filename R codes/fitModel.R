@@ -6,48 +6,48 @@ source("MODELpred.R")
 ###############################################################
 
 fitModels2Data <- function(args) {
-  
-  Trials <- 100
-  
-  pars <- list(list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
-            list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
-            list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
-  
-  print("Fitting MBiases...")
-  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb")
-  print("Fitting WSLS...")
-  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb")
-  print("Fitting FRA...")
-  f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb")
+
+  Trials <- 200
+  parametros <- list(rep(0, 11), rep(0, 11), rep(0, 11))
+  devs <- c(100000, 100000, 100000)
+  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
+  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador, FALSE)
+  f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb", contador, FALSE)
+  print("--------------")
   tryCatch({
     print(cat("MBiases dev: ",f_MBi$value))
     imprimir(f_MBi$par)
-    pars[[1]] <- f_MBi$par
+    parametros[[1]] <- c('MBiases', f_MBi$par, rep(0,6))
+    devs[1] <- f_MBi$value
   }, error = function(e) {
     print("Optimizer didn't work for MBiases")
-    pars[[1]] <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
   print("--------------")
   tryCatch({
     print(cat("WSLS dev: ",f_WSLS$value))
     imprimir(f_WSLS$par)
-    pars[[2]] <- f_WSLS$par
+    parametros[[2]] <- c('WSLS', f_WSLS$par, rep(0,3))
+    devs[2] <- f_WSLS$value
   }, error = function(e) {
     print("Optimizer didn't work for WSLS")
-    pars[[2]] <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
   print("--------------")
   tryCatch({
     print(cat("FRA dev: ",f_FRA$value))
     imprimir(f_FRA$par)
-    pars[[3]] <- f_FRA$par
+    parametros[[3]] <- c('FRA', f_FRA$par)
+    devs[3] <- f_FRA$value
   }, error = function(e) {
     print("Optimizer didn't work for FRA")
-    pars[[3]] <- list(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   })
-
-  return(pars)
   
+  data <- as.data.frame(do.call(rbind, parametros))
+  names(data) <- c('wA', 'wN', 'wL', 'wI',
+                   'alpha', 'beta', 'gamma',
+                   'delta', 'epsilon', 'zeta')
+  data$dev <- devs
+  return(data)
+
 } # end fitModels2Data
 
 ####################################################
@@ -81,12 +81,9 @@ print("Data prepared!")
 # thetaWS <- parametros
 # thetaFR <- parametros
 
-parametros <- fitModels2Data(args)
-rotulos <- c('MBiases', 'WSLS', 'FRA')
-for (i in seq(1,3)) {
-  print(paste('Parameters model', rotulos[i]))
-  imprimir(unlist(parametros[i]))
-}
+fitdata <- fitModels2Data(args)
+write.csv(fitdata, '../Data/parameter_fit_humans.csv', row.names=FALSE)
+
 # thetaWS <- parametros[[2]]
 # thetaFR <- parametros[[2]]
 # 

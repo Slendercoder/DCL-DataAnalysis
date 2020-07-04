@@ -8,8 +8,8 @@ from FRA import sim_consist, FRASim, create_regions_and_strategies
 print("Done!")
 
 round_from = 0
-round_to = 11
-dyad_number = 0
+round_to = 15
+dyad_number = 19
 Num_Loc = 8
 step = 1. / Num_Loc
 regions_names = ['ALL', 'NOT', 'BOT', 'TOP', 'LEF', 'RIG', 'IN', 'OUT']
@@ -53,9 +53,9 @@ def dibuja_FRAS(r1, r2, j, threshold):
     ax2.set_yticklabels([])
     ax4.set_yticklabels([])
     ax6.set_yticklabels([])
-    ax2.set_ylabel('Attracted\n to')
-    ax4.set_ylabel('Repelled\n towards')
-    ax6.set_ylabel('FRASim')
+    ax2.set_ylabel('Attracted\n to', fontsize=8)
+    ax4.set_ylabel('Attraction toward\n Complement of\n Overlap', fontsize=8)
+    ax6.set_ylabel('FRASim', fontsize=8)
     ax3.yaxis.tick_right()
     ax5.yaxis.tick_right()
     ax7.yaxis.tick_right()
@@ -96,7 +96,7 @@ def dibuja_FRAS(r1, r2, j, threshold):
     ax2.bar(regions_names, frasPL1)
     ax3.bar(regions_names, frasPL2)
 
-    # Plot repulsion to complement
+    # Plot attraction toward complement of overlap
     frasPL1 = [0] + [sim_consist(joint, complement(x)) for x in regions[1:]]
     frasPL2 = [0] + [sim_consist(joint, complement(x)) for x in regions[1:]]
     ax4.bar(regions_names, frasPL1)
@@ -149,7 +149,7 @@ def complement(r):
 
 # Opens the file with data from DCL experiment into a Pandas DataFrame
 print("Reading data...")
-script, data_archivo = argv
+data_archivo = "../Data/humans_only_absent.csv"
 data = pd.read_csv(data_archivo, index_col=False)
 print("Done!")
 

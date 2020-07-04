@@ -1004,38 +1004,38 @@ plot_3set_comparison_WSLS <- function(df1, df2, df3) {
     theme_bw() +
     theme(legend.position="bottom")
 
-  # 4...
-  # Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
-  model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df1)
-  g4 <- plot_model(model3h, 
-                   type = "pred", 
-                   terms = c("Dif_consist", "Joint_LAG1"), 
-                   colors = c("black", "red", "blue"),
-                   title = "MBiases",
-                   legend.title = "Overlap",
-                   axis.title = c("Absolute difference\nin consistency", "DLindex"))
-  
-  # 5...
-  # Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
-  model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df2)
-  g5 <- plot_model(model3h, 
-                   type = "pred", 
-                   terms = c("Dif_consist", "Joint_LAG1"), 
-                   colors = c("black", "red", "blue"),
-                   title = "WSLS",
-                   legend.title = "Overlap",
-                   axis.title = c("Absolute difference\nin consistency", "DLindex"))
-  
-  # 6...
-  # Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
-  model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df3)
-  g6 <- plot_model(model3h, 
-                   type = "pred", 
-                   terms = c("Dif_consist", "Joint_LAG1"), 
-                   colors = c("black", "red", "blue"),
-                   title = "FRA",
-                   legend.title = "Overlap",
-                   axis.title = c("Absolute difference\nin consistency", "DLindex"))
+  # # 4...
+  # # Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
+  # model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df1)
+  # g4 <- plot_model(model3h, 
+  #                  type = "pred", 
+  #                  terms = c("Dif_consist", "Joint_LAG1"), 
+  #                  colors = c("black", "red", "blue"),
+  #                  title = "MBiases",
+  #                  legend.title = "Overlap",
+  #                  axis.title = c("Absolute difference\nin consistency", "DLindex"))
+  # 
+  # # 5...
+  # # Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
+  # model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df2)
+  # g5 <- plot_model(model3h, 
+  #                  type = "pred", 
+  #                  terms = c("Dif_consist", "Joint_LAG1"), 
+  #                  colors = c("black", "red", "blue"),
+  #                  title = "WSLS",
+  #                  legend.title = "Overlap",
+  #                  axis.title = c("Absolute difference\nin consistency", "DLindex"))
+  # 
+  # # 6...
+  # # Two-way interaction effect: absolute difference in consistency(n) * overlap(n-1)
+  # model3h <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df3)
+  # g6 <- plot_model(model3h, 
+  #                  type = "pred", 
+  #                  terms = c("Dif_consist", "Joint_LAG1"), 
+  #                  colors = c("black", "red", "blue"),
+  #                  title = "FRA",
+  #                  legend.title = "Overlap",
+  #                  axis.title = c("Absolute difference\nin consistency", "DLindex"))
   
   # 7...
   # DLindex vs. round
@@ -1068,12 +1068,12 @@ plot_3set_comparison_WSLS <- function(df1, df2, df3) {
   
   p <- grid.arrange(g1, g2, g3, g7, g8,legend,
                     nrow=2)
-  q <- grid.arrange(g4, g5, g6,
-                    nrow=1)
+  # q <- grid.arrange(g4, g5, g6,
+  #                   nrow=1)
   
-  r <- grid.arrange(p, q, 
-                    nrow=2,
-                    heights=c(2/3, 1/3))
+  # r <- grid.arrange(p, q, 
+  #                   nrow=2,
+  #                   heights=c(2/3, 1/3))
   
 }
 

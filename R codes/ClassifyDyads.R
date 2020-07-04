@@ -1,16 +1,17 @@
 library(dplyr)
 
-df1 = read.csv("humans.csv")
+df1 = read.csv("../Data/humans_only_absent.csv")
 head(df1)
 
 byseveral <- dplyr::group_by(df1, Dyad)
 regionsAll <- dplyr::summarize(byseveral, DLMean = mean(DLIndex), DLsd = sd(DLIndex), DLMax = max(DLIndex))
 head(regionsAll)
 
-m <- mean(df1$DLIndex)
+# m <- mean(df1$DLIndex)
+m <- 0.65
 
 regionsAll$Division <- apply(regionsAll, 1, function(x) {
-  dyad <- as.character(x[1])
+  dyad <- as.character(unlist(x[1])[[1]])
   me <- as.double(x[2])
   ma <- as.double(x[4])
   if (me > m) {
@@ -18,7 +19,7 @@ regionsAll$Division <- apply(regionsAll, 1, function(x) {
 #    head(dat1)
     dat2 <- dat1[which(df1$DLIndex == ma), ]
 #    head(dat2)
-    regs <- unique(dat2$Distancias)
+    regs <- unique(dat2$Category)
     return(paste(regs, collapse="-"))
   } else {return('No DL')}
 })
@@ -68,7 +69,7 @@ regionsAll$DL[24] <- 'Nothing-Nothing'
 regionsAll$DL[42] <- 'Nothing-Nothing'
 regionsAll$DL[5] <- 'All-All'
 
-write.csv(regionsAll, file = 'classificationDL.csv', row.names = FALSE)
+write.csv(regionsAll, file = '../Data/classificationDL.csv', row.names = FALSE)
 
 byseveral <- dplyr::group_by(regionsAll, DL)
 resumen <- dplyr::summarize(byseveral, average = mean(DLMean), desvEst = sd(DLMean), count = length(DL))
