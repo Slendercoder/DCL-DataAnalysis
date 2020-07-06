@@ -23,7 +23,7 @@ rounds = 60 # number of rounds
 dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
-RM.data_for_confusion_matrix(gameParameters, 10)
+# RM.data_for_confusion_matrix(gameParameters, 10)
 
 # To simulate from chosen parameters
 # # Model Parameters BIAS
@@ -43,7 +43,7 @@ RM.data_for_confusion_matrix(gameParameters, 10)
 
 # To simulate fitted models
 # Model Parameters MBiases
-modelParameters = [0.12, 0.077,  0.058, 0.005 0, 0, 0, 0, 0, 0] #PL1
+modelParameters = [0.12, 0.077,  0.058, 0.005, 0, 0, 0, 0, 0, 0] #PL1
 modelParameters += modelParameters # Both players have equal parameters
 RM.simulation_with_measures(gameParameters, modelParameters, '05')
 
