@@ -13,8 +13,8 @@ library(sjmisc)
 regiones <- c('RS',
               'ALL', 
               'NOTHING', 
-              'DOWN', 
-              'UP', 
+              'BOTTOM', 
+              'TOP', 
               'LEFT', 
               'RIGHT', 
               'IN', 
@@ -97,8 +97,8 @@ plot_RSTransitions <- function(df) {
   df_RS <- df[df$Region == 'RS', ]
   df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
   df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'BOTTOM', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'TOP', ]
   df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
   df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
   df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
@@ -137,7 +137,7 @@ plot_FocalTransitions <- function(df) {
     theme_bw()
   
   regiones <- c('ALL', 'NOTHING', 
-                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'BOTTOM', 'TOP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   
   for (other in regiones) {
@@ -169,7 +169,7 @@ plot_FocalTransitions1 <- function(df) {
     theme_bw()
   
   regiones <- c('ALL', 'NOTHING', 
-                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'BOTTOM', 'TOP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   
   x <- 2
@@ -206,10 +206,10 @@ plot_ModelTransitions_Focal <- function(theta, pl, plColor) {
   # print('xs')
   # print(xs)
   regiones <- c('ALL', 'NOTHING', 
-                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'BOTTOM', 'TOP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   for (other in regiones) {
-    fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=thetaWS)
+    fitFocal <- sapply(xs, WSprob, i=other, k=other, theta=theta)
     print(paste('fitFocal', other))
     print(fitFocal)
     dfB <- data.frame(xs, fitFocal)
@@ -256,7 +256,7 @@ plot_FocalTransitions_3models <- function(df1, df2, df3) {
     theme_bw()
   
   regiones <- c('ALL', 'NOTHING', 
-                'DOWN', 'UP', 'LEFT', 'RIGHT',
+                'BOTTOM', 'TOP', 'LEFT', 'RIGHT',
                 'IN', 'OUT')
   
   for (other in regiones) {
@@ -637,8 +637,8 @@ plot_RSTransitions_FRA <- function(df, k) {
   df_RS <- df[df$Region == 'RS', ]
   df_RS <- df_RS[df_RS$RegionGo != 'ALL', ]
   df_RS <- df_RS[df_RS$RegionGo != 'NOTHING', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'DOWN', ]
-  df_RS <- df_RS[df_RS$RegionGo != 'UP', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'BOTTOM', ]
+  df_RS <- df_RS[df_RS$RegionGo != 'TOP', ]
   df_RS <- df_RS[df_RS$RegionGo != 'LEFT', ]
   df_RS <- df_RS[df_RS$RegionGo != 'RIGHT', ]
   df_RS <- df_RS[df_RS$RegionGo != 'IN', ]
@@ -704,20 +704,27 @@ plot_FRASim_k_RS2RS <- function(df1, k) {
 
 }
   
-plot_Transitions_FRASim_k <- function(df1, k) {
+plot_Transitions_FRASim_k <- function(args, k) {
   
+  num_k <- which(regiones == k)
   min_score <- 0
   max_score <- 1.2
   rotulo_x <- paste("FRASim", k, sep="")
+  columna <- which(colnames(args)==rotulo_x)
   titulo <- paste("From RS to", k)
   print(paste("Plotting", titulo))
   
   # Plot RS to k
-  df_Focal <- df1[df1$Region == 'RS', ]
-  df_Focal <- df_Focal[df_Focal$RegionGo == k, ]
+  df_Focal <- args[args$Region == 'RS', ]
+  df_Focal <- df_Focal[, c(5,num_k + 4)]
+  df_Focal$y <- lapply(df_Focal$freqs, function(x) return(unlist(x)[num_k]))
+  df_Focal$Freqs <- unlist(df_Focal$y)
+  df_Focal <- df_Focal[, c(2,4)]
+  names(df_Focal) <- c('FRASim', 'Freqs')
+
   color_a_usar <- cbPalette[1]
   g2 <- ggplot() +
-    geom_point(aes(x = FRASim, y = Freqs, shape=RegionGo, color=RegionGo, group=RegionGo),
+    geom_point(aes(x = FRASim, y = Freqs),#, shape=RegionGo, color=RegionGo, group=RegionGo),
                data = df_Focal, 
                color = color_a_usar, 
                alpha = alpha, 
