@@ -5,9 +5,22 @@ source("MODELpred.R")
 # Parameter recovery function
 ###############################################################
 
+
+# estimate_biases <- function(df, ronda_max=10) {
+#   aux <- df[df['Round'] < ronda_max, ]
+#   biases <- table(aux['Category'])
+#   suma <- sum(biases)
+#   biases <- biases/suma
+#   wA <- mean(biases[1])
+#   wN <- mean(biases[5])
+#   wL <- mean(biases[2], biases[4], biases[7], biases[9])
+#   wI <- mean(biases[3], biases[6])
+#   return(c(wA, wN, wL, wI))
+# }
+
 fitModels2Data <- function(args) {
 
-  Trials <- 200
+  Trials <- 1
   parametros <- list(rep(0, 11), rep(0, 11), rep(0, 11))
   devs <- c(100000, 100000, 100000)
   f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
@@ -54,8 +67,8 @@ fitModels2Data <- function(args) {
 
 # archivo <- "../Data/Confusion/Simulations/MB7.csv"
 # archivo <- "../Data/Confusion/Simulations/WS2.csv"
-# archivo <- "../Data/Confusion/Simulations/FR7.csv"
-archivo <- "../Data/humans_only_absent.csv"
+archivo <- "../Data/Confusion/Simulations/FR7.csv"
+# archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
@@ -67,6 +80,7 @@ df = read.csv(archivo)
 # pl <- grid.arrange(p1, p2, p3, nrow=1)
 
 df$Region <- df$Category
+# b <- estimate_biases(df, 5)
 df <- find_joint_region(df)
 df$RegionFULL <- unlist(df$RegionFULL)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)

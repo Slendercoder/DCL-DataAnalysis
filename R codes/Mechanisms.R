@@ -16,3 +16,17 @@ df3$Exp <- as.character("FRA")
 df3$Region <- df3$Category
 
 p <- plot_3set_comparison_WSLS(df1, df2, df3)
+
+# Regressing DLIndex w.r.t. Consistency with interaction between Joint(n-1) and Dif_Consist
+# MBiases
+
+modelMBiases <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df1)
+summary(modelMBiases) # => Positive interaction is significant
+
+# WSLS
+modelWSLS <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df2)
+summary(modelWSLS) # => Positive interaction is significant
+
+# FRA
+modelFRA <- lm(DLIndex ~ Consistency + Dif_consist*Joint_LAG1, data = df3)
+summary(modelFRA) # => Positive interaction is significant

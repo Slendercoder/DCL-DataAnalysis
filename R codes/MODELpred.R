@@ -32,8 +32,8 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.0001
 highEps2 =.9999
 
-lower_limits=c(0,0,0,0,0,999,0,0,999,0.5)
-upper_limits=c(0.25,0.25,0.25,0.25,1000,1000,32,1000,1000,1)
+lower_limits=c(0,0,0,0,0,29,0,0,29,0.5)
+upper_limits=c(0.25,0.25,0.25,0.25,100,30,32,100,30,1)
 
 ###########################
 # Define functions
@@ -816,6 +816,45 @@ searchFit_FRA_NMKB <- function(params, args, max_iter=2) {
   
 } # end searchFit_FRA_NMKB
 
+searchFit_FRA_NMKB_modBias <- function(params, args, max_iter=2, b) {
+  
+  contador <- 1
+  
+  while (contador < max_iter + 1) {
+    
+    print(paste("Trying nmkb...", contador))
+    
+    fitresFRA <- tryCatch({
+      f <- nmkb(par=params[5:10], 
+                fn = function(t) FRAutil(b[1], 
+                                         b[2],
+                                         b[3],
+                                         b[4],
+                                         t[1],
+                                         t[2], 
+                                         t[3], 
+                                         t[4], 
+                                         t[5], 
+                                         t[6]),
+                lower=lower_limits[5:10],
+                upper=upper_limits[5:10],
+                control=list(trace=0))
+      contador <- max_iter + 2
+      return(f)
+    }, error = function(e) {
+      print(paste("Error:", e))
+      print(paste("New attempt...(", contador, "/", max_iter, ")", sep=""))
+      contador <- contador - 1
+      return (NA)
+    }
+    )
+    contador <- contador + 1
+  }
+  
+  return(fitresFRA)  
+  
+} # end searchFit_FRA_NMKB_modBias
+
 searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0, escribir=TRUE) {
   
   best <- 100000
@@ -882,7 +921,7 @@ searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0, escribir=TRU
 
 searchBestFit_FRA_modBias <- function(args, N=1, module="nmkb", 
                                       contador=0, escribir=TRUE, 
-                                      lower_limits, upper_limits) {
+                                      b) {
   
   best <- 100000
   fitFRA <- NA
@@ -901,7 +940,7 @@ searchBestFit_FRA_modBias <- function(args, N=1, module="nmkb",
     
     # imprimir(params)
     if (module=="nmkb"){
-      bestFit <- searchFit_FRA_NMKB(params, args)
+      bestFit <- searchFit_FRA_NMKB_modBias(params, args, 2, b)
     } else if (module=="mle2") {
       bestFit <- searchFit_FRA_MLE2(params, args)
     } else {
