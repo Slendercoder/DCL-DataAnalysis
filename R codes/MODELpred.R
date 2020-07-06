@@ -349,7 +349,6 @@ FRAsim <- function(i, iV, j, k) {
   
   simil <- sim_consist(code2Vector(iV), kV)
   
-#  if (k!='ALL' && k!='NOTHING') {
   if (k!='ALL') {
     kVComp <- 1 - code2Vector(kCoded)
     simil2 <- sim_consist(code2Vector(j), kVComp)
@@ -659,6 +658,7 @@ FRApred1 <- function(i, iV, s, j, FRASims, theta) {
   # print('Attractiveness with WS:')
   # imprimir(attractiveness)
   
+  # Add FRASim
   similarities <- delta * sigmoid(unlist(FRASims), epsilon, zeta)
   similarities <- c(0, unlist(similarities))
   attractiveness <- attractiveness + similarities

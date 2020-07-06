@@ -233,10 +233,10 @@ def random_pars_FRAmodel():
 def data_for_confusion_matrix(gameParameters, N = 10):
 
     for n in range(N):
-        modelParameters = random_pars_Bmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'MB', n)
-        modelParameters = random_pars_WSLSmodel()
-        data_conf_mtrx(gameParameters, modelParameters, 'WS', n)
+        # modelParameters = random_pars_Bmodel()
+        # data_conf_mtrx(gameParameters, modelParameters, 'MB', n)
+        # modelParameters = random_pars_WSLSmodel()
+        # data_conf_mtrx(gameParameters, modelParameters, 'WS', n)
         modelParameters = random_pars_FRAmodel()
         data_conf_mtrx(gameParameters, modelParameters, 'FR', n)
 
