@@ -1,0 +1,4 @@
+  File "main.py", line 46
+    modelParameters = [0.12, 0.077,  0.058, 0.005 0, 0, 0, 0, 0, 0] #PL1
+                                                  ^
+SyntaxError: invalid syntax
