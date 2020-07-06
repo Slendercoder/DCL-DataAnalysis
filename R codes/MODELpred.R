@@ -1,6 +1,6 @@
 library(dplyr)
 library(dfoptim)
-library(bbmle)
+# library(bbmle)
 
 ###########################
 # Global variables
