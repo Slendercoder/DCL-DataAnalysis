@@ -545,7 +545,7 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 	# print('Intersection:')
 	# imprime_region(jV)
 	simils2 = [0] * 9
-	for k in range(3,9): # do not consider 'rs', 'all' and 'nothing'
+	for k in range(2,9): # do not consider 'rs' or 'all'
 		kCoded = regionsCoded[k - 1] # regionsCoded does not have 'RS'
 		kCoded = lettercode2Strategy(kCoded, Num_Loc)
 		kCoded = code2Vector(kCoded, Num_Loc)

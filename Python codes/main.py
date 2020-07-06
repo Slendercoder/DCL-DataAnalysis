@@ -31,11 +31,11 @@ modelParameters += modelParameters # Both players have equal parameters
 RM.simulation_with_measures(gameParameters, modelParameters, '05')
 
 # Model Parameters WSLS
-modelParameters = [0.1, 0.1, 0.1, 0.1, 500, 30, 31, 0, 0, 0] #PL1
+modelParameters = [0.1, 0.1, 0.1, 0.1, 100, 30, 31, 0, 0, 0] #PL1
 modelParameters += modelParameters # Both players have equal parameters
 RM.simulation_with_measures(gameParameters, modelParameters, '05')
 
 # Model Parameters FRA
-modelParameters = [0.1, 0.1, 0.1, 0.1, 500, 30, 31, 100, 30, 0.7] #PL1
+modelParameters = [0.1, 0.1, 0.1, 0.1, 100, 30, 31, 100, 30, 0.7] #PL1
 modelParameters += modelParameters # Both players have equal parameters
 RM.simulation_with_measures(gameParameters, modelParameters, '05')

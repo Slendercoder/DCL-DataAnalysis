@@ -880,6 +880,72 @@ searchBestFit_FRA <- function(args, N=1, module="nmkb", contador=0, escribir=TRU
   
 } # end searchBestFit_FRA
 
+searchBestFit_FRA_modBias <- function(args, N=1, module="nmkb", 
+                                      contador=0, escribir=TRUE, 
+                                      lower_limits, upper_limits) {
+  
+  best <- 100000
+  fitFRA <- NA
+  
+  for (n in rep(0, N)) {
+    params <- random_params(list(lower_limits[1], upper_limits[1]), 
+                            list(lower_limits[2], upper_limits[2]), 
+                            list(lower_limits[3], upper_limits[3]), 
+                            list(lower_limits[4], upper_limits[4]), 
+                            list(lower_limits[5], upper_limits[5]), 
+                            list(lower_limits[6], upper_limits[6]), 
+                            list(lower_limits[7], upper_limits[7]), 
+                            list(lower_limits[8], upper_limits[8]), 
+                            list(lower_limits[9], upper_limits[9]), 
+                            list(lower_limits[10], upper_limits[10]))
+    
+    # imprimir(params)
+    if (module=="nmkb"){
+      bestFit <- searchFit_FRA_NMKB(params, args)
+    } else if (module=="mle2") {
+      bestFit <- searchFit_FRA_MLE2(params, args)
+    } else {
+      print("Invalid module!")
+      print("Try with either \'nmkb\' or \'mle2\'")
+      return(NA)
+    }
+    
+    b <- tryCatch({
+      bestFit$value
+    }, error = function(e){
+      print(paste("Oops, optimizer didn\'t work this time!"))
+      return(1000000) 
+    })
+    
+    if (b < best) {
+      fitFRA <- bestFit
+      best <- bestFit$value
+    }
+    
+    print(paste("Best value so far:", best))
+  }
+  
+  if (escribir) {
+    b <- tryCatch({
+      print(fitFRA$message)
+      print(paste("Dev:", fitFRA$value))
+      imprimir(fitFRA$par)
+      archivo <- paste("../Data/Confusion/Estimations/FRA_Parameter_fit_", module, "_", contador, ".csv", sep = "")
+      df <- data.frame(fitFRA)
+      # print(head(df))
+      write.csv(df, archivo, row.names = FALSE)
+      print(paste("Data saved to", archivo))
+      return(fitFRA)
+    }, error = function(e){
+      print(paste("Optimizer", module, "didn\'t work at all :("))
+      return(NA) 
+    })
+  }
+  
+  return(fitFRA)
+  
+} # end searchBestFit_FRA_modBias
+
 ModelProb <- function(regionFrom, regionGo, s, k, theta){
   
   # FRA model returns probability of going from regionFrom to regionGo

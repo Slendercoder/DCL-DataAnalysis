@@ -42,7 +42,7 @@ fitModels2Data <- function(args) {
   })
   
   data <- as.data.frame(do.call(rbind, parametros))
-  names(data) <- c('Model', 'wA', 'wN', 'wL', 'wI',
+  names(data) <- c('wA', 'wN', 'wL', 'wI',
                    'alpha', 'beta', 'gamma',
                    'delta', 'epsilon', 'zeta')
   data$dev <- devs
@@ -54,8 +54,8 @@ fitModels2Data <- function(args) {
 
 # archivo <- "../Data/Confusion/Simulations/MB7.csv"
 # archivo <- "../Data/Confusion/Simulations/WS2.csv"
-# archivo <- "../Data/Confusion/Simulations/FR7.csv"
-archivo <- "../Data/humans_only_absent.csv"
+archivo <- "../Data/Confusion/Simulations/FR7.csv"
+#archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
@@ -75,6 +75,13 @@ args <- getFreqFRA(df, theta)
 args <- get_FRASims_list(args)
 print(head(args))
 print("Data prepared!")
+
+source("MODELpred.R")
+lower_limits=c(0,0,0,0,0,999,0,0,999,0.5)
+upper_limits=c(0.25, 0.25, 0.0001, 0.0001,1000,1000,32,1000,1000,1)
+fit <- searchBestFit_FRA_modBias(args, N=1, module="nmkb", 
+                                 contador=0, FALSE,
+                                 lower_limits, upper_limits)
 
 # start_pars <- c(111)
 # parametros <- searchFit_WSLS_NMKB(start_pars, args, 5)
