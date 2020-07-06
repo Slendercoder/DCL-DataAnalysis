@@ -67,8 +67,8 @@ fitModels2Data <- function(args) {
 
 # archivo <- "../Data/Confusion/Simulations/MB7.csv"
 # archivo <- "../Data/Confusion/Simulations/WS2.csv"
-archivo <- "../Data/Confusion/Simulations/FR7.csv"
-# archivo <- "../Data/humans_only_absent.csv"
+# archivo <- "../Data/Confusion/Simulations/FR7.csv"
+archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
