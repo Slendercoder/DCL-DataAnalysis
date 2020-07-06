@@ -20,7 +20,7 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args) {
 
-  Trials <- 1
+  Trials <- 100
   parametros <- list(rep(0, 11), rep(0, 11), rep(0, 11))
   devs <- c(100000, 100000, 100000)
   f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
