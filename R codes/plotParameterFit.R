@@ -1,5 +1,5 @@
-source('MODELpred.R')
 source("Model_Plots.R")
+source('MODELpred.R') # Load after Model_Plots
 
 ####################################################
 # Loading parameters from estimations...
@@ -34,16 +34,27 @@ print(head(df))
 args <- getFreqFRA(df, theta)
 args <- get_FRASims(args)
 head(args)
-plot_Transitions_FRASim_k(args, 'RIGHT')
 
-a <- c(0)
-for (k in regiones) {
-  df_Focal <- df[df$Region == 'RS', ]
-  df_Focal <- df_Focal[df_Focal$RegionGo == k, ]
-  a <- c(a, dim(df_Focal)[1])
-  print(dim(df_Focal))
-}
-sum(a)
+pA <- plot_Transitions_FRASim_k(args, 'ALL')
+pA <- plot_ModelTransition_k_FRA(args, thetaFR, 'ALL')
+pN <- plot_Transitions_FRASim_k(args, 'NOTHING')
+pN <- plot_ModelTransition_k_FRA(args, thetaFR, 'NOTHING')
+pL <- plot_Transitions_FRASim_k(args, 'LEFT')
+pL <- plot_ModelTransition_k_FRA(args, thetaFR, 'LEFT')
+pR <- plot_Transitions_FRASim_k(args, 'RIGHT')
+pR <- plot_ModelTransition_k_FRA(args, thetaFR, 'RIGHT')
+pT <- plot_Transitions_FRASim_k(args, 'TOP')
+pT <- plot_ModelTransition_k_FRA(args, thetaFR, 'TOP')
+pB <- plot_Transitions_FRASim_k(args, 'BOTTOM')
+pB <- plot_ModelTransition_k_FRA(args, thetaFR, 'BOTTOM')
+pI <- plot_Transitions_FRASim_k(args, 'IN')
+pI <- plot_ModelTransition_k_FRA(args, thetaFR, 'IN')
+pO <- plot_Transitions_FRASim_k(args, 'OUT')
+pO <- plot_ModelTransition_k_FRA(args, thetaFR, 'OUT')
+
+grid.arrange(d2, pA, pN,
+             pI, pO,
+             pL, pR, pT, pB)
 
 # PLOT AT DYADIC LEVEL
 
