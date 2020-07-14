@@ -570,10 +570,11 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		print('Similarity to complement\n', similsPrint)
 
 	simils = np.add(simils1, simils2)
-	simils = [delta * sigmoid(simils[1], epsilon, zeta)] + \
-             [delta1 * sigmoid(simils[2], epsilon, zeta)] + \
-             [delta2 * sigmoid(simils[3:7], epsilon, zeta)] + \
-             [delta3 * sigmoid(simils[7:], epsilon, zeta)] + \
+	simils_delta0 = [delta * sigmoid(simils[1], epsilon, zeta)]
+	simils_delta1 = [delta1 * sigmoid(simils[2], epsilon, zeta)]
+	simils_delta2 = [delta2 * sigmoid(x, epsilon, zeta) for x in simils[3:7]]
+	simils_delta3 = [delta3 * sigmoid(x, epsilon, zeta) for x in simils[7:]]
+
 	#
 	if DEB:
 		similsPrint = ["%.3f" % v for v in simils]
