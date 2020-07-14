@@ -1070,7 +1070,10 @@ searchBestFit_WSLS <- function(args, N=1, module="nmkb", contador=0, escribir=TR
                             list(lower_limits[7], upper_limits[7]), 
                             list(lower_limits[8], upper_limits[8]), 
                             list(lower_limits[9], upper_limits[9]), 
-                            list(lower_limits[10], upper_limits[10]))
+                            list(lower_limits[10], upper_limits[10]), 
+                            list(lower_limits[11], upper_limits[11]), 
+                            list(lower_limits[12], upper_limits[12]), 
+                            list(lower_limits[13], upper_limits[13]))
     params <- params[1:7]
     # imprimir(params)
     if (module=="nmkb"){
@@ -1236,7 +1239,10 @@ searchBestFit_MBiases <- function(args, N=1, module="nmkb", contador=0, escribir
                             list(lower_limits[7], upper_limits[7]), 
                             list(lower_limits[8], upper_limits[8]), 
                             list(lower_limits[9], upper_limits[9]), 
-                            list(lower_limits[10], upper_limits[10]))
+                            list(lower_limits[10], upper_limits[10]), 
+                            list(lower_limits[11], upper_limits[11]), 
+                            list(lower_limits[12], upper_limits[12]), 
+                            list(lower_limits[13], upper_limits[13]))
     params <- params[1:4]
     # imprimir(params)
     if (module=="nmkb"){

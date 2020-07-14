@@ -473,30 +473,24 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		alpha = float(modelParameters[4]) # for how much the focal region augments attractiveness
 		beta = float(modelParameters[5]) # amplitude of the WSLS sigmoid function
 		gamma = float(modelParameters[6]) # position of the WSLS sigmoid function
-		delta = float(modelParameters[7]) # for how much the added FRA similarities augments attractiveness to ALL
+		delta = float(modelParameters[7]) # for how much the added FRA similarities augments attractiveness
 		epsilon = float(modelParameters[8]) # amplitude of the FRA sigmoid function
 		zeta = float(modelParameters[9]) # position of the FRA sigmoid function
-		delta1 = float(modelParameters[10]) # for how much the added FRA similarities augments attractiveness to NOTHING
-		delta2 = float(modelParameters[11]) # for how much the added FRA similarities augments attractiveness to LEFT, ..., BOTTOM
-		delta3 = float(modelParameters[12]) # for how much the added FRA similarities augments attractiveness to IN, OUT
 	else:
-		wALL = float(modelParameters[13])
-		wNOTHING = float(modelParameters[14])
-		wBOTTOM = float(modelParameters[15])
-		wTOP = float(modelParameters[15])
-		wLEFT = float(modelParameters[15])
-		wRIGHT = float(modelParameters[15])
-		wIN = float(modelParameters[16])
-		wOUT = float(modelParameters[16])
-		alpha = float(modelParameters[17]) # for how much the focal region augments attractiveness
-		beta = float(modelParameters[18]) # amplitude of the WSLS sigmoid function
-		gamma = float(modelParameters[19]) # position of the WSLS sigmoid function
-		delta = float(modelParameters[20]) # for how much the added FRA similarities augments attractiveness
-		epsilon = float(modelParameters[21]) # amplitude of the FRA sigmoid function
-		zeta = float(modelParameters[22]) # position of the FRA sigmoid function
-		delta1 = float(modelParameters[23]) # for how much the added FRA similarities augments attractiveness to NOTHING
-		delta2 = float(modelParameters[24]) # for how much the added FRA similarities augments attractiveness to LEFT, ..., BOTTOM
-		delta3 = float(modelParameters[25]) # for how much the added FRA similarities augments attractiveness to IN, OUT
+		wALL = float(modelParameters[10])
+		wNOTHING = float(modelParameters[11])
+		wBOTTOM = float(modelParameters[12])
+		wTOP = float(modelParameters[12])
+		wLEFT = float(modelParameters[12])
+		wRIGHT = float(modelParameters[12])
+		wIN = float(modelParameters[13])
+		wOUT = float(modelParameters[13])
+		alpha = float(modelParameters[14]) # for how much the focal region augments attractiveness
+		beta = float(modelParameters[15]) # amplitude of the WSLS sigmoid function
+		gamma = float(modelParameters[16]) # position of the WSLS sigmoid function
+		delta = float(modelParameters[17]) # for how much the added FRA similarities augments attractiveness
+		epsilon = float(modelParameters[18]) # amplitude of the FRA sigmoid function
+		zeta = float(modelParameters[19]) # position of the FRA sigmoid function
 
 	# biasPrint = ["%.3f" % v for v in [wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]]
 	# print('bias: ', biasPrint)
@@ -570,10 +564,7 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 		print('Similarity to complement\n', similsPrint)
 
 	simils = np.add(simils1, simils2)
-	simils = [delta * sigmoid(simils[1], epsilon, zeta)] + \
-             [delta1 * sigmoid(simils[2], epsilon, zeta)] + \
-             [delta2 * sigmoid(simils[3:7], epsilon, zeta)] + \
-             [delta3 * sigmoid(simils[7:], epsilon, zeta)] + \
+	simils = [delta * sigmoid(x, epsilon, zeta) for x in simils]
 	#
 	if DEB:
 		similsPrint = ["%.3f" % v for v in simils]
