@@ -6,11 +6,11 @@ source("MODELpred-4deltas.R")
 
 fitModels2Data <- function(args) {
 
-  Trials <- 1
+  Trials <- 100
   parametros <- list(rep(0, 14), rep(0, 14), rep(0, 14))
   devs <- c(100000, 100000, 100000)
-  # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
-  # f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador, FALSE)
+  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
+  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador, FALSE)
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb", contador, FALSE)
   print("--------------")
   tryCatch({
@@ -54,8 +54,8 @@ fitModels2Data <- function(args) {
 # archivo <- "../Data/Confusion/Simulations/MB7.csv"
 # archivo <- "../Data/Confusion/Simulations/WS2.csv"
 # archivo <- "../Data/Confusion/Simulations/FR7.csv"
-# archivo <- "../Data/humans_only_absent.csv"
-archivo <- "../Data/high_performing_human_dyads.csv"
+archivo <- "../Data/humans_only_absent.csv"
+# archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
 
