@@ -25,8 +25,8 @@ gameParameters = [p, pl, n, rounds, dyads]
 
 
 # Model Parameters FRA
-modelParameters = [0.063, 0.035, 0.006, 0.002, \
-                    99, 100, 30,\
-                    1.5, 100, 0.978, 0.5, 0.5, 0] #PL1
+modelParameters = [0.043, 0.038, 0.003, 0.001, \
+                    10.4, 99, 30,\
+                    1.2, 99, 0.89, 0.28, 0.21, 0.05] #PL1
 modelParameters += modelParameters # Both players have equal parameters
 RM.simulation_with_measures(gameParameters, modelParameters, '05')
