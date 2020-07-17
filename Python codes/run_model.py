@@ -15,11 +15,13 @@ def simulate_with_parameter_fit(gameParameters):
     pars = []
     for m in models:
         aux = df.query('Model==@m').reset_index()
-        aux = aux.iloc[:, 2:15]
+        aux = aux.iloc[0, 2:15].to_list()
+        print(aux)
         pars.append(aux)
 
     for modelParameters in pars:
-        simulation_with_measures(gameParameters, modelParameters, '5')
+        print(modelParameters+modelParameters)
+        simulation_with_measures(gameParameters, modelParameters+modelParameters, '5')
 
 def standard_simulation(gameParameters, modelParameters):
 
