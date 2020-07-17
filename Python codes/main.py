@@ -24,9 +24,12 @@ dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
 
-# Model Parameters FRA
-modelParameters = [0.043, 0.038, 0.003, 0.001, \
-                    10.4, 99, 30,\
-                    1.2, 99, 0.89, 0.28, 0.21, 0.05] #PL1
-modelParameters += modelParameters # Both players have equal parameters
-RM.simulation_with_measures(gameParameters, modelParameters, '05')
+# Simulate data with fitter parameters
+RM.simulate_with_parameter_fit(gameParameters)
+
+# # Model Parameters FRA
+# modelParameters = [0.043, 0.038, 0.003, 0.001, \
+#                     10.4, 99, 30,\
+#                     1.2, 99, 0.89, 0.28, 0.21, 0.05] #PL1
+# modelParameters += modelParameters # Both players have equal parameters
+# RM.simulation_with_measures(gameParameters, modelParameters, '05')

@@ -8,6 +8,18 @@ import os
 ##########################################################################
 # DEFINE FUNCTIONS RUN MODEL
 ##########################################################################
+def simulate_with_parameter_fit(gameParameters):
+
+    df = pd.read_csv('../Data/parameter_fit_humans.csv')
+    models = df.Model.unique.tolist()
+    pars = []
+    for m in models:
+        aux = df.query('Model==@m').reset_index()
+        aux = aux.iloc[:, 2:15]
+        pars.append(aux)
+
+    for modelParameters in pars:
+        simulation_with_measures(gameParameters, modelParameters)
 
 def standard_simulation(gameParameters, modelParameters):
 
