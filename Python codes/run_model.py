@@ -11,7 +11,7 @@ import os
 def simulate_with_parameter_fit(gameParameters):
 
     df = pd.read_csv('../Data/parameter_fit_humans.csv')
-    models = df.Model.unique.tolist()
+    models = df.Model.unique().tolist()
     pars = []
     for m in models:
         aux = df.query('Model==@m').reset_index()
