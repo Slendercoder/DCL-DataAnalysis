@@ -1,5 +1,5 @@
 source("WSpred.R")
-source("FRApred.R")
+# source("FRApred.R")
 library(ggplot2)
 library(gridExtra)
 library(Rmisc)
@@ -123,11 +123,14 @@ plot_RSTransitions <- function(df) {
 plot_FocalTransitions <- function(df) {
   
   df <- df[df$Region != 'RS', ]
+  df <- df[df$Region == df$RegionGo, ]
   
   min_score <- 0
   max_score <- 33
+  alpha <- 0.5
   
-  gOTHER2OTHER <- ggplot() +
+  g <- ggplot() +
+    geom_point(aes(x = Score, y = Freqs), df, alpha = alpha, size=1.5) + 
     scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
     xlab("Score") +
@@ -136,19 +139,7 @@ plot_FocalTransitions <- function(df) {
     ggtitle("Re-select focal") +
     theme_bw()
   
-  regiones <- c('ALL', 'NOTHING', 
-                'BOTTOM', 'TOP', 'LEFT', 'RIGHT',
-                'IN', 'OUT')
-  
-  for (other in regiones) {
-    df_Focal <- df[df$Region == other, ]
-    df_Focal <- df_Focal[df_Focal$RegionGo == other, ]
-    print(dim(df_Focal))
-    gOTHER2OTHER <- gOTHER2OTHER +
-      geom_point(aes(x = Score, y = Freqs), df_Focal, alpha = alpha, size=1.5)
-  }
-  
-  return (gOTHER2OTHER)
+  return (g)
   
 }
 
@@ -631,7 +622,90 @@ plot_sample_variation <- function(ruta, N) {
   grid.arrange(g1, g2, nrow = 1)
   
 }
+
+ModelProb <- function(regionFrom, regionGo, s, k, theta){
   
+  # FRA model returns probability of going from regionFrom to regionGo
+  # given FRA similarity to region k
+  
+  wALL <- theta[1]
+  wNOTHING <- theta[2]
+  wLEFT <- theta[3]
+  wIN <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta0 <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
+  delta1 <- theta[11]
+  delta2 <- theta[12]
+  delta3 <- theta[13]
+  
+  aux <- c(wALL, wNOTHING, wLEFT, wLEFT, wLEFT, wLEFT, wIN, wIN)
+  
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  #  print('bias')
+  #  imprimir(bias)
+  
+  # Find the attractivenes:
+  focal <- 0
+  index <- which(regiones == regionGo)
+  #  print(paste('Indice regiones:', index))
+  attractiveness <- bias[index]
+  #  print(paste('attractiveness:', attractiveness))
+  
+  if (regionGo == 'ALL') {
+    delta <- delta0
+  } else if (reginGo == 'NOTHING') {
+    delta <- delta1
+  } else if (reginGo == 'LEFT') {
+    delta <- delta2
+  } else if (reginGo == 'RIGHT') {
+    delta <- delta2
+  } else if (reginGo == 'TOP') {
+    delta <- delta2
+  } else if (reginGo == 'BOTTOM') {
+    delta <- delta2
+  } else if (reginGo == 'IN') {
+    delta <- delta3
+  } else if (reginGo == 'OUT') {
+    delta <- delta3
+  }
+  
+  #  print(paste('Considering case from', regionFrom, 'to', regionGo))
+  if (regionFrom == 'RS') { 
+    #    print('Entering case from RS')
+    if (regionGo != 'RS') {
+      #      print('Entering case to Focal')
+      if(k == regionGo) {
+        attractiveness <- attractiveness + delta * sigmoid(s, epsilon, zeta)
+        focal <- delta * sigmoid(s, epsilon, zeta)
+      }
+    } else {
+      #      print('Entering case to RS')
+      focal <- delta * sigmoid(s, epsilon, zeta)
+    }
+  } else {
+    #    print('Entering case from Focal')
+    if(regionFrom == regionGo) {
+      attractiveness <- attractiveness + delta
+      focal <- delta
+    } else if(k == regionGo) {
+      attractiveness <- attractiveness +  delta * sigmoid(s, epsilon, zeta)
+      focal <- delta * sigmoid(s, epsilon, zeta)
+    }
+  }
+  
+  probab <- attractiveness / (1 + focal)
+  
+  return(probab)
+} # end ModelProb
+
 plot_RSTransitions_FRA <- function(df, k) {
   
   df_RS <- df[df$Region == 'RS', ]
@@ -709,6 +783,7 @@ plot_Transitions_FRASim_k <- function(args, k) {
   num_k <- which(regiones == k)
   min_score <- 0
   max_score <- 1.2
+  alpha <- 0.5
   rotulo_x <- paste("FRASim", k, sep="")
   columna <- which(colnames(args)==rotulo_x)
   titulo <- paste("From RS to", k)

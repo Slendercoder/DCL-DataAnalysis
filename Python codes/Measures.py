@@ -13,6 +13,7 @@ Num_Loc = 8
 CLASIFICAR = False
 CONTINUO = False
 CONTADOR = 1
+TOLERANCIA = 0.9
 
 # List of columns for region visited
 cols1 = ['a' + str(i) + str(j) \
@@ -183,24 +184,6 @@ def get_measures(data, lista):
         for c in cols1:
             # print('Working with column', c)
             data[c] = data.apply(lambda x: completeRegions(x['Strategy'], c), axis=1)
-
-    if '1' in lista:
-        # --------------------------------------------------
-        # Classify region per round, per player
-        # --------------------------------------------------
-        print("Classifying regions (please be patient)...")
-
-        # Deterimining list of columns
-        cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
-        data['Category'] = data.apply(lambda x: FRA.minDist2Focal(x[cols1], regionsCoded), axis=1)
-
-    else:
-        print("Trying to obtain classification from simulation...")
-        try:
-            data['Category'] = data.apply(lambda x: FRA.nameRegion(x['Strategy']), axis=1)
-            # print('Done!')
-        except:
-            print('Data does not seem to come from simulation!')
 
     if '2' in lista:
         # 1. Create column of indexes
@@ -378,6 +361,24 @@ def get_measures(data, lista):
                                     ['Score'].transform('shift', -1)
         data = pd.DataFrame(data.groupby('Is_there').get_group('Unicorn_Absent'))
         print('List of blocks\n', data[['Round', 'Is_there', 'Score', 'ScoreLEAD']][0:20])
+
+    if '1' in lista:
+        # --------------------------------------------------
+        # Classify region per round, per player
+        # --------------------------------------------------
+        print("Classifying regions (please be patient)...")
+
+        # Deterimining list of columns
+        cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
+        data['Category'] = data.apply(lambda x: FRA.classify_region(x[cols1], regionsCoded, TOLERANCIA), axis=1)
+
+    else:
+        print("Trying to obtain classification from simulation...")
+        try:
+            data['Category'] = data.apply(lambda x: FRA.nameRegion(x['Strategy']), axis=1)
+            # print('Done!')
+        except:
+            print('Data does not seem to come from simulation!')
 
     # --------------------------------------------------
     # Obtaining final measures from players' performance

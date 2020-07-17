@@ -328,6 +328,29 @@ def sim_consist(v1, v2):
 	       else:
 	              return 1
 
+def classify_region(r, regiones, TOLERANCIA):
+
+    # Check if close to NOTHING
+    if np.array(r).sum() < 3:
+        return('NOTHING')
+
+    sims = [0]*8
+    for i, k in enumerate(regiones):
+        sims[i] = sim_consist(r, k)
+
+    # sims_print = ["%.3f" % v for v in sims]
+    # print('similarities:\n', sims)
+
+    valor = np.max(np.array(sims))
+    indiceMax = np.argmax(np.array(sims))
+    # print('valor:', valor, 'vale?:', valor >= TOLERANCIA)
+
+    if valor >= TOLERANCIA:
+        reg = nameRegion(indiceMax + 1)
+        return(reg)
+    else:
+        return('RS')
+
 def dist(k, i):
     # Returns similarity between regions k and i
     # Input: k, which is a region coded as a vector of 0s and 1s of length 64

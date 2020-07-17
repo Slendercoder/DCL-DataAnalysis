@@ -1,5 +1,5 @@
 source("Model_Plots.R")
-source('MODELpred.R') # Load after Model_Plots
+source('MODELpred-4deltas.R') # Load after Model_Plots
 
 ####################################################
 # Loading parameters from estimations...
@@ -7,12 +7,13 @@ source('MODELpred.R') # Load after Model_Plots
 archivo <- "../Data/parameter_fit_humans.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 parametros = read.csv(archivo)
-thetaWS <- unlist(parametros[parametros['Model']=='WSLS', ][2:11])
+thetaWS <- unlist(parametros[parametros['Model']=='WSLS', ][2:14])
 imprimir(thetaWS)
-thetaFR <- unlist(parametros[parametros['Model']=='FRA', ][2:11])
+thetaFR <- unlist(parametros[parametros['Model']=='FRA', ][2:14])
 imprimir(thetaFR)
 
-archivo <- "../Data/humans_only_absent.csv"
+# archivo <- "../Data/humans_only_absent.csv"
+archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
 
@@ -52,9 +53,10 @@ pI <- plot_ModelTransition_k_FRA(args, thetaFR, 'IN')
 pO <- plot_Transitions_FRASim_k(args, 'OUT')
 pO <- plot_ModelTransition_k_FRA(args, thetaFR, 'OUT')
 
-grid.arrange(d2, pA, pN,
+p <- grid.arrange(d2, pA, pN,
              pI, pO,
              pL, pR, pT, pB)
+p
 
 # PLOT AT DYADIC LEVEL
 
