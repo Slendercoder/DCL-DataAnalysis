@@ -19,7 +19,7 @@ def simulate_with_parameter_fit(gameParameters):
         pars.append(aux)
 
     for modelParameters in pars:
-        simulation_with_measures(gameParameters, modelParameters)
+        simulation_with_measures(gameParameters, modelParameters, '5')
 
 def standard_simulation(gameParameters, modelParameters):
 
