@@ -76,7 +76,7 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 20), "Model parameters incorrect length!"
+		assert(len(modelParameters) == 26), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 
