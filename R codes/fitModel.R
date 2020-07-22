@@ -22,8 +22,8 @@ fitModels2Data <- function(args) {
   Trials <- 100
   parametros <- list(rep(0, 11), rep(0, 11), rep(0, 11))
   devs <- c(100000, 100000, 100000)
-  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
-  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador, FALSE)
+  # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
+  # f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador, FALSE)
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb", contador, FALSE)
   print("--------------")
   tryCatch({
@@ -90,4 +90,4 @@ print(head(args))
 print("Data prepared!")
 
 fitdata <- fitModels2Data(args)
-write.csv(fitdata, '../Data/parameter_fit_humans.csv', row.names=FALSE)
+write.csv(fitdata, '../Data/parameter_fit_humans-Y.csv', row.names=FALSE)

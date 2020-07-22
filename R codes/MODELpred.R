@@ -32,7 +32,7 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.0001
 highEps2 =.9999
 
-lower_limits=c(0,0,0,0,99,99,0,99,99,0.5)
+lower_limits=c(0,0,0,0,0,99,0,0,99,0.5)
 upper_limits=c(0.25,0.25,0.25,0.25,100,100,32,100,100,1)
 
 ###########################
@@ -675,6 +675,62 @@ FRApred1 <- function(i, iV, s, j, FRASims, theta) {
 
 } # End FRApred1
 
+FRApred2 <- function(i, iV, s, j, FRASims, theta) {
+  
+  FRASims <- data.frame(FRASims)[,1]
+  # print('FRASims')
+  # print(FRASims)
+  
+  wAll <- theta[1]
+  wNoth <- theta[2]
+  wLef <- theta[3]
+  wIn <- theta[4]
+  alpha <- theta[5]
+  beta <- theta[6]
+  gamma <- theta[7]
+  delta <- theta[8]
+  epsilon <- theta[9]
+  zeta <- theta[10]
+  
+  # First we calculate the prior probabilities
+  aux <- c(wAll, wNoth, wLef, wLef, wLef, wLef, wIn, wIn)
+  # The probability of region 'RS' is 1 - the sum of the other probabilities
+  if (sum(aux) > 1) {
+    aux <- aux/sum(aux)
+  }
+  bias <- c(1 - sum(aux), aux)
+  # print('bias')
+  # imprimir(bias)
+  
+  # Start from biases
+  attractiveness <- bias
+  # Add WinStay
+  index <- which(regiones == i)
+  WS <- rep(1, 8)
+  # adding win stay only to focal regions
+  if (i != 'RS') {
+    WS[index] <- 1 + alpha * sigmoid(s, beta, gamma) 
+  }
+  # print('Attractiveness with WS:')
+  # imprimir(attractiveness)
+  
+  # Add FRASim
+  similarities <- rep(1, 8) + delta * sigmoid(unlist(FRASims), epsilon, zeta)
+  similarities <- c(0, unlist(similarities))
+  
+  attractiveness <- attractiveness + WS * similarities
+  # print('Attractiveness with FRAsim:')
+  # imprimir(attractiveness)
+  
+  probs <- attractiveness / sum(attractiveness)
+  probs <- replace(probs,probs<lowerEps2,lowerEps2)
+  probs <- replace(probs,probs>highEps2,highEps2)
+  
+  # print('Probabilities:')
+  # imprimir(probs)
+  return(list(probs))
+  
+} # End FRApred2
 
 # A function to get deviance from FRA model
 FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
@@ -703,7 +759,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   # ) %>%
   #   ungroup()
   args$probs <- mapply(function(i,iv,s,j,f) {
-    return(FRApred1(i,iv,s,j,f,theta))
+    return(FRApred2(i,iv,s,j,f,theta))
   },
   args$Region, 
   args$RegionFULL, 
