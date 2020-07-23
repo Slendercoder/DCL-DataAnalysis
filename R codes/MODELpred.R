@@ -32,7 +32,12 @@ regionsCoded <- c('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
 lowerEps2=.0001
 highEps2 =.9999
 
-lower_limits=c(0,0,0,0,0,99,0,0,99,0.5)
+# Not including interaction
+# lower_limits=c(0,0,0,0,0,99,0,0,99,0.5)
+# upper_limits=c(0.25,0.25,0.25,0.25,100,100,32,100,100,1)
+
+# Including interaction where epsilon is the interaction coefficient
+lower_limits=c(0,0,0,0,0,99,0,0,0,0.5)
 upper_limits=c(0.25,0.25,0.25,0.25,100,100,32,100,100,1)
 
 ###########################
@@ -685,11 +690,11 @@ FRApred2 <- function(i, iV, s, j, FRASims, theta) {
   wNoth <- theta[2]
   wLef <- theta[3]
   wIn <- theta[4]
-  alpha <- theta[5]
+  alpha <- theta[5] # WSLS coefficient
   beta <- theta[6]
   gamma <- theta[7]
-  delta <- theta[8]
-  epsilon <- theta[9]
+  delta <- theta[8] # FRA coefficient
+  epsilon <- theta[9] # Interaction coefficient
   zeta <- theta[10]
   
   # First we calculate the prior probabilities
@@ -706,22 +711,25 @@ FRApred2 <- function(i, iV, s, j, FRASims, theta) {
   attractiveness <- bias
   # Add WinStay
   index <- which(regiones == i)
-  WS <- rep(1, 8)
   # adding win stay only to focal regions
   if (i != 'RS') {
-    WS[index] <- 1 + alpha * sigmoid(s, beta, gamma) 
+    attractiveness[index] <- attractiveness[index] + alpha * sigmoid(s, beta, gamma) 
   }
   # print('Attractiveness with WS:')
   # imprimir(attractiveness)
   
   # Add FRASim
-  similarities <- rep(1, 8) + delta * sigmoid(unlist(FRASims), epsilon, zeta)
+  similarities <- delta * sigmoid(unlist(FRASims), 100, zeta)
   similarities <- c(0, unlist(similarities))
-  
-  attractiveness <- attractiveness + WS * similarities
+  attractiveness <- attractiveness + similarities
   # print('Attractiveness with FRAsim:')
   # imprimir(attractiveness)
   
+  # Add interaction
+  if (i != 'RS') {
+    attractiveness[index] <- attractiveness[index] + epsilon * sigmoid(s, beta, gamma) * sigmoid(FRASims[index-1], 100, zeta)
+  }
+
   probs <- attractiveness / sum(attractiveness)
   probs <- replace(probs,probs<lowerEps2,lowerEps2)
   probs <- replace(probs,probs>highEps2,highEps2)
