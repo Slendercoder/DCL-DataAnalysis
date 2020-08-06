@@ -19,11 +19,11 @@ source("MODELpred.R")
 
 fitModels2Data <- function(args) {
 
-  Trials <- 100
+  Trials <- 10
   parametros <- list(rep(0, 11), rep(0, 11), rep(0, 11))
   devs <- c(100000, 100000, 100000)
-  # f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
-  # f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador, FALSE)
+  f_MBi <- searchBestFit_MBiases(args, N=Trials, module="nmkb", contador, FALSE)
+  f_WSLS <- searchBestFit_WSLS(args, N=Trials, module="nmkb", contador, FALSE)
   f_FRA <- searchBestFit_FRA(args, N=Trials, module="nmkb", contador, FALSE)
   print("--------------")
   tryCatch({

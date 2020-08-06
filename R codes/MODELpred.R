@@ -33,12 +33,12 @@ lowerEps2=.0001
 highEps2 =.9999
 
 # Not including interaction
-# lower_limits=c(0,0,0,0,0,99,0,0,99,0.5)
-# upper_limits=c(0.25,0.25,0.25,0.25,100,100,32,100,100,1)
+lower_limits=c(0,0,0,0,0,0,0,0,99,0.5)
+upper_limits=c(0.25,0.25,0.25,0.25,1,100,32,100,100,1)
 
-# Including interaction where epsilon is the interaction coefficient
-lower_limits=c(0,0,0,0,0,99,0,0,0,0.5)
-upper_limits=c(0.25,0.25,0.25,0.25,100,100,32,100,100,1)
+# # Including interaction where epsilon is the interaction coefficient
+# lower_limits=c(0,0,0,0,0,99,0,0,0,0.5)
+# upper_limits=c(0.25,0.25,0.25,0.25,100,100,32,100,100,1)
 
 ###########################
 # Define functions
@@ -767,7 +767,7 @@ FRAutil <- function(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10){
   # ) %>%
   #   ungroup()
   args$probs <- mapply(function(i,iv,s,j,f) {
-    return(FRApred2(i,iv,s,j,f,theta))
+    return(FRApred1(i,iv,s,j,f,theta))
   },
   args$Region, 
   args$RegionFULL, 
