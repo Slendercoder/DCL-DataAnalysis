@@ -33,8 +33,8 @@ lowerEps2=.0001
 highEps2 =.9999
 
 # Not including interaction
-lower_limits=c(0,0,0,0,0,0,0,0,99,0.5)
-upper_limits=c(0.25,0.25,0.25,0.25,1,100,32,100,100,1)
+lower_limits=c(0,0,0,0,0,50,0,0,50,0.5)
+upper_limits=c(0.25,0.25,0.25,0.25,100,100,32,100,100,1)
 
 # # Including interaction where epsilon is the interaction coefficient
 # lower_limits=c(0,0,0,0,0,99,0,0,0,0.5)
