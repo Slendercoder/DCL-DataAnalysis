@@ -4,19 +4,6 @@ source("MODELpred.R")
 # Parameter recovery function
 ###############################################################
 
-
-# estimate_biases <- function(df, ronda_max=10) {
-#   aux <- df[df['Round'] < ronda_max, ]
-#   biases <- table(aux['Category'])
-#   suma <- sum(biases)
-#   biases <- biases/suma
-#   wA <- mean(biases[1])
-#   wN <- mean(biases[5])
-#   wL <- mean(biases[2], biases[4], biases[7], biases[9])
-#   wI <- mean(biases[3], biases[6])
-#   return(c(wA, wN, wL, wI))
-# }
-
 fitModels2Data <- function(args) {
 
   Trials <- 10
@@ -73,14 +60,7 @@ archivo <- "../Data/humans_only_absent_perfect.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
 
-# p <- plot_individual_behavior(df)
-# p1 <- p[[1]]
-# p2 <- p[[2]]
-# p3 <- p[[3]]
-# pl <- grid.arrange(p1, p2, p3, nrow=1)
-
 df$Region <- df$Category
-# b <- estimate_biases(df, 5)
 df <- find_joint_region(df)
 df$RegionFULL <- unlist(df$RegionFULL)
 df$RegionGo <- factor(df$RegionGo, levels = regiones)
