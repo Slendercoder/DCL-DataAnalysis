@@ -1438,6 +1438,183 @@ plot_behavioral_data_fit <- function(df1, df2, df3, df4) {
 
 }
 
+plot_behavioral_data_fit1 <- function(df1, df2, df3, df4) {
+  
+  # Plot three panels
+  
+  min_score <- 0
+  max_score <- 33
+  
+  labeldf1 <- "Humans"
+  labeldf2 <- "MBiases"
+  labeldf3 <- "WSLS"
+  labeldf4 <- "FRA"
+  colordf1 <- cbPalette[1]
+  colordf2 <- cbPalette[4]
+  colordf3 <- cbPalette[5]
+  colordf4 <- cbPalette[7]
+  
+  df <- rbind(
+    df1[c('Round', 
+          'DLIndex',
+          'Consistency',
+          #          'Consistency_LEAD1',
+          'Category',
+          'Score',
+          'Score_LAG1',
+          'Dif_consist',
+          'Joint_LAG1',
+          'Similarity_LAG1',
+          'Exp')],
+    df2[c('Round', 
+          'DLIndex',
+          'Consistency',
+          #          'Consistency_LEAD1',
+          'Category',
+          'Score',
+          'Score_LAG1',
+          'Dif_consist',
+          'Joint_LAG1',
+          'Similarity_LAG1',
+          'Exp')],
+    df3[c('Round', 
+          'DLIndex',
+          'Consistency',
+          #          'Consistency_LEAD1',
+          'Category',
+          'Score',
+          'Score_LAG1',
+          'Dif_consist',
+          'Joint_LAG1',
+          'Similarity_LAG1',
+          'Exp')],
+    df4[c('Round', 
+          'DLIndex',
+          'Consistency',
+          #          'Consistency_LEAD1',
+          'Category',
+          'Score',
+          'Score_LAG1',
+          'Dif_consist',
+          'Joint_LAG1',
+          'Similarity_LAG1',
+          'Exp')]
+  )
+  df$Exp <- as.factor(df$Exp)
+  df$Exp <- factor(df$Exp, levels = c(labeldf1, labeldf2, labeldf3, labeldf4))
+  df$Category <- lapply(df$Category, function(x) {
+    if(x=='ALL') {
+      return('A.')
+    } else if(x=='NOTHING') {
+      return('N.')
+    } else if(x=='BOTTOM') {
+      return('B.')
+    } else if(x=='TOP') {
+      return('T.')
+    } else if(x=='T.') {
+      return('B.')
+    } else if(x=='LEFT') {
+      return('L.')
+    } else if(x=='L.') {
+      return('B.')
+    } else if(x=='RIGHT') {
+      return('R.')
+    } else if(x=='IN') {
+      return('I.')
+    } else if(x=='OUT') {
+      return('O.')
+    } else {
+      return(as.character(x))
+    }
+  })
+  df$Category <- unlist(df$Category)
+  df$Category <- as.factor(df$Category)
+  df$Category <- factor(df$Category, levels = c('RS',
+                                                'A.', 
+                                                'N.', 
+                                                'B.', 
+                                                'T.', 
+                                                'L.', 
+                                                'R.', 
+                                                'I.', 
+                                                'O.'))
+  
+  # 1...
+  # Top left -- Bar plot: Percentage of trials regions uncovered
+  g1 <- ggplot(df, aes(x=Category,  group=Exp, fill=Exp)) + 
+    geom_bar(aes(y = ..prop..*100), stat="count", position="dodge") +
+    xlab("Region") +
+    ylab("% of trials region\n was uncovered") +
+    scale_fill_manual(name = "Source of data",
+                      values = c(colordf1,colordf2,colordf3,colordf4)) +  
+    theme_bw() +
+    theme(legend.position="right")
+  
+  # 2...
+  # Consistency(n) ~ Score(n-1)
+  g2 <- ggplot(df, aes(x = Score_LAG1, y = Consistency, color=Exp)) +
+    geom_point(alpha = 1/8) +
+    scale_colour_manual(values = c(colordf1,colordf2,colordf3,colordf4)) +  
+    xlab("Score(n-1)") +
+    ylab("Consistency(n)") +
+    xlim(c(min_score,max_score)) +
+    ylim(c(0,1)) +
+    geom_smooth(method = lm) + 
+    theme_bw() +
+    theme(legend.position="bottom")
+  
+  # 3...
+  # Consistency(n) ~ Max similarity to focal region
+  g3 <- ggplot(df, aes(x = Similarity_LAG1, y = Consistency, color=Exp)) +
+    geom_point(alpha = 1/8) +
+    scale_colour_manual(values = c(colordf1,colordf2,colordf3,colordf4)) +  
+    xlab("Max similarity w.r.t.\n focal regions(n-1)") +
+    ylab("Consistency(n)") +
+    xlim(c(0,1)) +
+    ylim(c(0,1)) +
+    geom_smooth(method = lm) + 
+    theme_bw() +
+    theme(legend.position="bottom")
+  
+
+  # 8...
+  # Kernel density estimate DLindex
+  g8 <- ggplot(df, aes(DLIndex, colour=Exp, group=Exp)) +
+    geom_density(size=1) +
+    scale_colour_manual(values = c(colordf1,colordf2,colordf3,colordf4)) +  
+    xlab("Division of labor") +
+    # scale_y_continuous(limits = c(0, 5)) + 
+    # labs(color = "Source of data") +
+    theme_bw()
+
+  # Summarize data
+  dfc_DLIndex <- summarySE(df, measurevar="DLIndex", groupvars=c("Exp", "Round"))
+  # Plot DLIndex with error regions
+  g5 <- ggplot(dfc_DLIndex, aes(x=Round, y=DLIndex, group=Exp, color=Exp)) +
+    geom_line(size=0.9) +
+    # geom_ribbon(aes(ymin = DLIndex - sd,
+    #                 ymax = DLIndex + sd), alpha = 0.05) +
+    scale_colour_manual(values = c(colordf1,colordf2,colordf3,colordf4)) +  
+    labs(color = "Source") +
+    xlab("Round (unicorn absent)") +
+    ylab("DLindex") +
+    ylim(c(0.25,1)) +
+    theme_bw()
+  
+  legend <- get_legend(g1)
+  g2 <- g2 + theme(legend.position="none")
+  g3 <- g3 + theme(legend.position="none")
+  g1 <- g1 + theme(legend.position="none")
+  g8 <- g8 + theme(legend.position="none")
+  g5 <- g5 + theme(legend.position="none")
+  
+  p <- grid.arrange(g1, g2, g3, nrow=1)
+  q <- grid.arrange(g8, legend, nrow=2)
+  g <- grid.arrange(g5, q, widths=c(2/3, 1/3))
+  return (grid.arrange(p, g, heights=c(1/3, 2/3), nrow=2))
+  
+}
+
 plot_individual_behavior <- function(df){
   
   plots <- list()

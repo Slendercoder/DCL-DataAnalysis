@@ -28,4 +28,5 @@ df4 = read.csv(archivo)
 df4$Region <- df4$Category
 df4$Exp <- "FRA"
 
-plot_behavioral_data_fit(df1, df2, df3, df4)
+plot_behavioral_data_fit1(df1, df2, df3, df4)
+
