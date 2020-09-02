@@ -578,11 +578,96 @@ def probabilities(iV, i, score, j, pl, modelParameters, Num_Loc):
 
 	sum = np.sum(attractiveness)
 	probs = [x/sum for x in attractiveness]
-	# sum = np.sum([x**10 for x in attractiveness])
-	# probs = [x**10/sum for x in attractiveness]
 
 	return probs
 
+def attractiveness(region, score, overlap, pl, modelParameters, Num_Loc, focals, DEB=False):
+
+	if pl == 0:
+		wALL = float(modelParameters[0])
+		wNOTHING = float(modelParameters[1])
+		wBOTTOM = float(modelParameters[2])
+		wTOP = float(modelParameters[2])
+		wLEFT = float(modelParameters[2])
+		wRIGHT = float(modelParameters[2])
+		wIN = float(modelParameters[3])
+		wOUT = float(modelParameters[3])
+		alpha = float(modelParameters[4]) # for how much the focal region augments attractiveness
+		beta = float(modelParameters[5]) # amplitude of the WSLS sigmoid function
+		gamma = float(modelParameters[6]) # position of the WSLS sigmoid function
+		delta = float(modelParameters[7]) # for how much the added similarities augments attractiveness
+		epsilon = float(modelParameters[8]) # amplitude of the similarity sigmoid function
+		zeta = float(modelParameters[9]) # position of the similarity sigmoid function
+		eta = float(modelParameters[10]) # for how much the added complement similarities augments attractiveness
+		theta = float(modelParameters[11]) # amplitude of the complement similarity sigmoid function
+		iota = float(modelParameters[12]) # position of the complement similarity sigmoid function
+	else:
+		wALL = float(modelParameters[13])
+		wNOTHING = float(modelParameters[14])
+		wBOTTOM = float(modelParameters[15])
+		wTOP = float(modelParameters[15])
+		wLEFT = float(modelParameters[15])
+		wRIGHT = float(modelParameters[15])
+		wIN = float(modelParameters[16])
+		wOUT = float(modelParameters[16])
+		alpha = float(modelParameters[17]) # for how much the focal region augments attractiveness
+		beta = float(modelParameters[18]) # amplitude of the WSLS sigmoid function
+		gamma = float(modelParameters[19]) # position of the WSLS sigmoid function
+		delta = float(modelParameters[20]) # for how much the added FRA similarities augments attractiveness
+		epsilon = float(modelParameters[21]) # amplitude of the FRA sigmoid function
+		zeta = float(modelParameters[22]) # position of the FRA sigmoid function
+		eta = float(modelParameters[23]) # for how much the added complement similarities augments attractiveness
+		theta = float(modelParameters[24]) # amplitude of the complement similarity sigmoid function
+		iota = float(modelParameters[25]) # position of the complement similarity sigmoid function
+
+	attractiveness = [wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]
+	if DEB:
+		attactPrint = ["%.3f" % v for v in attractiveness]
+		print('Player', pl)
+		print('biases\n', attactPrint)
+
+	# Adding 'Win Stay'
+	WinStay = [alpha * sigmoid(score, beta, gamma) * sigmoid(sim_consist(x, region), epsilon, zeta) for x in focals]
+	attractiveness = np.add(attractiveness, WinStay)
+
+	if DEB:
+		attactPrint = ["%.3f" % v for v in WinStay]
+		print('win stay\n', attactPrint)
+
+	# Adding similarity to region
+	simils = [delta * sim_consist(x, region) for x in focals]
+	attractiveness = np.add(attractiveness, simils)
+
+	if DEB:
+		attactPrint = ["%.3f" % v for v in simils]
+		print('similarity to region\n', attactPrint)
+
+	# Adding similarity to complement
+	complements = [[1 - x for x in sublist] for sublist in focals]
+	simils = [eta * sigmoid(sim_consist(x, overlap), theta, iota) for x in complements]
+	attractiveness = np.add(attractiveness, simils)
+
+	if DEB:
+		attactPrint = ["%.3f" % v for v in simils]
+		print('similarity to complement\n', attactPrint)
+
+	if DEB:
+		attactPrint = ["%.3f" % v for v in attractiveness]
+		print('final attractiveness\n', attactPrint)
+
+	return attractiveness
+
+def err_l2(df, modelParameters):
+    pl = 0
+    Num_Loc = 8
+    df['attract'] = df.apply(lambda x: attractiveness(
+                            x['Region'], x['Score'], x['Overlap'],
+                            pl, modelParameters, Num_Loc, focals),
+                            axis = 1)
+    df['Err_L2'] = (df['Sims'] - df['attract'])**2
+    df['Err_L2'] = df['Err_L2'].apply(lambda x: np.sum(x))
+    return df['Err_L2'].sum()
+    
 def probabilities_WSLS(iV, i, score, j, pl, modelParameters, Num_Loc):
 
 	wALL = float(modelParameters[0])

@@ -1548,7 +1548,7 @@ plot_behavioral_data_fit1 <- function(df1, df2, df3, df4) {
     scale_fill_manual(name = "Source of data",
                       values = c(colordf1,colordf2,colordf3,colordf4)) +  
     theme_bw() +
-    theme(legend.position="right")
+    theme(legend.position="bottom")
   
   # 2...
   # Consistency(n) ~ Score(n-1)
@@ -1608,10 +1608,10 @@ plot_behavioral_data_fit1 <- function(df1, df2, df3, df4) {
   g8 <- g8 + theme(legend.position="none")
   g5 <- g5 + theme(legend.position="none")
   
-  p <- grid.arrange(g1, g2, g3, nrow=1)
-  q <- grid.arrange(g8, legend, nrow=2)
-  g <- grid.arrange(g5, q, widths=c(2/3, 1/3))
-  return (grid.arrange(p, g, heights=c(1/3, 2/3), nrow=2))
+  # p <- grid.arrange(g1, g2, g3, nrow=1)
+  # q <- grid.arrange(g8, legend, nrow=2)
+  # g <- grid.arrange(g5, q, widths=c(2/3, 1/3))
+  return (grid.arrange(g5, g8, nrow=1, bottom=legend))
   
 }
 
