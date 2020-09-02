@@ -60,6 +60,6 @@ modelParameters = [0.01, 0.01, 0.01, 0.01, # Biases
                # 1, 20, 0.7 # Repulsion to complement
               ]
 minimos = [0] * 13
-maximos = [0.25, 0.25, 0.25, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-#maximos = [0.25, 0.25, 0.25, 0.25, 1, 100, 32, 1, 100, 1, 1, 100, 1]
+#maximos = [0.25, 0.25, 0.25, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+maximos = [0.25, 0.25, 0.25, 0.25, 1, 100, 32, 1, 100, 1, 1, 100, 1]
 optimizar(modelParameters, minimos, maximos)
