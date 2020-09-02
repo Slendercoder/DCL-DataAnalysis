@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from random import choice, uniform, random, sample, randint
-from scipy.optimize import minimize, Bounds
 
 ###########################################################
 # GLOBAL VARIABLES
@@ -658,77 +657,6 @@ def attractiveness(region, score, overlap, pl, modelParameters, Num_Loc, focals,
 
 	return attractiveness
 
-def get_strategy(sims):
-    sims = [float(x) for x in sims]
-    a = sims[0]
-    b = sims[2]
-    t = sims[3]
-    l = sims[4]
-    r = sims[5]
-    A = int(np.ceil(64 * a))
-    B = int(b * (A + 32) / (1 + b))
-    T = int(t * (A + 32) / (1 + t))
-    L = int(l * (A + 32) / (1 + l))
-    R = int(r * (A + 32) / (1 + r))
-#    print(a, b, t, l, r)
-#    print("A = ", A)
-#    print("A int B =", B)
-#    print("A int T =", T)
-#    print("A int L =", L)
-#    print("A int R =", int(r * (A + 32) / (1 + r)))
-    Ma = min(T, L, 16, (16 + T + L - A))
-    Mi = max(0, T - R, L - 16, T - 16)
-#    print("Min(T, L, 16, (16 + T + L - A)) =", Ma)
-#    print("Max(0, T - R, L - 16, T - 16) =", Mi)
-    x = randint(Mi, Ma)
-    y = T - x
-    u = L - x
-    v = A - x - y - u
-#    print("x =", x)
-#    print("y =", y)
-#    print("u =", u)
-#    print("v =", v)
-    X = list(range(0,4)) + list(range(8,12)) + list(range(16,20)) + list(range(24, 28))
-    Y = list(range(4,8)) + list(range(12,16)) + list(range(20,24)) + list(range(28, 32))
-    U = list(range(32,36)) + list(range(40,44)) + list(range(48,52)) + list(range(56, 60))
-    V = list(range(36,40)) + list(range(44,48)) + list(range(52,56)) + list(range(60, 64))
-    X = list(np.random.choice(X, x, replace=False)) if x > 0 else []
-    Y = list(np.random.choice(Y, y, replace=False)) if y > 0 else []
-    U = list(np.random.choice(U, u, replace=False)) if u > 0 else []
-    V = list(np.random.choice(V, v, replace=False)) if v > 0 else []
-    region = X + Y + U + V
-#    print(region)
-    return region
-
-def shaky_hand(strategy, p=2):
-    outs = np.random.choice(strategy, p) if len(strategy) > 0 else []
-    complement = [i for i in range(64) if i not in strategy]
-    ins = np.random.choice(complement, p) if len(complement) > 0 else []
-    strategy = [i for i in strategy if i not in outs] + list(ins)
-    return [i for i in strategy]
-
-def err2_regions(region1, region2):
-    sims1 = [sim_consist(region1, k) for k in focals]
-    sims2 = [sim_consist(region2, k) for k in focals]
-    return sum([(sims1[i] - sims2[i])**2 for i in range(len(sims1))])
-
-def err2_sim_region(sims1, region, focals):
-    sims2 = [sim_consist(region, k) for k in focals]
-    return sum([(sims1[i] - sims2[i])**2 for i in range(len(sims1))])
-
-def err2_sims(sims1, sims2):
-    return sum([(sims1[i] - sims2[i])**2 for i in range(len(sims1))])
-
-def err2_model(df, pl, modelParameters, Num_Loc, focals, estrategias, p):
-    df['SimsPred'] = df.apply(lambda x: attractiveness(
-                            x['Region'], x['Score'], x['Overlap'],
-                            pl, modelParameters, Num_Loc, focals),
-                            axis = 1)
-    df['SimsPred'] = df['SimsPred'].apply(lambda x: shaky_hand(estrategias[np.argmax(x) + 1], p))
-    df['SimsPred'] = df['SimsPred'].apply(lambda x: code2Vector(x, Num_Loc))
-    df['SimsPred'] = df.apply(lambda x: err2_sim_region(x['Sims1'], x['SimsPred'], focals), axis=1)
-    return df['SimsPred'].sum()
-
 def err_l2(df, modelParameters):
     pl = 0
     Num_Loc = 8
@@ -739,7 +667,7 @@ def err_l2(df, modelParameters):
     df['Err_L2'] = (df['Sims'] - df['attract'])**2
     df['Err_L2'] = df['Err_L2'].apply(lambda x: np.sum(x))
     return df['Err_L2'].sum()
-
+    
 def probabilities_WSLS(iV, i, score, j, pl, modelParameters, Num_Loc):
 
 	wALL = float(modelParameters[0])
