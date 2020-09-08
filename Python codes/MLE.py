@@ -4,6 +4,7 @@ print("loading packages...")
 import numpy as np
 import pandas as pd
 from FRA import *
+from MSD import *
 print("Done!")
 
 # Opens the file with data from DCL experiment into a Pandas DataFrame
@@ -28,7 +29,8 @@ modelParameters = [0.01, 0.01, 0.01, 0.01, # Biases
 minimos = [0] * 13
 #maximos = [0.25, 0.25, 0.25, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 maximos = [0.25, 0.25, 0.25, 0.25, 1, 100, 32, 1, 100, 1, 1, 100, 1]
-res = optimizar(modelParameters, minimos, maximos)
+PARS = [data, focals, estrategias]
+res = optimizar(modelParameters, minimos, maximos, PARS)
 f = open('../Data/parameter_fit_humans.csv', 'w')
 sl = ''.join(res.x)
 f.close()
