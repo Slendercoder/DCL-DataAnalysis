@@ -23,36 +23,8 @@ TOLERANCIA = 1
 p_change = 0 # Include some random variation in region picked for the round
 
 #################################
-# Define some functions
-# to obtain measures
+# FUNCTIONS
 ################################
-
-def obtainPresentBlocks(x):
-
-    global CONTADOR
-
-    valor = CONTADOR
-
-    if x['Is_there'] == 'Unicorn_Present' and x['Is_there_LEAD'] == 'Unicorn_Absent':
-        CONTADOR += 1
-
-    if pd.isna(x['Is_there_LEAD']):
-        CONTADOR += 1
-
-    if x['Is_there'] == 'Unicorn_Present':
-        return valor
-    else:
-        return 0
-
-def nextScore(si, siLead, s, sLEAD):
-    if si == 'Unicorn_Absent' and siLead == 'Unicorn_Present' and s > 29 and s > sLEAD:
-        return sLEAD
-    else:
-        return s
-
-###########################
-# Define player objects
-###########################
 
 # Define players
 class player(object):
@@ -67,9 +39,7 @@ class player(object):
 		self.accuracy = Accuracy
 		self.name = Name
 
-###########################
 # Define Experiment Object
-###########################
 class Experiment(object):
 	'''Object defining the experiment and simulation with the following properties:
 		gameParameters, modelParameters'''
@@ -177,7 +147,7 @@ class Experiment(object):
 						# ...look at the location determined by the strategy
 		#				print("Player " + str(k) + " is using strategy: " + \
 		#					str(Players[k].strategy))
-		#				print("He is looking on location: " + str(strategies[Players[k].strategy]))
+		#				print("He is looking at location: " + str(strategies[Players[k].strategy]))
 						# See if the strategy is not over...
 						if j<len(strategies_used[k]):
 							search_place = strategies_used[k][j]
