@@ -32,5 +32,5 @@ maximos = [0.25, 0.25, 0.25, 0.25, 1, 100, 32, 1, 100, 1, 1, 100, 1]
 PARS = [data, focals, estrategias]
 res = optimizar(modelParameters, minimos, maximos, PARS)
 f = open('../Data/parameter_fit_humans.csv', 'w')
-sl = ''.join(res.x)
+sl = ', '.join([str(x) for x in res.x])
 f.close()
