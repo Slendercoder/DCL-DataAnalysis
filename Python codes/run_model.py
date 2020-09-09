@@ -67,7 +67,7 @@ def standard_simulation(gameParameters, modelParameters):
 
     return E.df
 
-def simulation_with_measures(gameParameters, modelParameters, medidas):
+def simulation_with_measures(gameParameters, modelParameters, medidas, TO_FILE=True):
 
     print("****************************")
     print('Starting simulation')
@@ -84,18 +84,24 @@ def simulation_with_measures(gameParameters, modelParameters, medidas):
     print('delta: ', modelParameters[7])
     print('epsilon: ', modelParameters[8])
     print('zeta: ', modelParameters[9])
+    print('eta:', modelParameters[10])
+    print('theta:', modelParameters[11])
+    print('iota:', modelParameters[12])
     print("\n")
     print('--- Player 2 ----')
-    print('wALL: ', modelParameters[10])
-    print('wNOTHING: ', modelParameters[11])
-    print('wLEFT: ', modelParameters[12])
-    print('wIN: ', modelParameters[13])
-    print('alpha: ', modelParameters[14])
-    print('beta: ', modelParameters[15])
-    print('gamma: ', modelParameters[16])
-    print('delta: ', modelParameters[17])
-    print('epsilon: ', modelParameters[18])
-    print('zeta: ', modelParameters[19])
+    print('wALL: ', modelParameters[13])
+    print('wNOTHING: ', modelParameters[14])
+    print('wLEFT: ', modelParameters[15])
+    print('wIN: ', modelParameters[16])
+    print('alpha: ', modelParameters[17])
+    print('beta: ', modelParameters[18])
+    print('gamma: ', modelParameters[19])
+    print('delta: ', modelParameters[20])
+    print('epsilon: ', modelParameters[21])
+    print('zeta: ', modelParameters[22])
+    print('eta:', modelParameters[23])
+    print('theta:', modelParameters[24])
+    print('iota:', modelParameters[25])
     print("\n")
     print("****************************")
     print('--- Game parameters ---')
@@ -108,13 +114,16 @@ def simulation_with_measures(gameParameters, modelParameters, medidas):
 
     E = DL.Experiment(gameParameters, modelParameters)
     # Inicializa archivo temporal
-    with open('temp.csv', 'w') as dfile:
-        dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy\n')
-        dfile.close()
+    if TO_FILE:
+        with open('temp.csv', 'w') as dfile:
+            dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy\n')
+            dfile.close()
     with open('output_Prev.csv', 'w') as dfile:
         dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy,Is_there_LEAD,Category,Category1,RegionGo\n')
         dfile.close()
     E.run_simulation()
+    if TO_FILE:
+        E.df = pd.read_csv('temp.csv')
     E.df = M.get_measures(E.df, medidas)
     count = 0
     archivo = '../Data/output' + str(count) + '.csv'

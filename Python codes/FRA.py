@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib import gridspec
 from random import choice, uniform, random, sample, randint
 
 ###########################################################
@@ -280,6 +281,77 @@ def dibuja_regiones(reg1, reg2, Num_Loc, titulo):
 
 	fig4.suptitle(titulo)
 	plt.show()
+
+def dibuja_ronda(reg1, sco1, reg2, sco2, Num_Loc, modelParameters, focals, titulo):
+
+    assert(len(reg1) == Num_Loc * Num_Loc), "Incorrect region size 1!"
+    assert(len(reg2) == Num_Loc * Num_Loc), "Incorrect region size 2!"
+
+    # Initializing Plot
+    fig = plt.figure()
+    spec = gridspec.GridSpec(ncols=2, nrows=2)#, height_ratios=[3, 1, 1, 1])
+    fig.subplots_adjust(left=0.1, bottom=0.05, right=0.9, top=0.95, wspace=0.1, hspace=0.2)
+
+    ax0 = fig.add_subplot(spec[0,0])
+    ax1 = fig.add_subplot(spec[0,1])
+    ax2 = fig.add_subplot(spec[1,0])
+    ax3 = fig.add_subplot(spec[1,1])
+
+    ax0.set_title('Player 1')
+    ax1.set_title('Player 2')
+    ax0.get_xaxis().set_visible(False)
+    ax1.get_xaxis().set_visible(False)
+    ax0.get_yaxis().set_visible(False)
+    ax1.get_yaxis().set_visible(False)
+    ax2.set_yticklabels([])
+    ax2.set_ylabel('Attracted\n to', fontsize=8)
+    ax3.yaxis.tick_right()
+    # ax2.get_xaxis().set_visible(False)
+    # ax3.get_xaxis().set_visible(False)
+
+    # Ploting regions
+    step = 1. / Num_Loc
+    tangulos1 = []
+    tangulos2 = []
+    for j in range(0, Num_Loc * Num_Loc):
+        x = int(j) % Num_Loc
+        y = (int(j) - x) / Num_Loc
+        by_x = x * step
+        by_y = 1 - (y + 1) * step
+        if reg1[j] == 1:
+            tangulos1.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="black", alpha=1))
+        if reg2[j] == 1:
+            tangulos2.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="black", alpha=1))
+        if reg1[j] == 1 and reg2[j] == 1:
+            tangulos1.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="red", alpha=1))
+            tangulos2.append(patches.Rectangle(*[(by_x, by_y), step, step],\
+			facecolor="red", alpha=1))
+
+    for t in tangulos1:
+        ax0.add_patch(t)
+
+    for t in tangulos2:
+        ax1.add_patch(t)
+
+    # Plot attractiveness
+    regions_names = ['RS','A','N','B','T','L','R','I','O']
+    overlap = np.multiply(reg1, reg2).tolist()
+    frasPL1 = attractiveness(reg1, sco1, overlap, 0, modelParameters, Num_Loc, focals)
+    frasPL2 = attractiveness(reg2, sco2, overlap, 1, modelParameters, Num_Loc, focals)
+    ax2.set_ylim(0,max(1,max(frasPL1)))
+    ax3.set_ylim(0,max(1,max(frasPL1)))
+    ax2.bar(regions_names, frasPL1)
+    ax3.bar(regions_names, frasPL2)
+
+    threshold = frasPL1[0]
+    ax2.axhline(y=threshold, linewidth=1, color='k')
+    ax3.axhline(y=threshold, linewidth=1, color='k')
+
+    fig.suptitle(titulo)
+    plt.show()
 
 def sigmoid(x, beta, gamma):
     # define attractiveness and choice functions
@@ -621,15 +693,26 @@ def attractiveness(region, score, overlap, pl, modelParameters, Num_Loc, focals,
 	# Adding similarity to complement
 	complements = [[1 - x for x in sublist] for sublist in focals]
 	simils = [eta * sigmoid(sim_consist(x, overlap), theta, iota) for x in complements]
-	attractiveness = np.add(attractiveness, simils)
+	simils[0] = 0 # region NOTHING is not attracted by overlap
+	attractiveness = np.add(attractiveness, simils).tolist()
 
 	if DEB:
+		# print('eta, theta, iota', eta, theta, iota)
+		# print('overlap:')
+		# imprime_region(overlap)
+		# x = complements[3]
+		# print('sim', eta * sigmoid(sim_consist(x, overlap), theta, iota))
 		attactPrint = ["%.3f" % v for v in simils]
 		print('similarity to complement\n', attactPrint)
 
 	if DEB:
 		attactPrint = ["%.3f" % v for v in attractiveness]
 		print('final attractiveness\n', attactPrint)
+
+	wRS = 1 - np.sum(np.array([wALL, wNOTHING, wBOTTOM, wTOP, wLEFT, wRIGHT, wIN, wOUT]))
+#	assert(wRS > 0), "Incorrect biases!"
+	attractiveness = [wRS] + attractiveness
+	attractiveness = [np.round(x, 3) for x in attractiveness]
 
 	return attractiveness
 
@@ -693,7 +776,7 @@ def mean_region():
     strategy = shaky_hand(mean_strategy)
     return code2Vector(strategy, 8)
 
-def chooseStrategy(region, score, overlap, pl, modelParameters, Num_Loc, focals, estrategias, DEB=False):
+def chooseStrategy(region, score, overlap, pl, modelParameters, Num_Loc, focals, estrategias, DEB=False, random=False):
 	# Returns the next region according to attractiveness
 	# Input: region (64-bit list), the region explored on the previous round
 	#		 score, the player's score
@@ -709,12 +792,16 @@ def chooseStrategy(region, score, overlap, pl, modelParameters, Num_Loc, focals,
 	# get the strategy corresponding to the highest ranking attractiveness
 	selected = np.argmax(attract)
 	if selected > 0:
-		# newStrategy = shaky_hand(estrategias[np.argmax(attract) + 1])
-		newStrategy = estrategias[np.argmax(attract) + 1]
+            if random:
+	              newStrategy = shaky_hand(estrategias[np.argmax(attract) + 1])
+            else:
+                newStrategy = estrategias[np.argmax(attract) + 1]
 	else:
-		# Seleccionando una estrategia media al azar
-        # para todos los casos
-		newStrategy = [10, 2, 16, 0, 24, 27, 26, 11, 19, 15, 14, 5, 7, 30, 31, 35, 49, 41, 43, 34, 48, 45, 60, 55, 62, 37, 44, 61, 63, 38, 52, 47]
+	       if random:
+	              newStrategy = mean_strategy()
+	       else:
+    		# Seleccionando una estrategia media para todos los casos
+	              newStrategy = [10, 2, 16, 0, 24, 27, 26, 11, 19, 15, 14, 5, 7, 30, 31, 35, 49, 41, 43, 34, 48, 45, 60, 55, 62, 37, 44, 61, 63, 38, 52, 47]
 
 	return newStrategy
 

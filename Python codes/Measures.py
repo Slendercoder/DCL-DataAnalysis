@@ -153,6 +153,7 @@ def get_measures(data, lista):
 
     global cols1
 
+    print(data.head())
     print("Sorting by Dyad, Player, Round...")
     data = data.sort_values(['Dyad', 'Player', 'Round'], ascending=[True, True, True]).reset_index(drop=True)
     # data.to_csv('output_Prev.csv', index=False)

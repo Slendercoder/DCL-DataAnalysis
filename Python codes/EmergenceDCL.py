@@ -14,7 +14,7 @@ import FRA
 
 DEB = False
 IMPR = False
-TO_FILE = False
+TO_FILE = True
 
 CONTINUO = False
 CONTADOR = 1
@@ -46,7 +46,7 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 20), "Model parameters incorrect length!"
+		assert(len(modelParameters) == 26), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 
@@ -65,7 +65,7 @@ class Experiment(object):
 		cols += ['Score', 'Joint', 'Is_there', 'where_x', 'where_y', 'Strategy']
 		self.df = pd.DataFrame(columns=cols)
 
-	def run_dyad(self):
+	def run_dyad(self, TO_FILE=True):
 
 		p = self.gameParameters[0] # probability of there being a unicorn (usually 0.5)
 		Pl = self.gameParameters[1] # number of players (usually 2)
@@ -106,31 +106,6 @@ class Experiment(object):
 				place = int(floor(uniform(0, Num_Loc * Num_Loc - 1)))
 				Board[place] = 1
 
-            # Include some small random variations in chosen strategy
-			strategies_used = []
-			strat = self.strategies[Players[0].strategy]
-			# print("strat")
-			# print(strat)
-			if uniform(0, 1) < p_change:
-			    lista = [x for x in range(Num_Loc * Num_Loc) if x not in strat]
-			    # print("lista")
-			    # print(lista)
-			    if len(lista) > 0:
-			        rt = choice(lista)
-			        strat.append(rt)
-			        rt = choice(lista)
-			        strat.append(rt)
-			strategies_used.append(strat)
-			strat = self.strategies[Players[1].strategy]
-			if uniform(0, 1) < p_change:
-			    lista = [x for x in range(Num_Loc * Num_Loc) if x not in strat]
-			    if len(lista) > 0:
-			        rt = choice(lista)
-			        strat.append(rt)
-			        rt = choice(lista)
-			        strat.append(rt)
-			strategies_used.append(strat)
-
 			# Start searchging for the unicorn
 			for j in range(0, Num_Loc * Num_Loc + 1):
 				# print("\nRunning iteration " + str(j))
@@ -149,8 +124,12 @@ class Experiment(object):
 		#					str(Players[k].strategy))
 		#				print("He is looking at location: " + str(strategies[Players[k].strategy]))
 						# See if the strategy is not over...
-						if j<len(strategies_used[k]):
-							search_place = strategies_used[k][j]
+						if (Players[k].strategy == 0) or (Players[k].strategy == 9):
+							estrat = FRA.mean_strategy()
+						else:
+							estrat = FRA.shaky_hand(self.strategies[Players[k].strategy], 0)
+						if j<len(estrat):
+							search_place = estrat[j]
 							Players[k].where.append(search_place)
 							# print("Player " + str(k) + " is searching at " + str(search_place))
 							if Board[search_place] == 1:
@@ -257,57 +236,45 @@ class Experiment(object):
 				# print(self.df)
 				# print("Data from player " + str(k) + " has been saved")
 
-			reg1 = FRA.code2Vector(self.strategies[Players[0].strategy], Num_Loc)
-			reg2 = FRA.code2Vector(self.strategies[Players[1].strategy], Num_Loc)
+			reg1 = FRA.code2Vector(Players[0].where, Num_Loc)
+			reg2 = FRA.code2Vector(Players[1].where, Num_Loc)
 			j = FRA.code2Vector(both, Num_Loc)
 			# Players determine their next strategy
 			a = []
 			sc = []
 			a.append(Players[0].strategy)
 			sc.append(Players[0].score)
-			i = Players[0].strategy
 			s = Players[0].score
-			newStrategy = FRA.chooseStrategy(reg1, i, s, j, 0, self.modelParameters, Num_Loc)
-			Players[0].strategy = newStrategy
-			# print('newStrategy:', newStrategy)
-			self.strategies[0] = FRA.new_random_strategy(Num_Loc)
-
-			# if not sameRS:
-			# 	self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-			# 	while len(self.strategies[0]) < 2 or len(self.strategies[0]) > 62:
-			# 	                self.strategies[0] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-			# else:
-			# 	print('Do not randomize for player 0')
+			if place == -1:
+				attract = FRA.attractiveness(reg1, s, j, 0, self.modelParameters, Num_Loc, self.regions)#, True)
+				winner = np.argwhere(attract == np.amax(attract)).tolist()
+				winner = [x[0] for x in winner]
+				# print('attract:', attract)
+				# print('winner:', winner)
+				Players[0].strategy = choice(winner)
+				# print('newStrategy:', Players[0].strategy)
 
 			a.append(Players[1].strategy)
 			sc.append(Players[1].score)
-			# newStrategy, sameRS = self.chooseStrategy(Players[1].strategy, Players[1].score, both)
-			i = Players[1].strategy
 			s = Players[1].score
-			newStrategy = FRA.chooseStrategy(reg2, i, s, j, 1, self.modelParameters, Num_Loc)
-			# print('newStrategy:', newStrategy)
-			if newStrategy == 0:
-				newStrategy = 9
-			Players[1].strategy = newStrategy
-			self.strategies[9] = FRA.new_random_strategy(Num_Loc)
-
-			# if not sameRS:
-			# 	self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-			# 	while len(self.strategies[9]) < 2 or len(self.strategies[9]) > 62:
-			# 	                self.strategies[9] = list(np.random.choice(Num_Loc * Num_Loc, np.random.randint(Num_Loc * Num_Loc)))
-			# else:
-			# 	print('Do not randomize for player 1')
+			if place == -1:
+				attract = FRA.attractiveness(reg2, s, j, 1, self.modelParameters, Num_Loc, self.regions)#, True)
+				winner = np.argwhere(attract == np.amax(attract)).tolist()
+				winner = [x[0] for x in winner]
+				Players[1].strategy = choice(winner)
+				# print('newStrategy:', Players[1].strategy)
 
 			if DEB:
+				Is_there = " Absent" if place == -1 else " Present"
 				print('-----------------')
+				print('Unicorn ' + Is_there)
 				print('both', len(both))
 				print('scores: p0: ', sc[0], ' p1: ', sc[1])
 				print('Player 0 from region ', FRA.nameRegion(a[0]), 'to region ', FRA.nameRegion(Players[0].strategy))
 				print('Player 1 from region ', FRA.nameRegion(a[1]), 'to region ', FRA.nameRegion(Players[1].strategy))
 				print('End summary round ', i)
 				print('-----------------')
-				# dibuja_region(j, 8)
-				FRA.dibuja_regiones(reg1, reg2, 8, 'Ok')
+				FRA.dibuja_ronda(reg1, sc[0], reg2, sc[1], Num_Loc,self. modelParameters, self.regions, "Round: " + str(i) + Is_there)
 
 
 	def run_simulation(self):
