@@ -19,11 +19,12 @@ print('Done!')
 p = 0.5 # probability of there being a unicorn
 pl = 2 # number of players
 n = 8 # number of rows/columns in grid
-rounds = 15 # number of rounds
-dyads = 1 # number of dyads
+rounds = 60 # number of rounds
+dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
 # Model Parameters FRA
-modelParameters = [0.08, 0.08, 0.08, 0.01, 1, 100, 31, 1, 100, 0.8, 1, 50, 0.5] #PL1
+modelParameters = [0.08, 0.08, 0.08, 0.01, 1, 100, 31, 1, 0, 0, 1, 50, 0.5] #PL1
 modelParameters += modelParameters # Both players have equal parameters
-RM.simulation_with_measures(gameParameters, modelParameters, '05')
+RM.simulation_with_measures_shaky(gameParameters, modelParameters, '05', [0, 2, 3, 4, 5, 6])
+# RM.simulation_with_measures(gameParameters, modelParameters, '05')

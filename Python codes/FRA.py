@@ -675,7 +675,7 @@ def attractiveness(region, score, overlap, pl, modelParameters, Num_Loc, focals,
 		print('biases\n', attactPrint)
 
 	# Adding 'Win Stay'
-	WinStay = [alpha * sigmoid(score, beta, gamma)  * sigmoid(sim_consist(x, region), 100, 0.95) for x in focals]
+	WinStay = [alpha * sigmoid(score, beta, gamma) * sigmoid(sim_consist(x, region), 100, 0.95) for x in focals]
 	attractiveness = np.add(attractiveness, WinStay)
 
 	if DEB:

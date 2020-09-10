@@ -49,6 +49,7 @@ class Experiment(object):
 		assert(len(modelParameters) == 26), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
+		self.shaky_hand = 0
 
 		# Create regions and strategies
 		Num_Loc = gameParameters[2]
@@ -127,7 +128,7 @@ class Experiment(object):
 						if (Players[k].strategy == 0) or (Players[k].strategy == 9):
 							estrat = FRA.mean_strategy()
 						else:
-							estrat = FRA.shaky_hand(self.strategies[Players[k].strategy], 0)
+							estrat = FRA.shaky_hand(self.strategies[Players[k].strategy], 2)
 						if j<len(estrat):
 							search_place = estrat[j]
 							Players[k].where.append(search_place)
