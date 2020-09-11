@@ -225,18 +225,24 @@ def data_conf_mtrx(gameParameters, modelParameters, model, count):
     print('delta: ', modelParameters[7])
     print('epsilon: ', modelParameters[8])
     print('zeta: ', modelParameters[9])
+    print('eta:', modelParameters[10])
+    print('theta:', modelParameters[11])
+    print('iota:', modelParameters[12])
     print("\n")
     print('--- Player 2 ----')
-    print('wALL: ', modelParameters[10])
-    print('wNOTHING: ', modelParameters[11])
-    print('wLEFT: ', modelParameters[12])
-    print('wIN: ', modelParameters[13])
-    print('alpha: ', modelParameters[14])
-    print('beta: ', modelParameters[15])
-    print('gamma: ', modelParameters[16])
-    print('delta: ', modelParameters[17])
-    print('epsilon: ', modelParameters[18])
-    print('zeta: ', modelParameters[19])
+    print('wALL: ', modelParameters[13])
+    print('wNOTHING: ', modelParameters[14])
+    print('wLEFT: ', modelParameters[15])
+    print('wIN: ', modelParameters[16])
+    print('alpha: ', modelParameters[17])
+    print('beta: ', modelParameters[18])
+    print('gamma: ', modelParameters[19])
+    print('delta: ', modelParameters[20])
+    print('epsilon: ', modelParameters[21])
+    print('zeta: ', modelParameters[22])
+    print('eta:', modelParameters[23])
+    print('theta:', modelParameters[24])
+    print('iota:', modelParameters[25])
     print("\n")
     print("****************************")
     print('--- Game parameters ---')
@@ -256,7 +262,7 @@ def data_conf_mtrx(gameParameters, modelParameters, model, count):
         dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy,Is_there_LEAD,Category,Category1,RegionGo\n')
         dfile.close()
     E.run_simulation()
-    E.df = M.get_measures(E.df, '45')
+    E.df = M.get_measures(E.df, '05')
     archivo = '../Data/Confusion/Simulations/' + str(model) + str(count) + '.csv'
     E.df.to_csv(archivo, index=False)
     print('Data saved to' + archivo)
@@ -269,56 +275,65 @@ def data_conf_mtrx(gameParameters, modelParameters, model, count):
 
 def random_pars_Bmodel():
     mParameters = []
-    mParameters.append(uniform(0, 0.12)) # appending random wALL
-    mParameters.append(uniform(0, 0.12)) # appending random wNOTHING
-    mParameters.append(uniform(0, 0.12)) # appending random wLEFT
-    mParameters.append(uniform(0, 0.12)) # appending random wIN
+    mParameters.append(uniform(0, 0.125)) # appending random wALL
+    mParameters.append(uniform(0, 0.125)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.125)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.125)) # appending random wIN
     mParameters.append(0) # appending Alpha
     mParameters.append(0) # appending Beta
     mParameters.append(0) # appending Gamma
     mParameters.append(0) # appending Delta
     mParameters.append(0) # appending Epsilon
     mParameters.append(0) # appending Zeta
+    mParameters.append(0) # appending Eta
+    mParameters.append(0) # appending Theta
+    mParameters.append(0) # appending Iota
     mParameters += mParameters
     return mParameters
 
 def random_pars_WSLSmodel():
     mParameters = []
-    mParameters.append(uniform(0, 0.12)) # appending random wALL
-    mParameters.append(uniform(0, 0.12)) # appending random wNOTHING
-    mParameters.append(uniform(0, 0.12)) # appending random wLEFT
-    mParameters.append(uniform(0, 0.12)) # appending random wIN
-    mParameters.append(uniform(0, 1000)) # appending random Alpha
-    mParameters.append(1000) # appending Beta
+    mParameters.append(uniform(0, 0.125)) # appending random wALL
+    mParameters.append(uniform(0, 0.125)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.125)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.125)) # appending random wIN
+    mParameters.append(uniform(0, 2)) # appending random Alpha
+    mParameters.append(100) # appending Beta
     mParameters.append(uniform(0, 32)) # appending random Gamma
     mParameters.append(0) # appending Delta
     mParameters.append(0) # appending Epsilon
     mParameters.append(0) # appending Zeta
+    mParameters.append(0) # appending Eta
+    mParameters.append(0) # appending Theta
+    mParameters.append(0) # appending Iota
     mParameters += mParameters
     return mParameters
 
 def random_pars_FRAmodel():
     mParameters = []
-    mParameters.append(uniform(0, 0.12)) # appending random wALL
-    mParameters.append(uniform(0, 0.12)) # appending random wNOTHING
-    mParameters.append(uniform(0, 0.12)) # appending random wLEFT
-    mParameters.append(uniform(0, 0.12)) # appending random wIN
-    mParameters.append(uniform(0, 1000)) # appending random Alpha
-    mParameters.append(1000) # appending Beta
+    mParameters.append(uniform(0, 0.125)) # appending random wALL
+    mParameters.append(uniform(0, 0.125)) # appending random wNOTHING
+    mParameters.append(uniform(0, 0.125)) # appending random wLEFT
+    mParameters.append(uniform(0, 0.125)) # appending random wIN
+    mParameters.append(uniform(0, 2)) # appending random Alpha
+    mParameters.append(100) # appending Beta
     mParameters.append(uniform(0, 32)) # appending random Gamma
-    mParameters.append(uniform(0, 1000)) # appending random Delta
-    mParameters.append(1000) # appending Epsilon
-    mParameters.append(uniform(0, 1)) # appending random Zeta
+    mParameters.append(uniform(0, 2)) # appending random Delta
+    mParameters.append(0) # appending Epsilon
+    mParameters.append(0) # appending random Zeta
+    mParameters.append(uniform(0, 2)) # appending Eta
+    mParameters.append(100) # appending Theta
+    mParameters.append(uniform(0, 1)) # appending Iota
     mParameters += mParameters
     return mParameters
 
-def data_for_confusion_matrix(gameParameters, N = 10):
+def data_for_confusion_matrix(gameParameters, N = 0):
 
     for n in range(N):
-        # modelParameters = random_pars_Bmodel()
-        # data_conf_mtrx(gameParameters, modelParameters, 'MB', n)
-        # modelParameters = random_pars_WSLSmodel()
-        # data_conf_mtrx(gameParameters, modelParameters, 'WS', n)
+        modelParameters = random_pars_Bmodel()
+        data_conf_mtrx(gameParameters, modelParameters, 'MB', n)
+        modelParameters = random_pars_WSLSmodel()
+        data_conf_mtrx(gameParameters, modelParameters, 'WS', n)
         modelParameters = random_pars_FRAmodel()
         data_conf_mtrx(gameParameters, modelParameters, 'FR', n)
 
@@ -336,7 +351,7 @@ def sample_variation(gameParameters, modelParameters, model, n_samples = 100):
         archivo = nombre + str(i + 1) + '.csv'
         data.to_csv(archivo, index=False)
 
-def parameter_sweep_alpha(gameParameters, modelParameters):
+def parameter_sweep_alpha(gameParameters, modelParameters, forSweep):
 
     # Sweep alpha
 
@@ -352,32 +367,56 @@ def parameter_sweep_alpha(gameParameters, modelParameters):
     print("\n")
 
     print('--- Fixed parameters ----')
-    print('Focal: ', modelParameters[0])
-    # print('alpha: ', modelParameters[1])
-    print('beta: ', modelParameters[2])
-    print('gamma: ', modelParameters[3])
-    print('delta: ', modelParameters[4])
-    print('epsilon: ', modelParameters[5])
-    print('zeta: ', modelParameters[6])
-    print('eta: ', modelParameters[7])
+    print('--- Player 1 ----')
+    print('wALL: ', modelParameters[0])
+    print('wNOTHING: ', modelParameters[1])
+    print('wLEFT: ', modelParameters[2])
+    print('wIN: ', modelParameters[3])
+#    print('alpha: ', modelParameters[4])
+    print('beta: ', modelParameters[5])
+    print('gamma: ', modelParameters[6])
+    print('delta: ', modelParameters[7])
+    print('epsilon: ', modelParameters[8])
+    print('zeta: ', modelParameters[9])
+    print('eta:', modelParameters[10])
+    print('theta:', modelParameters[11])
+    print('iota:', modelParameters[12])
     print("\n")
-    print("Sweeping alpha...")
-
-    # Intervals for sweep
-    forSweep = [0, 70, 150]
-
+    print('--- Player 2 ----')
+    print('wALL: ', modelParameters[13])
+    print('wNOTHING: ', modelParameters[14])
+    print('wLEFT: ', modelParameters[15])
+    print('wIN: ', modelParameters[16])
+#    print('alpha: ', modelParameters[17])
+    print('beta: ', modelParameters[18])
+    print('gamma: ', modelParameters[19])
+    print('delta: ', modelParameters[20])
+    print('epsilon: ', modelParameters[21])
+    print('zeta: ', modelParameters[22])
+    print('eta:', modelParameters[23])
+    print('theta:', modelParameters[24])
+    print('iota:', modelParameters[25])
     print('--- Sweep parameters ----')
-    print('alpha: ', forSweep)
+    print('alpha in', forSweep)
+    print('\n----------')
 
-    for i in list(forSweep):
-        print('\n----------')
-        print('Sweep alpha=' + str(i))
-        modelParameters[1] = i
+    for i in forSweep:
+        print("Sweeping alpha...")
+        print('alpha=' + str(i))
+        modelParameters[4] = i
+        modelParameters[17] = i
         E = DL.Experiment(gameParameters, modelParameters)
+        with open('temp.csv', 'w') as dfile:
+            dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy\n')
+            dfile.close()
+        with open('output_Prev.csv', 'w') as dfile:
+            dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy,Is_there_LEAD,Category,Category1,RegionGo\n')
+            dfile.close()
         E.run_simulation()
-        E.get_measures()
-        E.df['Alpha'] = [i]*len(E.df['Dyad'])
-        outputFile = 'Sweeps/out_Alpha_' + str(i) + '.csv'
+        E.df = pd.read_csv('temp.csv')
+        E.df = M.get_measures(E.df, '05')
+        E.df['Alpha'] = i
+        outputFile = '../Data/Sweeps/out_Alpha_' + str(i) + '.csv'
         E.df.to_csv(outputFile, index=False)
         print("Results saved to " + outputFile)
 
@@ -471,9 +510,9 @@ def parameter_sweep_Zeta(gameParameters, modelParameters):
         E.df.to_csv(outputFile, index=False)
         print("Results saved to " + outputFile)
 
-def parameter_sweep_Delta(gameParameters, modelParameters):
+def parameter_sweep_delta(gameParameters, modelParameters, forSweep):
 
-    # Sweep RS
+    # Sweep delta
 
     print("****************************")
     print('Starting parameter sweep')
@@ -487,32 +526,56 @@ def parameter_sweep_Delta(gameParameters, modelParameters):
     print("\n")
 
     print('--- Fixed parameters ----')
-    print('Focal: ', modelParameters[0])
-    print('alpha: ', modelParameters[1])
-    print('beta: ', modelParameters[2])
-    print('gamma: ', modelParameters[3])
-    # print('delta: ', modelParameters[4])
-    print('epsilon: ', modelParameters[5])
-    print('zeta: ', modelParameters[6])
-    print('eta: ', modelParameters[7])
+    print('--- Player 1 ----')
+    print('wALL: ', modelParameters[0])
+    print('wNOTHING: ', modelParameters[1])
+    print('wLEFT: ', modelParameters[2])
+    print('wIN: ', modelParameters[3])
+    print('alpha: ', modelParameters[4])
+    print('beta: ', modelParameters[5])
+    print('gamma: ', modelParameters[6])
+#    print('delta: ', modelParameters[7])
+    print('epsilon: ', modelParameters[8])
+    print('zeta: ', modelParameters[9])
+    print('eta:', modelParameters[10])
+    print('theta:', modelParameters[11])
+    print('iota:', modelParameters[12])
     print("\n")
-    print("Sweeping Delta...")
-
-    # Intervals for sweep
-    forSweep = [0, 10, 50]
-
+    print('--- Player 2 ----')
+    print('wALL: ', modelParameters[13])
+    print('wNOTHING: ', modelParameters[14])
+    print('wLEFT: ', modelParameters[15])
+    print('wIN: ', modelParameters[16])
+    print('alpha: ', modelParameters[17])
+    print('beta: ', modelParameters[18])
+    print('gamma: ', modelParameters[19])
+#    print('delta: ', modelParameters[20])
+    print('epsilon: ', modelParameters[21])
+    print('zeta: ', modelParameters[22])
+    print('eta:', modelParameters[23])
+    print('theta:', modelParameters[24])
+    print('iota:', modelParameters[25])
     print('--- Sweep parameters ----')
-    print('delta: ', forSweep)
+    print('delta in', forSweep)
+    print('\n----------')
 
-    for i in list(forSweep):
-        print('\n----------')
-        print('Sweep delta=' + str(i))
-        modelParameters[4] = i
+    for i in forSweep:
+        print("Sweeping delta...")
+        print('alpha=' + str(i))
+        modelParameters[7] = i
+        modelParameters[20] = i
         E = DL.Experiment(gameParameters, modelParameters)
+        with open('temp.csv', 'w') as dfile:
+            dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy\n')
+            dfile.close()
+        with open('output_Prev.csv', 'w') as dfile:
+            dfile.write('index,Dyad,Round,Player,Answer,Time,a11,a12,a13,a14,a15,a16,a17,a18,a21,a22,a23,a24,a25,a26,a27,a28,a31,a32,a33,a34,a35,a36,a37,a38,a41,a42,a43,a44,a45,a46,a47,a48,a51,a52,a53,a54,a55,a56,a57,a58,a61,a62,a63,a64,a65,a66,a67,a68,a71,a72,a73,a74,a75,a76,a77,a78,a81,a82,a83,a84,a85,a86,a87,a88,Score,Joint,Is_there,where_x,where_y,Strategy,Is_there_LEAD,Category,Category1,RegionGo\n')
+            dfile.close()
         E.run_simulation()
-        E.get_measures()
-        E.df['Delta'] = [i]*len(E.df['Dyad'])
-        outputFile = 'Sweeps/out_Delta_' + str(i) + '.csv'
+        E.df = pd.read_csv('temp.csv')
+        E.df = M.get_measures(E.df, '05')
+        E.df['Delta'] = i
+        outputFile = '../Data/Sweeps/out_Delta_' + str(i) + '.csv'
         E.df.to_csv(outputFile, index=False)
         print("Results saved to " + outputFile)
 
