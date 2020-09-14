@@ -125,10 +125,14 @@ class Experiment(object):
 		#					str(Players[k].strategy))
 		#				print("He is looking at location: " + str(strategies[Players[k].strategy]))
 						# See if the strategy is not over...
+###########################################################################################
+###########################################################################################
 						if (Players[k].strategy == 0) or (Players[k].strategy == 9):
 							estrat = FRA.mean_strategy()
 						else:
 							estrat = FRA.shaky_hand(self.strategies[Players[k].strategy], 2)
+###########################################################################################
+###########################################################################################
 						if j<len(estrat):
 							search_place = estrat[j]
 							Players[k].where.append(search_place)

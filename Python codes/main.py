@@ -24,9 +24,9 @@ dyads = 50 # number of dyads
 gameParameters = [p, pl, n, rounds, dyads]
 
 # Model Parameters FRA
-modelParameters = [0.05, 0.05, 0.05, 0.05, 1, 100, 31, 0, 0, 0, 0, 0, 0] #PL1
+modelParameters = [0.05, 0.05, 0.05, 0.05, 1, 1, 27, 0, 0, 0, 0, 0, 0] #PL1
 modelParameters += modelParameters # Both players have equal parameters
-RM.parameter_sweep_alpha(gameParameters, modelParameters, [0.2, 0.4, 0.6, 0.8, 1])
+RM.parameter_sweep_alpha(gameParameters, modelParameters, [0.4, 0.6, 0.8, 1, 1.2])
 RM.parameter_sweep_delta(gameParameters, modelParameters, [0.8, 0.9, 1, 1.1, 1.2])
 # RM.simulation_with_measures_shaky(gameParameters, modelParameters, '05', [0, 2, 3, 4, 5, 6])
 # RM.simulation_with_measures(gameParameters, modelParameters, '05')
