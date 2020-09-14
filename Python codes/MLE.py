@@ -28,7 +28,7 @@ modelParameters = [0.01, 0.01, 0.01, 0.01, # Biases
               ]
 minimos = [0] * 13
 #maximos = [0.25, 0.25, 0.25, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-maximos = [0.25, 0.25, 0.25, 0.25, 1, 100, 32, 1, 100, 1, 1, 100, 1]
+maximos = [0.25, 0.25, 0.25, 0.25, 1, 100, 32, 2, 0, 0, 1, 100, 1]
 PARS = [data, focals, estrategias]
 res = optimizar(modelParameters, minimos, maximos, PARS)
 f = open('../Data/parameter_fit_humans.csv', 'w')
