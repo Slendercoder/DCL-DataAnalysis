@@ -46,7 +46,7 @@ class Experiment(object):
 
 	def __init__(self, gameParameters, modelParameters):
 		assert(len(gameParameters) == 5), "Game parameters incorrect length!"
-		assert(len(modelParameters) == 26), "Model parameters incorrect length!"
+		# assert(len(modelParameters) == 26), "Model parameters incorrect length!"
 		self.gameParameters = gameParameters
 		self.modelParameters = modelParameters
 		self.shaky_hand = 0
@@ -76,8 +76,10 @@ class Experiment(object):
 		# Create players
 		Players = []
 		for k in range(0, Pl):
-			strat = 0 if k == 0 else 9
+			strat = FRA.new_random_strategy(Num_Loc)
+			# strat = 0 if k == 0 else 9
 			Players.append(player(False, "", strat, [], 0, False, int(uniform(0, 1000000))))
+			# Players.append(player(False, "", 0, [], 0, False, int(uniform(0, 1000000))))
 			# print "Player " + str(k) + " chose strategy " + strat
 
 		# Create dyad name
@@ -127,10 +129,12 @@ class Experiment(object):
 						# See if the strategy is not over...
 ###########################################################################################
 ###########################################################################################
-						if (Players[k].strategy == 0) or (Players[k].strategy == 9):
-							estrat = FRA.mean_strategy()
-						else:
-							estrat = FRA.shaky_hand(self.strategies[Players[k].strategy], 2)
+						# if (Players[k].strategy == 0) or (Players[k].strategy == 9):
+						#  	# estrat = FRA.mean_strategy()
+						#  	estrat = FRA.new_random_strategy(Num_Loc)
+						# else:
+						#  	estrat = FRA.shaky_hand(self.strategies[Players[k].strategy], 0)
+						estrat = Players[k].strategy
 ###########################################################################################
 ###########################################################################################
 						if j<len(estrat):
@@ -241,33 +245,43 @@ class Experiment(object):
 				# print(self.df)
 				# print("Data from player " + str(k) + " has been saved")
 
-			reg1 = FRA.code2Vector(Players[0].where, Num_Loc)
-			reg2 = FRA.code2Vector(Players[1].where, Num_Loc)
-			j = FRA.code2Vector(both, Num_Loc)
 			# Players determine their next strategy
 			a = []
 			sc = []
 			a.append(Players[0].strategy)
 			sc.append(Players[0].score)
 			s = Players[0].score
-			if place == -1:
-				attract = FRA.attractiveness(reg1, s, j, 0, self.modelParameters, Num_Loc, self.regions)#, True)
-				winner = np.argwhere(attract == np.amax(attract)).tolist()
-				winner = [x[0] for x in winner]
-				# print('attract:', attract)
-				# print('winner:', winner)
-				Players[0].strategy = choice(winner)
-				# print('newStrategy:', Players[0].strategy)
-
 			a.append(Players[1].strategy)
 			sc.append(Players[1].score)
-			s = Players[1].score
 			if place == -1:
-				attract = FRA.attractiveness(reg2, s, j, 1, self.modelParameters, Num_Loc, self.regions)#, True)
-				winner = np.argwhere(attract == np.amax(attract)).tolist()
-				winner = [x[0] for x in winner]
-				Players[1].strategy = choice(winner)
+				# attract = FRA.attractiveness(reg1, s, j, 0, self.modelParameters, Num_Loc, self.regions, DEB)
+				# winner = np.argwhere(attract == np.amax(attract)).tolist()
+				# winner = [x[0] for x in winner]
+				# # print('attract:', attract)
+				# # print('winner:', winner)
+				# Players[0].strategy = choice(winner)
+				try:
+					Players[0].strategy = FRA.estimate_strategy(reg1, Players[0].score, j, self.modelParameters[:8], self.regions, self.strategies, DEB)
+				except:
+					j = FRA.code2Vector(both, Num_Loc)
+					reg1 = FRA.code2Vector(Players[0].where, Num_Loc)
+					Players[0].strategy = FRA.estimate_strategy(reg1, Players[0].score, j, self.modelParameters[:8], self.regions, self.strategies, DEB)
+				# print('newStrategy:', Players[0].strategy)
+				# attract = FRA.attractiveness(reg2, s, j, 1, self.modelParameters, Num_Loc, self.regions, DEB)
+				# winner = np.argwhere(attract == np.amax(attract)).tolist()
+				# winner = [x[0] for x in winner]
+				# Players[1].strategy = choice(winner)
+				try:
+					Players[1].strategy = FRA.estimate_strategy(reg2, Players[1].score, j, self.modelParameters[8:], self.regions, self.strategies, DEB)
+				except:
+					j = FRA.code2Vector(both, Num_Loc)
+					reg2 = FRA.code2Vector(Players[1].where, Num_Loc)
+					Players[1].strategy = FRA.estimate_strategy(reg2, Players[1].score, j, self.modelParameters[8:], self.regions, self.strategies, DEB)
 				# print('newStrategy:', Players[1].strategy)
+
+				reg1 = FRA.code2Vector(Players[0].where, Num_Loc)
+				reg2 = FRA.code2Vector(Players[1].where, Num_Loc)
+				j = FRA.code2Vector(both, Num_Loc)
 
 			if DEB:
 				Is_there = " Absent" if place == -1 else " Present"
@@ -275,11 +289,11 @@ class Experiment(object):
 				print('Unicorn ' + Is_there)
 				print('both', len(both))
 				print('scores: p0: ', sc[0], ' p1: ', sc[1])
-				print('Player 0 from region ', FRA.nameRegion(a[0]), 'to region ', FRA.nameRegion(Players[0].strategy))
-				print('Player 1 from region ', FRA.nameRegion(a[1]), 'to region ', FRA.nameRegion(Players[1].strategy))
+				# print('Player 0 from region ', FRA.nameRegion(a[0]), 'to region ', FRA.nameRegion(Players[0].strategy))
+				# print('Player 1 from region ', FRA.nameRegion(a[1]), 'to region ', FRA.nameRegion(Players[1].strategy))
 				print('End summary round ', i)
 				print('-----------------')
-				FRA.dibuja_ronda(reg1, sc[0], reg2, sc[1], Num_Loc,self. modelParameters, self.regions, "Round: " + str(i) + Is_there)
+				FRA.dibuja_ronda(FRA.code2Vector(Players[0].where, Num_Loc), sc[0], FRA.code2Vector(Players[1].where, Num_Loc), sc[1], Num_Loc,self. modelParameters, self.regions, "Scores: (" + str(sc[0]) + "," + str(sc[1]) + ") Round: " + str(i) + "(" + Is_there + ")")
 
 
 	def run_simulation(self):
@@ -292,7 +306,32 @@ class Experiment(object):
 			print("****************************\n")
 			self.run_dyad()
 
-	def run_dyad_with_parameters(self, w, alpha):
+	def run_simulation_arthur(self, attraction=1, win_stay=1, stubbornness=1, repulsion=1):
 
-            self.modelParameters = [w, alpha] + self.modelParameters[2:]
-            self.run_dyad()
+		IT = self.gameParameters[4] # number of experiments in a set
+
+		for k in range(self.gameParameters[1]):
+			# Determining if player k follows attraction heuristic
+			if uniform(0,1) < attraction:
+				pass
+			else:
+				self.modelParameters[:4 + k * (13)] = [0] * 4
+
+			# Determining if player k follows win_stay heuristic
+			if uniform(0,1) < attraction:
+				self.modelParameters[4 + k * (13):7 + k * (13)] = [100, 100, 31]
+			else:
+				self.modelParameters[4 + k * (13):7 + k * (13)] = [0] * 4
+
+			# Determining if player k follows stubbornness heuristic
+			if uniform(0,1) < attraction:
+				self.modelParameters[7 + k * (13):10 + k * (13)] = [100, 100, 31]
+			else:
+				self.modelParameters[7 + k * (13):10 + k * (13)] = [0] * 4
+
+		for h in range(0, IT):
+			print("****************************")
+			print("Running dyad no. ", h + 1)
+			print("****************************\n")
+
+			self.run_dyad()

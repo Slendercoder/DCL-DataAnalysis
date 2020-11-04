@@ -82,6 +82,25 @@ getFreq <- function(df) {
   return (df[c('Region', 'Score', 'freqs')])
 } 
 
+getRelFreq_Rows_DLindex <- function(df) {
+  # Obtains the relative frequencies for transition from region i and score s to region k
+  # Input: k, the region the player is going to
+  #        df, the dataframe from which the observations are obtained
+  # Output: Relative frequency
+  df <- df[complete.cases(df), ]
+  df$Region <- df$Category
+  df <- df[df$RegionGo != "", ]
+  df <- df %>% select('Region', 'DLIndex', 'RegionGo')
+  df <- df %>%
+    dplyr::group_by(Region, DLIndex, RegionGo) %>%
+    dplyr::summarize(n = n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(Region, DLIndex) %>%
+    dplyr::mutate(n1 = sum(n),
+                  Freqs = n/n1)  
+  return(df[c('Region', 'DLIndex', 'RegionGo', 'Freqs')])
+}
+
 getRelFreq_Rows <- function(df) {
   # Obtains the relative frequencies for transition from region i and score s to region k
   # Input: k, the region the player is going to
@@ -97,7 +116,7 @@ getRelFreq_Rows <- function(df) {
     dplyr::ungroup() %>%
     dplyr::group_by(Region, Score) %>%
     dplyr::mutate(n1 = sum(n),
-                  Freqs = n/n1)  
+                  Freqs = n/n1)
   return(df[c('Region', 'Score', 'RegionGo', 'Freqs')])
 }
 

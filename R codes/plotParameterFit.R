@@ -1,18 +1,19 @@
 source("Model_Plots.R")
-source('MODELpred-4deltas.R') # Load after Model_Plots
+source('MODELpred.R') # Load after Model_Plots
 
 ####################################################
 # Loading parameters from estimations...
 ####################################################
-archivo <- "../Data/parameter_fit_humans.csv"
+archivo <- "../Data/parameter_fit_humans-Y.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 parametros = read.csv(archivo)
-thetaWS <- unlist(parametros[parametros['Model']=='WSLS', ][2:14])
+thetaWS <- unlist(parametros[parametros['Model']=='WSLS', ][2:11])
 imprimir(thetaWS)
-thetaFR <- unlist(parametros[parametros['Model']=='FRA', ][2:14])
+thetaFR <- unlist(parametros[parametros['Model']=='FRA', ][2:11])
 imprimir(thetaFR)
 
-archivo <- "../Data/humans_only_absent_perfect.csv"
+archivo <- "../Data/new_humans_only_absent.csv"
+# archivo <- "../Data/humans_only_absent_perfect.csv"
 # archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))

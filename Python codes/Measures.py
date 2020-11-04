@@ -13,7 +13,7 @@ Num_Loc = 8
 CLASIFICAR = False
 CONTINUO = False
 CONTADOR = 1
-TOLERANCIA = 0.9
+TOLERANCIA = 6
 
 # List of columns for region visited
 cols1 = ['a' + str(i) + str(j) \
@@ -367,7 +367,7 @@ def get_measures(data, lista):
         # --------------------------------------------------
         # Classify region per round, per player
         # --------------------------------------------------
-        print("Classifying regions (please be patient)...")
+        print("Classifying regions...")
 
         # Deterimining list of columns
         cols1 = ['a' + str(i) + str(j) for i in range(1, Num_Loc + 1) for j in range(1, Num_Loc + 1)]
@@ -471,7 +471,8 @@ def get_measures(data, lista):
         # Finding distance to closest focal region per round, per player
         # --------------------------------------------------
         print("Finding distances to focal regions (please be patient)...")
-        data['Similarity'] = data.apply(lambda x: FRA.maxSim2Focal(x[cols1], Num_Loc), axis=1)
+        # data['Similarity'] = data.apply(lambda x: FRA.maxSim2Focal(x[cols1], Num_Loc), axis=1)
+        data['Similarity'] = data.apply(lambda x: FRA.minDist2Focal(x[cols1], regionsCoded), axis=1)
 
     # --------------------------------------------------
     # Finding the lag and lead variables

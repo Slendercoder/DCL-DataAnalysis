@@ -133,7 +133,30 @@ plot_FocalTransitions <- function(df) {
     geom_point(aes(x = Score, y = Freqs), df, alpha = alpha, size=1.5) + 
     scale_x_continuous(limits = c(min_score, max_score)) + 
     scale_y_continuous(limits = c(0, 1.01)) + 
-    xlab("Score") +
+    xlab("DLIndex") +
+    #  ylab("") +
+    ylab("Rel. Freq./Probability") +
+    ggtitle("Re-select focal") +
+    theme_bw()
+  
+  return (g)
+  
+}
+
+plot_FocalTransitions_DLindex <- function(df) {
+  
+  df <- df[df$Region != 'RS', ]
+  df <- df[df$Region == df$RegionGo, ]
+  
+  min_score <- 0
+  max_score <- 1
+  alpha <- 0.5
+  
+  g <- ggplot() +
+    geom_point(aes(x = DLIndex, y = Freqs), df, alpha = alpha, size=1.5) + 
+    scale_x_continuous(limits = c(min_score, max_score)) + 
+    scale_y_continuous(limits = c(0, 1.01)) + 
+    xlab("DLIndex") +
     #  ylab("") +
     ylab("Rel. Freq./Probability") +
     ggtitle("Re-select focal") +
