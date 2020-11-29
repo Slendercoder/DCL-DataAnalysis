@@ -12,9 +12,9 @@ imprimir(thetaWS)
 thetaFR <- unlist(parametros[parametros['Model']=='FRA', ][2:11])
 imprimir(thetaFR)
 
-archivo <- "../Data/new_humans_only_absent.csv"
+# archivo <- "../Data/new_humans_only_absent.csv"
 # archivo <- "../Data/humans_only_absent_perfect.csv"
-# archivo <- "../Data/humans_only_absent.csv"
+ archivo <- "../Data/humans_only_absent.csv"
 # archivo <- "../Data/high_performing_human_dyads.csv"
 print(paste("Loading and preparing data", archivo, "..."))
 df = read.csv(archivo)
